@@ -1,0 +1,1056 @@
+{
+ "product": "MarketMind Pro",
+ "run_date": "2026-10-23",
+ "data_as_of": "2026-10-22",
+ "target_date": "2026-10-30",
+ "horizon": "7 calendar days (5 trading days)",
+ "universe_counts": {
+  "nse": 2613,
+  "bse": 5374,
+  "total": 7987
+ },
+ "stage_counts": {
+  "universe": 7987,
+  "with_data": 2359,
+  "liquid": 1621,
+  "stage2": 145,
+  "quality_passed": 83
+ },
+ "picks": [
+  {
+   "symbol": "MAHASTEEL",
+   "name": "Mahamaya Steel Industries Limited",
+   "exchange": "NSE",
+   "current_price": 1420.5,
+   "trader_score": 92.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b91212.13) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "Volume 2.6\u00d7 20-day average on an up day",
+    "OBV trending up \u2014 accumulation",
+    "Hammer"
+   ],
+   "patterns": [
+    "Hammer",
+    "Three white soldiers"
+   ],
+   "support": 766.4000244140625,
+   "resistance": 1422.9000244140625,
+   "high52": 1422.9000244140625,
+   "stop_loss": 1292.42,
+   "target": 1548.58,
+   "target2": 1612.62,
+   "risk_reward": 1.0,
+   "rsi": 71.4,
+   "adx": 24.4,
+   "volume_ratio": 2.6,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 9.33,
+   "predicted_price": 1553.02,
+   "range_low": 1438.46,
+   "range_high": 1667.58,
+   "backtest": {
+    "ml_mape": 4.53,
+    "ml_dir_acc": 91.7,
+    "drift_mape": 8.57,
+    "drift_dir_acc": 50.0,
+    "naive_mape": 8.02,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 4.53,
+    "best_dir_acc": 91.7,
+    "windows": 12
+   },
+   "quality_pass": true
+  },
+  {
+   "symbol": "LAGNAM",
+   "name": "Lagnam Spintex Limited",
+   "exchange": "NSE",
+   "current_price": 98.01,
+   "trader_score": 89.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b978.91) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 82 \u2014 overbought, chase risk",
+    "MACD histogram positive",
+    "ADX 25 \u2014 strong uptrend",
+    "Volume 2.3\u00d7 20-day average on an up day"
+   ],
+   "patterns": [
+    "Bullish engulfing"
+   ],
+   "support": 68.0999984741211,
+   "resistance": 107.9000015258789,
+   "high52": 107.9000015258789,
+   "stop_loss": 86.82,
+   "target": 109.2,
+   "target2": 114.8,
+   "risk_reward": 1.0,
+   "rsi": 82.2,
+   "adx": 25.5,
+   "volume_ratio": 2.28,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 9.08,
+   "predicted_price": 106.91,
+   "range_low": 96.9,
+   "range_high": 116.92,
+   "backtest": {
+    "ml_mape": 2.64,
+    "ml_dir_acc": 75.0,
+    "drift_mape": 3.33,
+    "drift_dir_acc": 58.3,
+    "naive_mape": 3.42,
+    "naive_dir_acc": 8.3,
+    "best_model": "ml",
+    "best_mape": 2.64,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true
+  },
+  {
+   "symbol": "SHREERAMA",
+   "name": "Shree Rama Multi-Tech Limited",
+   "exchange": "NSE",
+   "current_price": 53.81,
+   "trader_score": 91.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b947.50) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 61 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "ADX 28 \u2014 strong uptrend",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Inside bar (compression)"
+   ],
+   "support": 37.619998931884766,
+   "resistance": 60.0,
+   "high52": 71.98999786376953,
+   "stop_loss": 45.89,
+   "target": 61.73,
+   "target2": 65.68,
+   "risk_reward": 1.0,
+   "rsi": 61.1,
+   "adx": 28.0,
+   "volume_ratio": 0.75,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 7.58,
+   "predicted_price": 57.89,
+   "range_low": 50.81,
+   "range_high": 64.97,
+   "backtest": {
+    "ml_mape": 5.86,
+    "ml_dir_acc": 83.3,
+    "drift_mape": 6.54,
+    "drift_dir_acc": 58.3,
+    "naive_mape": 6.52,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 5.86,
+    "best_dir_acc": 83.3,
+    "windows": 12
+   },
+   "quality_pass": true
+  },
+  {
+   "symbol": "TBZ",
+   "name": "Tribhovandas Bhimji Zaveri Limited",
+   "exchange": "NSE",
+   "current_price": 715.15,
+   "trader_score": 87.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9649.43) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 65 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "ADX 36 \u2014 strong uptrend",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [],
+   "support": 232.5,
+   "resistance": 789.0,
+   "high52": 789.0,
+   "stop_loss": 636.45,
+   "target": 793.85,
+   "target2": 833.2,
+   "risk_reward": 1.0,
+   "rsi": 64.9,
+   "adx": 36.1,
+   "volume_ratio": 1.03,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 9.59,
+   "predicted_price": 783.75,
+   "range_low": 694.36,
+   "range_high": 873.14,
+   "backtest": {
+    "ml_mape": 9.37,
+    "ml_dir_acc": 75.0,
+    "drift_mape": 14.79,
+    "drift_dir_acc": 58.3,
+    "naive_mape": 13.66,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 9.37,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true
+  },
+  {
+   "symbol": "OAL",
+   "name": "Oriental Aromatics Limited",
+   "exchange": "NSE",
+   "current_price": 589.4,
+   "trader_score": 84.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9549.22) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 63 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "ADX 32 \u2014 strong uptrend",
+    "Volume well below average \u2014 low conviction"
+   ],
+   "patterns": [
+    "Three black crows"
+   ],
+   "support": 332.1499938964844,
+   "resistance": 639.0,
+   "high52": 639.0,
+   "stop_loss": 519.4,
+   "target": 659.4,
+   "target2": 694.41,
+   "risk_reward": 1.0,
+   "rsi": 62.9,
+   "adx": 31.7,
+   "volume_ratio": 0.21,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 10.26,
+   "predicted_price": 649.89,
+   "range_low": 587.27,
+   "range_high": 712.5,
+   "backtest": {
+    "ml_mape": 7.02,
+    "ml_dir_acc": 75.0,
+    "drift_mape": 7.88,
+    "drift_dir_acc": 58.3,
+    "naive_mape": 7.78,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 7.02,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true
+  },
+  {
+   "symbol": "PASHUPATI",
+   "name": "Pashupati Cotspin Limited",
+   "exchange": "NSE",
+   "current_price": 99.31,
+   "trader_score": 87.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b981.57) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "ADX 54 \u2014 strong uptrend",
+    "Volume 3.1\u00d7 20-day average on an up day",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [],
+   "support": 67.5,
+   "resistance": 111.26000213623047,
+   "high52": 118.3499984741211,
+   "stop_loss": 87.47,
+   "target": 111.15,
+   "target2": 117.07,
+   "risk_reward": 1.0,
+   "rsi": 71.4,
+   "adx": 54.2,
+   "volume_ratio": 3.06,
+   "model_used": "ml+drift blend, best=drift",
+   "predicted_return_pct": 9.48,
+   "predicted_price": 108.72,
+   "range_low": 98.14,
+   "range_high": 119.31,
+   "backtest": {
+    "ml_mape": 3.73,
+    "ml_dir_acc": 41.7,
+    "drift_mape": 3.5,
+    "drift_dir_acc": 66.7,
+    "naive_mape": 3.57,
+    "naive_dir_acc": 0.0,
+    "best_model": "drift",
+    "best_mape": 3.5,
+    "best_dir_acc": 66.7,
+    "windows": 12
+   },
+   "quality_pass": true
+  },
+  {
+   "symbol": "PCJEWELLER",
+   "name": "PC Jeweller Limited",
+   "exchange": "NSE",
+   "current_price": 18.07,
+   "trader_score": 81.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b914.92) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "ADX 35 \u2014 strong uptrend",
+    "Volume 1.8\u00d7 average but on a down day \u2014 distribution",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [],
+   "support": 8.979999542236328,
+   "resistance": 20.100000381469727,
+   "high52": 20.100000381469727,
+   "stop_loss": 15.75,
+   "target": 20.39,
+   "target2": 21.55,
+   "risk_reward": 1.0,
+   "rsi": 74.3,
+   "adx": 34.6,
+   "volume_ratio": 1.8,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 11.66,
+   "predicted_price": 20.18,
+   "range_low": 18.1,
+   "range_high": 22.25,
+   "backtest": {
+    "ml_mape": 6.41,
+    "ml_dir_acc": 75.0,
+    "drift_mape": 8.36,
+    "drift_dir_acc": 58.3,
+    "naive_mape": 8.45,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 6.41,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true
+  }
+ ],
+ "allocation": null,
+ "stage1_top50": [
+  {
+   "symbol": "ANANDRATHI",
+   "name": "Anand Rathi Wealth Limited",
+   "exchange": "NSE",
+   "current_price": 2235.0,
+   "trader_score": 100.0,
+   "rsi": 63.6,
+   "ret21_pct": 2.57,
+   "reasons": [
+    "Price above 21-EMA (\u20b92159.28) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CYIENT",
+   "name": "Cyient Limited",
+   "exchange": "NSE",
+   "current_price": 1233.0,
+   "trader_score": 100.0,
+   "rsi": 66.7,
+   "ret21_pct": 14.27,
+   "reasons": [
+    "Price above 21-EMA (\u20b91142.22) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SGMART",
+   "name": "SG Mart Limited",
+   "exchange": "NSE",
+   "current_price": 796.8,
+   "trader_score": 100.0,
+   "rsi": 57.9,
+   "ret21_pct": 10.39,
+   "reasons": [
+    "Price above 21-EMA (\u20b9762.66) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "JINDALPOLY",
+   "name": "Jindal Poly Films Limited",
+   "exchange": "NSE",
+   "current_price": 739.35,
+   "trader_score": 98.0,
+   "rsi": 61.7,
+   "ret21_pct": 2.42,
+   "reasons": [
+    "Price above 21-EMA (\u20b9681.86) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MAHASTEEL",
+   "name": "Mahamaya Steel Industries Limited",
+   "exchange": "NSE",
+   "current_price": 1473.5,
+   "trader_score": 97.0,
+   "rsi": 74.1,
+   "ret21_pct": 33.74,
+   "reasons": [
+    "Price above 21-EMA (\u20b91235.89) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PANACHE",
+   "name": "Panache Digilife Limited",
+   "exchange": "NSE",
+   "current_price": 652.7,
+   "trader_score": 96.0,
+   "rsi": 66.9,
+   "ret21_pct": 28.08,
+   "reasons": [
+    "Price above 21-EMA (\u20b9605.43) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SHREERAMA",
+   "name": "Shree Rama Multi-Tech Limited",
+   "exchange": "NSE",
+   "current_price": 58.97,
+   "trader_score": 96.0,
+   "rsi": 66.5,
+   "ret21_pct": 34.97,
+   "reasons": [
+    "Price above 21-EMA (\u20b948.55) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KROSS",
+   "name": "Kross Limited",
+   "exchange": "NSE",
+   "current_price": 306.55,
+   "trader_score": 95.0,
+   "rsi": 68.3,
+   "ret21_pct": 19.69,
+   "reasons": [
+    "Price above 21-EMA (\u20b9266.05) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ALGOQUANT",
+   "name": "Algoquant Fintech Limited",
+   "exchange": "NSE",
+   "current_price": 74.73,
+   "trader_score": 92.0,
+   "rsi": 65.0,
+   "ret21_pct": 3.45,
+   "reasons": [
+    "Price above 21-EMA (\u20b970.38) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BMWVENTLTD",
+   "name": "BMW Ventures Limited",
+   "exchange": "NSE",
+   "current_price": 63.7,
+   "trader_score": 92.0,
+   "rsi": 58.2,
+   "ret21_pct": 22.69,
+   "reasons": [
+    "Price above 21-EMA (\u20b960.57) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "FSL",
+   "name": "Firstsource Solutions Limited",
+   "exchange": "NSE",
+   "current_price": 290.4,
+   "trader_score": 92.0,
+   "rsi": 62.3,
+   "ret21_pct": 7.76,
+   "reasons": [
+    "Price above 21-EMA (\u20b9275.48) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "NAZARA",
+   "name": "Nazara Technologies Limited",
+   "exchange": "NSE",
+   "current_price": 402.15,
+   "trader_score": 92.0,
+   "rsi": 58.2,
+   "ret21_pct": 8.56,
+   "reasons": [
+    "Price above 21-EMA (\u20b9390.77) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "REGAAL",
+   "name": "Regaal Resources Limited",
+   "exchange": "NSE",
+   "current_price": 88.43,
+   "trader_score": 92.0,
+   "rsi": 52.5,
+   "ret21_pct": -9.03,
+   "reasons": [
+    "Price above 21-EMA (\u20b987.41) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SSWL",
+   "name": "Steel Strips Wheels Limited",
+   "exchange": "NSE",
+   "current_price": 468.75,
+   "trader_score": 92.0,
+   "rsi": 70.8,
+   "ret21_pct": 28.5,
+   "reasons": [
+    "Price above 21-EMA (\u20b9402.39) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "UTTAMSUGAR",
+   "name": "Uttam Sugar Mills Limited",
+   "exchange": "NSE",
+   "current_price": 352.4,
+   "trader_score": 92.0,
+   "rsi": 58.3,
+   "ret21_pct": 36.46,
+   "reasons": [
+    "Price above 21-EMA (\u20b9331.64) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CRISIL",
+   "name": "Crisil Limited",
+   "exchange": "NSE",
+   "current_price": 4751.1,
+   "trader_score": 90.0,
+   "rsi": 62.4,
+   "ret21_pct": 4.2,
+   "reasons": [
+    "Price above 21-EMA (\u20b94562.34) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "DCMSRIND",
+   "name": "DCM Shriram Industries Limited",
+   "exchange": "NSE",
+   "current_price": 49.97,
+   "trader_score": 90.0,
+   "rsi": 64.6,
+   "ret21_pct": 31.95,
+   "reasons": [
+    "Price above 21-EMA (\u20b943.29) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Below 200-EMA \u2014 long-term trend down"
+   ]
+  },
+  {
+   "symbol": "DHANBANK",
+   "name": "Dhanlaxmi Bank Limited",
+   "exchange": "NSE",
+   "current_price": 35.76,
+   "trader_score": 90.0,
+   "rsi": 60.9,
+   "ret21_pct": 22.55,
+   "reasons": [
+    "Price above 21-EMA (\u20b933.26) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "GCSL",
+   "name": "Gretex Corporate Services Limited",
+   "exchange": "NSE",
+   "current_price": 726.2,
+   "trader_score": 90.0,
+   "rsi": 69.0,
+   "ret21_pct": 13.61,
+   "reasons": [
+    "Price above 21-EMA (\u20b9695.47) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "HILINFRA",
+   "name": "Highway Infrastructure Limited",
+   "exchange": "NSE",
+   "current_price": 54.52,
+   "trader_score": 90.0,
+   "rsi": 69.8,
+   "ret21_pct": 26.03,
+   "reasons": [
+    "Price above 21-EMA (\u20b950.05) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KOLTEPATIL",
+   "name": "Kolte - Patil Developers Limited",
+   "exchange": "NSE",
+   "current_price": 458.3,
+   "trader_score": 90.0,
+   "rsi": 62.7,
+   "ret21_pct": 5.22,
+   "reasons": [
+    "Price above 21-EMA (\u20b9431.95) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "LTTS",
+   "name": "L&T Technology Services Limited",
+   "exchange": "NSE",
+   "current_price": 3910.3,
+   "trader_score": 90.0,
+   "rsi": 69.2,
+   "ret21_pct": 18.72,
+   "reasons": [
+    "Price above 21-EMA (\u20b93545.11) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MASTEK",
+   "name": "Mastek Limited",
+   "exchange": "NSE",
+   "current_price": 1761.6,
+   "trader_score": 90.0,
+   "rsi": 56.4,
+   "ret21_pct": 12.35,
+   "reasons": [
+    "Price above 21-EMA (\u20b91713.46) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SOUTHBANK",
+   "name": "The South Indian Bank Limited",
+   "exchange": "NSE",
+   "current_price": 52.57,
+   "trader_score": 90.0,
+   "rsi": 60.5,
+   "ret21_pct": 16.23,
+   "reasons": [
+    "Price above 21-EMA (\u20b950.29) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TANLA",
+   "name": "Tanla Platforms Limited",
+   "exchange": "NSE",
+   "current_price": 557.15,
+   "trader_score": 90.0,
+   "rsi": 59.3,
+   "ret21_pct": 14.79,
+   "reasons": [
+    "Price above 21-EMA (\u20b9532.01) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "UNIONBANK",
+   "name": "Union Bank of India",
+   "exchange": "NSE",
+   "current_price": 178.9,
+   "trader_score": 90.0,
+   "rsi": 54.1,
+   "ret21_pct": 0.51,
+   "reasons": [
+    "Price above 21-EMA (\u20b9176.11) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BAJAJHLDNG",
+   "name": "Bajaj Holdings & Investment Limited",
+   "exchange": "NSE",
+   "current_price": 11175.0,
+   "trader_score": 89.0,
+   "rsi": 54.2,
+   "ret21_pct": -0.09,
+   "reasons": [
+    "Price above 21-EMA (\u20b911003.81) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CANTABIL",
+   "name": "Cantabil Retail India Limited",
+   "exchange": "NSE",
+   "current_price": 244.59,
+   "trader_score": 89.0,
+   "rsi": 55.5,
+   "ret21_pct": 2.4,
+   "reasons": [
+    "Price above 21-EMA (\u20b9241.34) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "DCI",
+   "name": "Dc Infotech And Communication Limited",
+   "exchange": "NSE",
+   "current_price": 334.15,
+   "trader_score": 89.0,
+   "rsi": 53.6,
+   "ret21_pct": 21.13,
+   "reasons": [
+    "Price above 21-EMA (\u20b9328.79) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "RATNAVEER",
+   "name": "Ratnaveer Precision Engineering Limited",
+   "exchange": "NSE",
+   "current_price": 330.7,
+   "trader_score": 89.0,
+   "rsi": 53.1,
+   "ret21_pct": -0.48,
+   "reasons": [
+    "Price above 21-EMA (\u20b9329.20) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "VIJIFIN",
+   "name": "Viji Finance Limited",
+   "exchange": "NSE",
+   "current_price": 16.01,
+   "trader_score": 89.0,
+   "rsi": 56.6,
+   "ret21_pct": 2.63,
+   "reasons": [
+    "Price above 21-EMA (\u20b915.47) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "HEXT",
+   "name": "Hexaware Technologies Limited",
+   "exchange": "NSE",
+   "current_price": 590.8,
+   "trader_score": 88.0,
+   "rsi": 68.2,
+   "ret21_pct": 17.18,
+   "reasons": [
+    "Price above 21-EMA (\u20b9551.44) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "INDHOTEL",
+   "name": "The Indian Hotels Company Limited",
+   "exchange": "NSE",
+   "current_price": 781.75,
+   "trader_score": 88.0,
+   "rsi": 65.3,
+   "ret21_pct": 6.18,
+   "reasons": [
+    "Price above 21-EMA (\u20b9742.27) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MAWANASUG",
+   "name": "Mawana Sugars Limited",
+   "exchange": "NSE",
+   "current_price": 161.22,
+   "trader_score": 88.0,
+   "rsi": 55.2,
+   "ret21_pct": 22.67,
+   "reasons": [
+    "Price above 21-EMA (\u20b9157.78) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SHYAMMETL",
+   "name": "Shyam Metalics and Energy Limited",
+   "exchange": "NSE",
+   "current_price": 1131.3,
+   "trader_score": 88.0,
+   "rsi": 53.4,
+   "ret21_pct": 3.4,
+   "reasons": [
+    "Price above 21-EMA (\u20b91122.74) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BHARTIHEXA",
+   "name": "Bharti Hexacom Limited",
+   "exchange": "NSE",
+   "current_price": 1637.9,
+   "trader_score": 87.0,
+   "rsi": 65.0,
+   "ret21_pct": 6.75,
+   "reasons": [
+    "Price above 21-EMA (\u20b91556.24) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ICICIBANK",
+   "name": "ICICI Bank Limited",
+   "exchange": "NSE",
+   "current_price": 1394.2,
+   "trader_score": 87.0,
+   "rsi": 57.4,
+   "ret21_pct": 4.08,
+   "reasons": [
+    "Price above 21-EMA (\u20b91367.47) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MPHASIS",
+   "name": "MphasiS Limited",
+   "exchange": "NSE",
+   "current_price": 2480.0,
+   "trader_score": 87.0,
+   "rsi": 59.3,
+   "ret21_pct": 9.49,
+   "reasons": [
+    "Price above 21-EMA (\u20b92404.17) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CUBEXTUB",
+   "name": "Cubex Tubings Limited",
+   "exchange": "NSE",
+   "current_price": 212.17,
+   "trader_score": 86.0,
+   "rsi": 72.1,
+   "ret21_pct": 102.36,
+   "reasons": [
+    "Price above 21-EMA (\u20b9179.83) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "FEDERALBNK",
+   "name": "The Federal Bank  Limited",
+   "exchange": "NSE",
+   "current_price": 340.9,
+   "trader_score": 86.0,
+   "rsi": 54.9,
+   "ret21_pct": 4.25,
+   "reasons": [
+    "Price above 21-EMA (\u20b9335.26) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "LAGNAM",
+   "name": "Lagnam Spintex Limited",
+   "exchange": "NSE",
+   "current_price": 89.78,
+   "trader_score": 86.0,
+   "rsi": 64.9,
+   "ret21_pct": 21.31,
+   "reasons": [
+    "Price above 21-EMA (\u20b979.90) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "NINSYS",
+   "name": "NINtec Systems Limited",
+   "exchange": "NSE",
+   "current_price": 876.1,
+   "trader_score": 86.0,
+   "rsi": 68.3,
+   "ret21_pct": 23.21,
+   "reasons": [
+    "Price above 21-EMA (\u20b9816.83) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "OAL",
+   "name": "Oriental Aromatics Limited",
+   "exchange": "NSE",
+   "current_price": 577.45,
+   "trader_score": 86.0,
+   "rsi": 59.4,
+   "ret21_pct": 3.69,
+   "reasons": [
+    "Price above 21-EMA (\u20b9551.78) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ORIENTHOT",
+   "name": "Oriental Hotels Limited",
+   "exchange": "NSE",
+   "current_price": 151.76,
+   "trader_score": 86.0,
+   "rsi": 62.1,
+   "ret21_pct": 6.21,
+   "reasons": [
+    "Price above 21-EMA (\u20b9144.79) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SEJALLTD",
+   "name": "Sejal Glass Limited",
+   "exchange": "NSE",
+   "current_price": 845.45,
+   "trader_score": 86.0,
+   "rsi": 60.8,
+   "ret21_pct": 26.89,
+   "reasons": [
+    "Price above 21-EMA (\u20b9772.03) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KRISHANA",
+   "name": "Krishana Phoschem Limited",
+   "exchange": "NSE",
+   "current_price": 199.66,
+   "trader_score": 85.0,
+   "rsi": 54.0,
+   "ret21_pct": 5.33,
+   "reasons": [
+    "Price above 21-EMA (\u20b9197.46) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PNB",
+   "name": "Punjab National Bank",
+   "exchange": "NSE",
+   "current_price": 120.37,
+   "trader_score": 85.0,
+   "rsi": 58.0,
+   "ret21_pct": 2.88,
+   "reasons": [
+    "Price above 21-EMA (\u20b9117.42) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PNGSREVA",
+   "name": "PNGS Reva Diamond Jewellery Limited",
+   "exchange": "NSE",
+   "current_price": 632.5,
+   "trader_score": 85.0,
+   "rsi": 55.2,
+   "ret21_pct": 23.61,
+   "reasons": [
+    "Price above 21-EMA (\u20b9619.05) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SASKEN",
+   "name": "Sasken Technologies Limited",
+   "exchange": "NSE",
+   "current_price": 1788.3,
+   "trader_score": 85.0,
+   "rsi": 56.6,
+   "ret21_pct": 1.86,
+   "reasons": [
+    "Price above 21-EMA (\u20b91692.44) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SINGERIND",
+   "name": "Singer India Limited",
+   "exchange": "NSE",
+   "current_price": 86.04,
+   "trader_score": 85.0,
+   "rsi": 58.2,
+   "ret21_pct": 11.36,
+   "reasons": [
+    "Price above 21-EMA (\u20b981.36) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  }
+ ],
+ "evaluated_count": 145
+}

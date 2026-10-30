@@ -1,0 +1,29 @@
+{
+  "rules": [
+    {
+      "id": "tcs.ns-plan-stop",
+      "symbol": "TCS.NS",
+      "type": "stop",
+      "price": 2510.5,
+      "note": "plan stop: opening-range midpoint",
+      "date": "2026-10-30"
+    },
+    {
+      "id": "tcs.ns-plan-target",
+      "symbol": "TCS.NS",
+      "type": "target",
+      "price": 2542.9,
+      "note": "plan target: 2R (two times the risk)",
+      "date": "2026-10-30"
+    },
+    {
+      "id": "tcs.ns-flat-by",
+      "symbol": "TCS.NS",
+      "type": "time",
+      "at": "15:20",
+      "label": "flat by close",
+      "before_close": true,
+      "date": "2026-10-30"
+    }
+  ]
+}

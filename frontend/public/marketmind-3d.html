@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarketMind Pro — 3D Stock Market Prediction Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #F4F5F7;
+      color: #0A0A0C;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+    }
+    #webgl-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      outline: none;
+    }
+
+    /* Minimalist Film HUD Overlay */
+    .hud-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 32px 40px;
+      z-index: 10;
+    }
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #0A0A0C;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .orange-dot {
+      width: 7px;
+      height: 7px;
+      background: #FF5500;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 85, 0, 0.6);
+      display: inline-block;
+    }
+    .shot-tag {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #71717A;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .shot-tag span.index {
+      color: #0A0A0C;
+      font-weight: 600;
+    }
+    .shot-tag span.pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #FF5500;
+      box-shadow: 0 0 8px #FF5500;
+    }
+    .hud-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .shot-description {
+      font-family: 'Geist', sans-serif;
+      font-size: 13.5px;
+      font-weight: 400;
+      color: #52525B;
+      max-width: 460px;
+      line-height: 1.5;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .shot-name {
+      font-weight: 600;
+      color: #0A0A0C;
+      margin-bottom: 2px;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .shot-name span.ticker-tag {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      background: #0A0A0C;
+      color: #FFF;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .timeline-controls {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .shot-pills {
+      display: flex;
+      gap: 6px;
+    }
+    .shot-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: #52525B;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .shot-btn:hover {
+      background: #FFFFFF;
+      color: #0A0A0C;
+      border-color: rgba(0, 0, 0, 0.25);
+    }
+    .shot-btn.active {
+      background: #0A0A0C;
+      color: #FFFFFF;
+      border-color: #0A0A0C;
+    }
+    .scrubber-track {
+      width: 280px;
+      height: 4px;
+      background: rgba(0, 0, 0, 0.08);
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+    }
+    .scrubber-fill {
+      height: 100%;
+      background: #0A0A0C;
+      border-radius: 2px;
+      width: 0%;
+      position: relative;
+    }
+    .scrubber-handle {
+      position: absolute;
+      right: -5px;
+      top: -3.5px;
+      width: 11px;
+      height: 11px;
+      background: #FF5500;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(255, 85, 0, 0.6);
+    }
+
+    /* Final Wordmark Overlay */
+    .final-title-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 12;
+    }
+    .final-title-overlay.visible {
+      opacity: 1;
+    }
+    .final-title-overlay h1 {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #0A0A0C;
+      margin-bottom: 6px;
+    }
+    .final-title-overlay h1 em {
+      font-style: normal;
+      color: #FF5500;
+    }
+    .final-title-overlay p {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      color: #71717A;
+      text-transform: uppercase;
+    }
+
+    /* Render Mode Hides All UI Overlays */
+    body.render-mode .hud-layer {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="webgl-canvas"></canvas>
+
+  <div class="hud-layer">
+    <div class="hud-top">
+      <div class="brand-mark">
+        <span class="orange-dot"></span>
+        MarketMind Pro // 3D Prediction Space
+      </div>
+      <div class="shot-tag">
+        <span class="pulse"></span>
+        <span class="index" id="shot-badge">SHOT 1 / 6</span>
+        <span id="shot-move-badge">MACRO &amp; RACK FOCUS</span>
+      </div>
+    </div>
+    
+    <div class="hud-bottom">
+      <div class="shot-description">
+        <div class="shot-name" id="shot-title">
+          01. Macro &amp; Rack Focus
+          <span class="ticker-tag" id="shot-ticker">RELIANCE.NS</span>
+        </div>
+        <div id="shot-desc">Rack focus from the tactile beveled card edge onto the live 90-day candlestick trajectory and ML 5-day horizon forecast.</div>
+      </div>
+      
+      <div class="timeline-controls">
+        <div class="shot-pills">
+          <button class="shot-btn active" data-shot="0">1</button>
+          <button class="shot-btn" data-shot="1">2</button>
+          <button class="shot-btn" data-shot="2">3</button>
+          <button class="shot-btn" data-shot="3">4</button>
+          <button class="shot-btn" data-shot="4">5</button>
+          <button class="shot-btn" data-shot="5">6</button>
+        </div>
+        <div class="scrubber-track" id="scrubber-track">
+          <div class="scrubber-fill" id="scrubber-fill">
+            <div class="scrubber-handle"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="final-title-overlay" id="final-title">
+    <h1>MARKETMIND <em>PRO</em></h1>
+    <p>Institutional-Grade Indian Stock Prediction · NSE + BSE</p>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    // ----------------------------------------------------
+    // Configuration & Deterministic Constants
+    // ----------------------------------------------------
+    const TOTAL_DURATION = 20.0;
+    const SHOT_DURATIONS = [3.333, 3.333, 3.334, 3.333, 3.667, 3.000];
+    const SHOT_STARTS = [0];
+    for (let i = 0; i < SHOT_DURATIONS.length - 1; i++) {
+      SHOT_STARTS.push(SHOT_STARTS[i] + SHOT_DURATIONS[i]);
+    }
+
+    const SHOT_METADATA = [
+      { name: "01. Macro & Rack Focus", ticker: "RELIANCE.NS", move: "RACK FOCUS", desc: "Extreme close-up on the tactile beveled card edge, racking focus onto live 90-day candlestick action and 5-day ML price target." },
+      { name: "02. Dolly Back & Kinetic Wave", ticker: "NSE CORRIDOR", move: "DOLLY BACK", desc: "Dolly back along the sweeping curved gallery wall; a kinetic orange light wave tilts each stock card with spring physics." },
+      { name: "03. Crane Over Corridors", ticker: "ORB PAVILION", move: "CRANE UP", desc: "Ascending over the wall crest to reveal parallel trading corridors and the central algorithmic Thinking Orb." },
+      { name: "04. Unhinging Thesis Card", ticker: "ML THESIS", move: "PUSH-IN", desc: "Reliance prediction card swings out with physical inertia; the machine learning thesis lifts off as 3D typography." },
+      { name: "05. The Signature Shot", ticker: "TYPOGRAPHY", move: "AERIAL PULL-BACK", desc: "Pulling far back into high-altitude perspective as corridors resolve into MARKETMIND PRO and orange light traces the O." },
+      { name: "06. Wordmark & Settle", ticker: "MARKETMIND", move: "SETTLE", desc: "Architectural alignment on the illuminated typographic floor plan and institutional stock prediction engine." }
+    ];
+
+    const isRenderMode = new URLSearchParams(window.location.search).has('render') || window.RENDER_MODE === true;
+    if (isRenderMode) {
+      document.body.classList.add('render-mode');
+    }
+
+    // Canvas & Three.js Renderer Setup
+    const canvas = document.getElementById('webgl-canvas');
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(isRenderMode ? 1.0 : Math.min(window.devicePixelRatio, 2.0));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.06;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 450);
+
+    // Scene & Environment
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xF2F3F5);
+    scene.fog = new THREE.FogExp2(0xF2F3F5, 0.0035);
+
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    const envTexture = pmremGenerator.fromScene(new RoomEnvironment()).texture;
+    scene.environment = envTexture;
+
+    // ----------------------------------------------------
+    // Lighting Architecture
+    // ----------------------------------------------------
+    const keyLight = new THREE.DirectionalLight(0xFFFDF8, 2.4);
+    keyLight.position.set(45, 80, 40);
+    keyLight.castShadow = true;
+    keyLight.shadow.bias = -0.0001;
+    keyLight.shadow.normalBias = 0.02;
+    keyLight.shadow.mapSize.width = 2048;
+    keyLight.shadow.mapSize.height = 2048;
+    keyLight.shadow.camera.near = 15;
+    keyLight.shadow.camera.far = 240;
+    keyLight.shadow.camera.left = -75;
+    keyLight.shadow.camera.right = 75;
+    keyLight.shadow.camera.top = 75;
+    keyLight.shadow.camera.bottom = -75;
+    keyLight.shadow.radius = 2.5;
+    scene.add(keyLight);
+
+    const fillLight = new THREE.HemisphereLight(0xFFFFFF, 0xD4D8E0, 0.75);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xEAF0FF, 0.65);
+    rimLight.position.set(-45, 30, -50);
+    scene.add(rimLight);
+
+    // Kinetic Orange Point Light
+    const orangePulseLight = new THREE.PointLight(0xFF5500, 0, 38, 2.0);
+    orangePulseLight.position.set(0, 3, 0);
+    scene.add(orangePulseLight);
+
+    // ----------------------------------------------------
+    // Shared Materials (Physically Based)
+    // ----------------------------------------------------
+    // Floor
+    const floorCanvas = document.createElement('canvas');
+    floorCanvas.width = 512;
+    floorCanvas.height = 512;
+    const fctx = floorCanvas.getContext('2d');
+    fctx.fillStyle = '#EDEDF0';
+    fctx.fillRect(0, 0, 512, 512);
+    fctx.strokeStyle = 'rgba(0,0,0,0.035)';
+    fctx.lineWidth = 2;
+    fctx.strokeRect(0, 0, 512, 512);
+    for (let i = 0; i < 2000; i++) {
+      const x = Math.random() * 512, y = Math.random() * 512;
+      fctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.015)';
+      fctx.fillRect(x, y, 1.5, 1.5);
+    }
+    const floorTexture = new THREE.CanvasTexture(floorCanvas);
+    floorTexture.wrapS = THREE.RepeatWrapping;
+    floorTexture.wrapT = THREE.RepeatWrapping;
+    floorTexture.repeat.set(18, 18);
+
+    const floorMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xEEEFF2,
+      roughness: 0.32,
+      metalness: 0.04,
+      clearcoat: 0.15,
+      clearcoatRoughness: 0.35,
+      map: floorTexture
+    });
+
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(380, 380), floorMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    // Gallery Walls
+    const wallMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xF5F6F8,
+      roughness: 0.88,
+      metalness: 0.01,
+      reflectivity: 0.15,
+      clearcoat: 0.05
+    });
+
+    // Dark Card Anodized Aluminum Casing
+    const cardCasingMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x141416,
+      roughness: 0.38,
+      metalness: 0.25,
+      clearcoat: 0.15,
+      clearcoatRoughness: 0.25
+    });
+
+    // ----------------------------------------------------
+    // Thinking Orb 3D Mesh in the Center of the "O" Pavilion
+    // ----------------------------------------------------
+    const orbGroup = new THREE.Group();
+    scene.add(orbGroup);
+
+    // Core glass sphere
+    const orbCoreMat = new THREE.MeshPhysicalMaterial({
+      color: 0xFF5500,
+      emissive: 0xFF3300,
+      emissiveIntensity: 0.6,
+      roughness: 0.1,
+      metalness: 0.1,
+      transmission: 0.85,
+      ior: 1.45,
+      clearcoat: 1.0
+    });
+    const orbCore = new THREE.Mesh(new THREE.SphereGeometry(1.2, 32, 32), orbCoreMat);
+    orbGroup.add(orbCore);
+
+    // Outer refractive rings
+    const ringMat = new THREE.MeshPhysicalMaterial({
+      color: 0x18191C,
+      roughness: 0.2,
+      metalness: 0.8,
+      clearcoat: 0.5
+    });
+    const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.65, 0.04, 16, 64), ringMat);
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.95, 0.03, 16, 64), ringMat);
+    orbGroup.add(ring1);
+    orbGroup.add(ring2);
+
+    // ----------------------------------------------------
+    // 10 Curated Indian Stock Prediction Canvas Textures
+    // ----------------------------------------------------
+    const INDIAN_STOCKS = [
+      { symbol: 'RELIANCE', exch: 'NSE', name: 'Reliance Industries', price: 1482.50, pred: 1595.00, ret: 7.6, score: 85, acc: 68.4, pe: 24.2, rsi: 62 },
+      { symbol: 'TCS', exch: 'NSE', name: 'Tata Consultancy Services', price: 3920.00, pred: 4110.00, ret: 4.8, score: 79, acc: 64.2, pe: 28.5, rsi: 54 },
+      { symbol: 'HDFCBANK', exch: 'NSE', name: 'HDFC Bank Ltd', price: 1680.00, pred: 1765.00, ret: 5.1, score: 82, acc: 66.8, pe: 18.9, rsi: 58 },
+      { symbol: 'INFY', exch: 'NSE', name: 'Infosys Limited', price: 1840.00, pred: 1950.00, ret: 6.0, score: 80, acc: 63.5, pe: 26.1, rsi: 60 },
+      { symbol: 'TATAMOTORS', exch: 'NSE', name: 'Tata Motors Limited', price: 940.00, pred: 1025.00, ret: 9.0, score: 88, acc: 71.2, pe: 15.3, rsi: 67 },
+      { symbol: 'ICICIBANK', exch: 'NSE', name: 'ICICI Bank Ltd', price: 1240.00, pred: 1310.00, ret: 5.6, score: 84, acc: 67.5, pe: 17.2, rsi: 59 },
+      { symbol: 'BHARTIARTL', exch: 'NSE', name: 'Bharti Airtel Ltd', price: 1520.00, pred: 1610.00, ret: 5.9, score: 81, acc: 65.0, pe: 38.4, rsi: 56 },
+      { symbol: 'LT', exch: 'NSE', name: 'Larsen & Toubro Ltd', price: 3680.00, pred: 3890.00, ret: 5.7, score: 78, acc: 62.8, pe: 33.1, rsi: 52 },
+      { symbol: 'SBIN', exch: 'NSE', name: 'State Bank of India', price: 815.00, pred: 870.00, ret: 6.7, score: 83, acc: 69.1, pe: 10.8, rsi: 64 },
+      { symbol: 'BAJFINANCE', exch: 'NSE', name: 'Bajaj Finance Limited', price: 7150.00, pred: 7620.00, ret: 6.6, score: 77, acc: 61.5, pe: 31.0, rsi: 51 }
+    ];
+
+    const stockCanvases = [];
+    const stockTextures = [];
+
+    INDIAN_STOCKS.forEach(stock => {
+      const vCan = document.createElement('canvas');
+      vCan.width = 512;
+      vCan.height = 320; // 16:10 cinematic aspect ratio
+      const vTex = new THREE.CanvasTexture(vCan);
+      vTex.generateMipmaps = true;
+      vTex.minFilter = THREE.LinearMipmapLinearFilter;
+      stockCanvases.push(vCan);
+      stockTextures.push(vTex);
+    });
+
+    function renderStockCanvases(tSec) {
+      for (let i = 0; i < INDIAN_STOCKS.length; i++) {
+        const stock = INDIAN_STOCKS[i];
+        const ctx = stockCanvases[i].getContext('2d');
+        const w = 512, h = 320;
+
+        // Dark matte UI background
+        ctx.fillStyle = '#0D0E11';
+        ctx.fillRect(0, 0, w, h);
+
+        // Header Bar
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.fillRect(0, 0, w, 52);
+
+        ctx.fillStyle = '#FF5500';
+        ctx.font = '600 13px "Geist Mono", monospace';
+        ctx.fillText(stock.symbol, 24, 32);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.font = '500 11px "Geist Mono", monospace';
+        ctx.fillText(`· ${stock.exch}`, 24 + ctx.measureText(stock.symbol).width + 8, 32);
+
+        // Live Price & Predicted Return Pill
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '600 15px "Geist Mono", monospace';
+        ctx.fillText(`₹${stock.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, w - 110, 32);
+
+        // Green Return Pill
+        ctx.fillStyle = 'rgba(49, 199, 116, 0.16)';
+        ctx.beginPath();
+        ctx.roundRect(w - 96, 16, 72, 24, 6);
+        ctx.fill();
+        ctx.fillStyle = '#31C774';
+        ctx.font = '600 11.5px "Geist Mono", monospace';
+        ctx.fillText(`+${stock.ret}%`, w - 34, 32);
+
+        ctx.textAlign = 'left';
+
+        // 90-Day Price Trajectory Chart Area
+        const chartY = 64, chartH = 175;
+        const pts = [];
+        const numPts = 36;
+        for (let p = 0; p < numPts; p++) {
+          const u = p / (numPts - 1);
+          // Synthetic price trajectory modulated by seeded sine harmonics
+          const trend = u * 0.25;
+          const noise = Math.sin(u * 14 + tSec * 0.8 + i) * 0.08 + Math.cos(u * 8 + i * 2) * 0.05;
+          const val = 0.35 + trend + noise;
+          const px = 24 + u * (w - 120);
+          const py = chartY + chartH - val * chartH;
+          pts.push({ x: px, y: py });
+        }
+
+        // Gradient Area Fill
+        const grad = ctx.createLinearGradient(0, chartY, 0, chartY + chartH);
+        grad.addColorStop(0, 'rgba(49, 199, 116, 0.28)');
+        grad.addColorStop(1, 'rgba(49, 199, 116, 0.01)');
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, chartY + chartH);
+        pts.forEach(pt => ctx.lineTo(pt.x, pt.y));
+        ctx.lineTo(pts[pts.length - 1].x, chartY + chartH);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Stroke line
+        ctx.beginPath();
+        pts.forEach((pt, idx) => {
+          if (idx === 0) ctx.moveTo(pt.x, pt.y);
+          else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.strokeStyle = '#31C774';
+        ctx.lineWidth = 2.0;
+        ctx.stroke();
+
+        // Target Date Forecast Dotted Extension
+        const lastPt = pts[pts.length - 1];
+        const targetPt = { x: w - 28, y: lastPt.y - 28 + Math.sin(tSec * 2.0) * 4 };
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(lastPt.x, lastPt.y);
+        ctx.lineTo(targetPt.x, targetPt.y);
+        ctx.strokeStyle = '#FF5500';
+        ctx.lineWidth = 2.0;
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Target Node Circle
+        ctx.beginPath();
+        ctx.arc(targetPt.x, targetPt.y, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#FF5500';
+        ctx.fill();
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#FF5500';
+        ctx.font = '600 11px "Geist Mono", monospace';
+        ctx.fillText(`TARGET ₹${stock.pred.toFixed(0)}`, targetPt.x, targetPt.y - 10);
+        ctx.textAlign = 'left';
+
+        // Bottom Stats Footer
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.fillRect(0, h - 56, w, 56);
+
+        // Trader Score Badge
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+        ctx.font = '500 10.5px "Geist Mono", monospace';
+        ctx.fillText('TRADER SCORE', 24, h - 36);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '600 13px "Geist Mono", monospace';
+        ctx.fillText(`${stock.score} / 100`, 24, h - 18);
+
+        // Direction Accuracy
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+        ctx.font = '500 10.5px "Geist Mono", monospace';
+        ctx.fillText('BACKTEST ACC', 160, h - 36);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '600 13px "Geist Mono", monospace';
+        ctx.fillText(`${stock.acc}%`, 160, h - 18);
+
+        // Walk-Forward Quality Pass Stamp
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#FF5500';
+        ctx.font = '600 11px "Geist Mono", monospace';
+        ctx.fillText('✓ BEAT BASELINE · 5D HORIZON', w - 24, h - 24);
+        ctx.textAlign = 'left';
+
+        stockTextures[i].needsUpdate = true;
+      }
+    }
+
+    // ----------------------------------------------------
+    // Architectural Top-Down Layout: MARKETMIND PRO
+    // ----------------------------------------------------
+    const wallsGroup = new THREE.Group();
+    scene.add(wallsGroup);
+
+    const cardsGroup = new THREE.Group();
+    scene.add(cardsGroup);
+
+    const cardsList = [];
+    let heroCardMesh = null;
+
+    const WALL_HEIGHT = 5.2;
+    const WALL_THICKNESS = 0.55;
+    const CARD_W = 2.4;
+    const CARD_H = 1.5;
+    const CARD_D = 0.06;
+
+    function addStraightWall(x1, z1, x2, z2) {
+      const dx = x2 - x1;
+      const dz = z2 - z1;
+      const length = Math.sqrt(dx * dx + dz * dz);
+      const angle = Math.atan2(dx, dz);
+
+      const geom = new THREE.BoxGeometry(WALL_THICKNESS, WALL_HEIGHT, length);
+      const wall = new THREE.Mesh(geom, wallMaterial);
+      wall.position.set((x1 + x2) * 0.5, WALL_HEIGHT * 0.5, (z1 + z2) * 0.5);
+      wall.rotation.y = angle;
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      wallsGroup.add(wall);
+
+      const numCards = Math.max(1, Math.floor(length / 3.4));
+      const step = length / (numCards + 1);
+      const normX = -Math.cos(angle);
+      const normZ = Math.sin(angle);
+
+      for (let side = -1; side <= 1; side += 2) {
+        for (let i = 1; i <= numCards; i++) {
+          const dist = -length * 0.5 + i * step;
+          const px = wall.position.x + Math.sin(angle) * dist + normX * (WALL_THICKNESS * 0.5 + CARD_D * 0.6) * side;
+          const pz = wall.position.z + Math.cos(angle) * dist + normZ * (WALL_THICKNESS * 0.5 + CARD_D * 0.6) * side;
+          const rotY = angle + (side > 0 ? Math.PI * 0.5 : -Math.PI * 0.5);
+
+          createCard(px, 2.5, pz, rotY);
+        }
+      }
+    }
+
+    function addCurvedWall(cx, cz, radius, startAngle, endAngle) {
+      const arcLength = Math.abs(endAngle - startAngle);
+      const segments = Math.max(8, Math.floor(arcLength * 12));
+      const shape = new THREE.Shape();
+
+      const rOut = radius + WALL_THICKNESS * 0.5;
+      const rIn = radius - WALL_THICKNESS * 0.5;
+
+      shape.absarc(0, 0, rOut, startAngle, endAngle, false);
+      shape.absarc(0, 0, rIn, endAngle, startAngle, true);
+      shape.closePath();
+
+      const geom = new THREE.ExtrudeGeometry(shape, {
+        depth: WALL_HEIGHT,
+        bevelEnabled: false,
+        curveSegments: segments
+      });
+      geom.rotateX(Math.PI / 2);
+      const wall = new THREE.Mesh(geom, wallMaterial);
+      wall.position.set(cx, WALL_HEIGHT, cz);
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      wallsGroup.add(wall);
+
+      const perimeter = radius * arcLength;
+      const numCards = Math.max(2, Math.floor(perimeter / 3.4));
+      for (let i = 0; i < numCards; i++) {
+        const u = (i + 0.5) / numCards;
+        const theta = startAngle + u * (endAngle - startAngle);
+        const px = cx + Math.cos(theta) * (radius + WALL_THICKNESS * 0.5 + CARD_D * 0.6);
+        const pz = cz + Math.sin(theta) * (radius + WALL_THICKNESS * 0.5 + CARD_D * 0.6);
+        const rotY = Math.PI / 2 - theta;
+
+        const card = createCard(px, 2.5, pz, rotY);
+        card.userData.isCircleO = true;
+        card.userData.theta = theta;
+        card.userData.circleCenter = { x: cx, z: cz, r: radius };
+        card.userData.norm = new THREE.Vector3(Math.cos(theta), 0, Math.sin(theta));
+        card.userData.tangent = new THREE.Vector3(-Math.sin(theta), 0, Math.cos(theta));
+      }
+    }
+
+    function createCard(x, y, z, rotY) {
+      const cardContainer = new THREE.Group();
+      cardContainer.position.set(x, y, z);
+      cardContainer.rotation.y = rotY;
+
+      // Card Casing Backing
+      const casingGeom = new THREE.BoxGeometry(CARD_W, CARD_H, CARD_D);
+      const casingMesh = new THREE.Mesh(casingGeom, cardCasingMaterial);
+      casingMesh.castShadow = true;
+      casingMesh.receiveShadow = true;
+      cardContainer.add(casingMesh);
+
+      // Front Video Screen Face
+      const screenGeom = new THREE.PlaneGeometry(CARD_W * 0.94, CARD_H * 0.92);
+      const texIndex = cardsList.length % INDIAN_STOCKS.length;
+      const screenMat = new THREE.MeshPhysicalMaterial({
+        roughness: 0.12,
+        metalness: 0.0,
+        map: stockTextures[texIndex],
+        clearcoat: 0.15,
+        clearcoatRoughness: 0.1
+      });
+      const screenMesh = new THREE.Mesh(screenGeom, screenMat);
+      screenMesh.position.z = CARD_D * 0.51;
+      cardContainer.add(screenMesh);
+
+      // Back Face: Clean dark matte backing for 3D typography
+      const backThesisCanvas = document.createElement('canvas');
+      backThesisCanvas.width = 512;
+      backThesisCanvas.height = 320;
+      const btCtx = backThesisCanvas.getContext('2d');
+      btCtx.fillStyle = '#101114';
+      btCtx.fillRect(0, 0, 512, 320);
+
+      // Subtle brushed border
+      btCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      btCtx.lineWidth = 2;
+      btCtx.strokeRect(16, 16, 480, 288);
+
+      btCtx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      btCtx.font = '500 11px "Geist Mono", monospace';
+      btCtx.fillText('OFFICIAL BHAVCOPY DATA · SHIFT(-5) LEAK-FREE INFERENCE', 32, 276);
+      btCtx.fillText('WALK-FORWARD VERIFIED // INSTITUTIONAL MODEL', 32, 292);
+
+      const backThesisTex = new THREE.CanvasTexture(backThesisCanvas);
+      const backMat = new THREE.MeshPhysicalMaterial({
+        color: 0x141416,
+        roughness: 0.45,
+        metalness: 0.15,
+        map: backThesisTex
+      });
+      const backMesh = new THREE.Mesh(new THREE.PlaneGeometry(CARD_W * 0.94, CARD_H * 0.92), backMat);
+      backMesh.position.z = -CARD_D * 0.51;
+      backMesh.rotation.y = Math.PI;
+      cardContainer.add(backMesh);
+
+      cardsGroup.add(cardContainer);
+
+      const cardObj = {
+        mesh: cardContainer,
+        casingMesh,
+        screenMesh,
+        basePos: new THREE.Vector3(x, y, z),
+        baseRotY: rotY,
+        userData: {}
+      };
+
+      cardsList.push(cardObj);
+
+      if (!heroCardMesh && cardsList.length === 1) {
+        heroCardMesh = cardObj;
+      }
+
+      return cardObj;
+    }
+
+    // ----------------------------------------------------
+    // Construct Typography Corridors:
+    // Top Row:    M   A   R   K   E   T
+    // Bottom Row: M   I   N   D   P   R   O
+    // ----------------------------------------------------
+    const Z_TOP = -14;
+    const Z_BOT = 14;
+
+    // --- TOP ROW: MARKET ---
+    // Letter M (X = -36)
+    addStraightWall(-39.5, Z_TOP - 6, -39.5, Z_TOP + 6);
+    addStraightWall(-39.5, Z_TOP - 6, -36.0, Z_TOP);
+    addStraightWall(-36.0, Z_TOP, -32.5, Z_TOP - 6);
+    addStraightWall(-32.5, Z_TOP - 6, -32.5, Z_TOP + 6);
+
+    // Letter A (X = -22)
+    addStraightWall(-25.5, Z_TOP + 6, -22.0, Z_TOP - 6);
+    addStraightWall(-22.0, Z_TOP - 6, -18.5, Z_TOP + 6);
+    addStraightWall(-24.0, Z_TOP + 1, -20.0, Z_TOP + 1);
+
+    // Letter R (X = -8)
+    addStraightWall(-11.5, Z_TOP - 6, -11.5, Z_TOP + 6);
+    addCurvedWall(-11.5, Z_TOP - 3, 3.2, -Math.PI * 0.5, Math.PI * 0.5);
+    addStraightWall(-11.5, Z_TOP, -5.5, Z_TOP + 6);
+
+    // Letter K (X = 6)
+    addStraightWall(2.5, Z_TOP - 6, 2.5, Z_TOP + 6);
+    addStraightWall(2.5, Z_TOP, 9.5, Z_TOP - 6);
+    addStraightWall(2.5, Z_TOP, 9.5, Z_TOP + 6);
+
+    // Letter E (X = 20)
+    addStraightWall(16.5, Z_TOP - 6, 16.5, Z_TOP + 6);
+    addStraightWall(16.5, Z_TOP - 6, 23.5, Z_TOP - 6);
+    addStraightWall(16.5, Z_TOP, 22.0, Z_TOP);
+    addStraightWall(16.5, Z_TOP + 6, 23.5, Z_TOP + 6);
+
+    // Letter T (X = 34)
+    addStraightWall(29.5, Z_TOP - 6, 38.5, Z_TOP - 6);
+    addStraightWall(34.0, Z_TOP - 6, 34.0, Z_TOP + 6);
+
+    // --- BOTTOM ROW: MIND PRO ---
+    // Letter M (X = -38)
+    addStraightWall(-41.5, Z_BOT - 6, -41.5, Z_BOT + 6);
+    addStraightWall(-41.5, Z_BOT - 6, -38.0, Z_BOT);
+    addStraightWall(-38.0, Z_BOT, -34.5, Z_BOT - 6);
+    addStraightWall(-34.5, Z_BOT - 6, -34.5, Z_BOT + 6);
+
+    // Letter I (X = -26)
+    addStraightWall(-26.0, Z_BOT - 6, -26.0, Z_BOT + 6);
+
+    // Letter N (X = -14)
+    addStraightWall(-17.5, Z_BOT - 6, -17.5, Z_BOT + 6);
+    addStraightWall(-17.5, Z_BOT - 6, -10.5, Z_BOT + 6);
+    addStraightWall(-10.5, Z_BOT - 6, -10.5, Z_BOT + 6);
+
+    // Letter D (X = -2)
+    addStraightWall(-5.5, Z_BOT - 6, -5.5, Z_BOT + 6);
+    addCurvedWall(-5.5, Z_BOT, 4.5, -Math.PI * 0.5, Math.PI * 0.5);
+
+    // Letter P (X = 10)
+    addStraightWall(6.5, Z_BOT - 6, 6.5, Z_BOT + 6);
+    addCurvedWall(6.5, Z_BOT - 3, 3.2, -Math.PI * 0.5, Math.PI * 0.5);
+
+    // Letter R (X = 22)
+    addStraightWall(18.5, Z_BOT - 6, 18.5, Z_BOT + 6);
+    addCurvedWall(18.5, Z_BOT - 3, 3.2, -Math.PI * 0.5, Math.PI * 0.5);
+    addStraightWall(18.5, Z_BOT, 24.5, Z_BOT + 6);
+
+    // Letter O (X = 35) - The Grand Circular Trading Pavilion Ring!
+    addCurvedWall(35, Z_BOT, 5.2, 0, Math.PI * 2);
+
+    // Position the Thinking Orb inside the "O" trading pavilion
+    orbGroup.position.set(35, 2.5, Z_BOT);
+
+    // Designate primary hero card on the circular "O" pavilion
+    const oCards = cardsList.filter(c => c.userData.isCircleO);
+    if (oCards.length > 0) {
+      heroCardMesh = oCards[0];
+    }
+
+    // 3D Lifted Typography Lines for Shot 4
+    const liftedLinesGroup = new THREE.Group();
+    heroCardMesh.mesh.add(liftedLinesGroup);
+    liftedLinesGroup.position.set(0, 0, -CARD_D * 0.52);
+    liftedLinesGroup.rotation.y = Math.PI;
+
+    const lineBars = [];
+    const thesisLines = [
+      { text: "RELIANCE.NS // NSE 5-DAY HORIZON", col: "#FF5500", font: "600 20px 'Geist Mono', monospace", y: 0.35, w: 2.1, h: 0.22 },
+      { text: "HistGradientBoosting: Target ₹1,595 (+7.6%)", col: "#FFFFFF", font: "600 22px 'Geist', sans-serif", y: 0.08, w: 2.2, h: 0.23 },
+      { text: "Breakout 21-EMA · 2.4× Volume · Direction Acc 68.4%", col: "#D1D5DB", font: "500 18.5px 'Geist', sans-serif", y: -0.18, w: 2.2, h: 0.22 }
+    ];
+
+    thesisLines.forEach(tl => {
+      const lineCan = document.createElement('canvas');
+      lineCan.width = 640;
+      lineCan.height = 64;
+      const lctx = lineCan.getContext('2d');
+      lctx.clearRect(0, 0, 640, 64);
+      lctx.fillStyle = tl.col;
+      lctx.font = tl.font;
+      lctx.textAlign = 'center';
+      lctx.textBaseline = 'middle';
+      lctx.fillText(tl.text, 320, 32);
+
+      const lineTex = new THREE.CanvasTexture(lineCan);
+      lineTex.generateMipmaps = true;
+      const lineMat = new THREE.MeshPhysicalMaterial({
+        map: lineTex,
+        transparent: true,
+        roughness: 0.2,
+        metalness: 0.1,
+        clearcoat: 0.3
+      });
+
+      const lineMesh = new THREE.Mesh(new THREE.PlaneGeometry(tl.w, tl.h), lineMat);
+      lineMesh.position.set(0, tl.y, 0.01);
+      liftedLinesGroup.add(lineMesh);
+      lineBars.push(lineMesh);
+    });
+
+    // ----------------------------------------------------
+    // Film Camera Moves & Interpolation
+    // ----------------------------------------------------
+    function smoothstep(edge0, edge1, x) {
+      const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+      return t * t * (3 - 2 * t);
+    }
+    function easeInOutQuart(x) {
+      return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
+    }
+    function easeInOutCubic(x) {
+      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    }
+
+    const camPos = new THREE.Vector3();
+    const lookTarget = new THREE.Vector3();
+
+    function updateCameraAndScene(t) {
+      t = Math.max(0, Math.min(TOTAL_DURATION, t));
+
+      let shotIdx = 0;
+      for (let s = 0; s < SHOT_STARTS.length; s++) {
+        if (t >= SHOT_STARTS[s]) shotIdx = s;
+      }
+      const shotStart = SHOT_STARTS[shotIdx];
+      const shotDur = SHOT_DURATIONS[shotIdx];
+      const u = (t - shotStart) / shotDur;
+
+      // Update UI
+      const shotBadge = document.getElementById('shot-badge');
+      const shotMoveBadge = document.getElementById('shot-move-badge');
+      const shotTitle = document.getElementById('shot-title');
+      const shotDesc = document.getElementById('shot-desc');
+      const shotTicker = document.getElementById('shot-ticker');
+      const finalTitle = document.getElementById('final-title');
+      const scrubberFill = document.getElementById('scrubber-fill');
+
+      if (shotBadge && !isRenderMode) {
+        shotBadge.innerText = `SHOT ${shotIdx + 1} / 6`;
+        shotMoveBadge.innerText = SHOT_METADATA[shotIdx].move;
+        shotTitle.innerText = SHOT_METADATA[shotIdx].name;
+        shotDesc.innerText = SHOT_METADATA[shotIdx].desc;
+        if (shotTicker) shotTicker.innerText = SHOT_METADATA[shotIdx].ticker;
+
+        document.querySelectorAll('.shot-btn').forEach((btn, idx) => {
+          btn.classList.toggle('active', idx === shotIdx);
+        });
+
+        if (scrubberFill) {
+          scrubberFill.style.width = `${(t / TOTAL_DURATION) * 100}%`;
+        }
+
+        if (finalTitle) {
+          if (t >= 16.5) finalTitle.classList.add('visible');
+          else finalTitle.classList.remove('visible');
+        }
+      }
+
+      // Reset card positions
+      cardsList.forEach(c => {
+        c.mesh.position.copy(c.basePos);
+        c.mesh.rotation.y = c.baseRotY;
+      });
+      lineBars.forEach(b => b.position.z = 0.01);
+      orangePulseLight.intensity = 0;
+
+      // Orb Animation: rotating rings
+      ring1.rotation.x = t * 1.5;
+      ring1.rotation.y = t * 1.0;
+      ring2.rotation.y = -t * 1.2;
+      ring2.rotation.z = t * 0.8;
+      orbCore.scale.setScalar(1.0 + Math.sin(t * 4.0) * 0.04);
+
+      // ----------------------------------------------------
+      // SHOT 1: Macro & Rack Focus (0.0s to 3.33s)
+      // Extreme close-up on the tactile beveled edge in soft daylight.
+      // Racks focus onto the live 90-day candlestick trajectory.
+      // ----------------------------------------------------
+      if (shotIdx === 0) {
+        const ease = easeInOutCubic(u);
+        const heroP = heroCardMesh.basePos;
+        const norm = heroCardMesh.userData.norm || new THREE.Vector3(0, 0, 1);
+        const tangent = heroCardMesh.userData.tangent || new THREE.Vector3(1, 0, 0);
+
+        const startPos = heroP.clone().add(norm.clone().multiplyScalar(0.85)).add(tangent.clone().multiplyScalar(1.4)).setY(heroP.y + 0.15);
+        const endPos = heroP.clone().add(norm.clone().multiplyScalar(2.1)).add(tangent.clone().multiplyScalar(0.2)).setY(heroP.y);
+
+        camPos.lerpVectors(startPos, endPos, ease);
+        lookTarget.copy(heroP);
+
+        camera.fov = 34;
+        camera.updateProjectionMatrix();
+      }
+
+      // ----------------------------------------------------
+      // SHOT 2: Dolly Back & Kinetic Pulse (3.33s to 6.67s)
+      // Dolly back along the sweeping curved wall as a wave of orange light rolls through.
+      // Each card tilts on its spring axis.
+      // ----------------------------------------------------
+      else if (shotIdx === 1) {
+        const ease = easeInOutQuart(u);
+        const heroP = heroCardMesh.basePos;
+        const norm = heroCardMesh.userData.norm || new THREE.Vector3(0, 0, 1);
+        const tangent = heroCardMesh.userData.tangent || new THREE.Vector3(1, 0, 0);
+
+        const startPos = heroP.clone().add(norm.clone().multiplyScalar(2.1)).add(tangent.clone().multiplyScalar(0.2));
+        const endPos = heroP.clone().add(norm.clone().multiplyScalar(7.5)).sub(tangent.clone().multiplyScalar(10.5)).setY(heroP.y + 1.6);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        const startLook = heroP.clone();
+        const endLook = heroP.clone().add(tangent.clone().multiplyScalar(3.0)).setY(heroP.y);
+        lookTarget.lerpVectors(startLook, endLook, ease);
+
+        camera.fov = 44;
+        camera.updateProjectionMatrix();
+
+        // Wavefront traveling along theta of the circle
+        const waveTheta = u * Math.PI * 2.0;
+        const waveX = 35 + Math.cos(waveTheta) * 5.2;
+        const waveZ = Z_BOT + Math.sin(waveTheta) * 5.2;
+        orangePulseLight.intensity = 2.4;
+        orangePulseLight.position.set(waveX, 2.5, waveZ);
+
+        cardsList.forEach(c => {
+          if (c.userData.isCircleO) {
+            const dTheta = Math.abs(c.userData.theta - waveTheta);
+            if (dTheta < 0.8) {
+              const tilt = Math.sin(dTheta * 4.0) * 0.22;
+              c.mesh.rotation.y = c.baseRotY + tilt;
+            }
+          }
+        });
+      }
+
+      // ----------------------------------------------------
+      // SHOT 3: Crane Over Corridors (6.67s to 10.0s)
+      // Ascends over the wall crest to reveal the parallel gallery corridors.
+      // ----------------------------------------------------
+      else if (shotIdx === 2) {
+        const ease = easeInOutCubic(u);
+        const heroP = heroCardMesh.basePos;
+        const norm = heroCardMesh.userData.norm || new THREE.Vector3(0, 0, 1);
+        const tangent = heroCardMesh.userData.tangent || new THREE.Vector3(1, 0, 0);
+
+        const startPos = heroP.clone().add(norm.clone().multiplyScalar(7.5)).sub(tangent.clone().multiplyScalar(10.5)).setY(heroP.y + 1.6);
+        const endPos = new THREE.Vector3(26.0, 18.0, 16.0);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        const startLook = heroP.clone().add(tangent.clone().multiplyScalar(3.0)).setY(heroP.y);
+        const endLook = new THREE.Vector3(10.0, 2.2, 0);
+        lookTarget.lerpVectors(startLook, endLook, ease);
+
+        camera.fov = 48;
+        camera.updateProjectionMatrix();
+
+        // Orb pulse in the center
+        orangePulseLight.intensity = 1.6 + Math.sin(t * 6.0) * 0.5;
+        orangePulseLight.position.set(35, 2.5, Z_BOT);
+      }
+
+      // ----------------------------------------------------
+      // SHOT 4: Unhinging Prediction Thesis Card (10.0s to 13.33s)
+      // Central Reliance card swings out 180 deg toward camera, 3D typography lifts off.
+      // ----------------------------------------------------
+      else if (shotIdx === 3) {
+        const ease = easeInOutCubic(u);
+        const heroP = heroCardMesh.basePos;
+        const norm = heroCardMesh.userData.norm || new THREE.Vector3(0, 0, 1);
+
+        const startPos = new THREE.Vector3(26.0, 18.0, 16.0);
+        const endPos = heroP.clone().add(norm.clone().multiplyScalar(2.9)).setY(heroP.y + 0.15);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        lookTarget.copy(heroP);
+        camera.fov = 40;
+        camera.updateProjectionMatrix();
+
+        const swingProgress = smoothstep(0.12, 0.85, u);
+        const damp = Math.exp(-u * 5.0) * Math.cos(u * 14.0) * 0.12;
+        const swingAngle = (swingProgress * Math.PI) + (u > 0.85 ? damp : 0);
+
+        heroCardMesh.mesh.position.set(
+          heroP.x + norm.x * (Math.sin(swingProgress * Math.PI) * 0.6),
+          heroP.y + Math.sin(swingProgress * Math.PI) * 0.3,
+          heroP.z + norm.z * (Math.sin(swingProgress * Math.PI) * 0.6)
+        );
+        heroCardMesh.mesh.rotation.y = heroCardMesh.baseRotY + swingAngle;
+
+        if (u > 0.45) {
+          const liftU = smoothstep(0.45, 0.95, u);
+          lineBars.forEach((bar, idx) => {
+            const delay = idx * 0.12;
+            const lineProgress = Math.max(0, Math.min(1, (liftU - delay) / 0.7));
+            bar.position.z = 0.02 + lineProgress * 0.09;
+          });
+        }
+      }
+
+      // ----------------------------------------------------
+      // SHOT 5: The Signature Shot — Grand Aerial Pull-Back & Tracing the 'O' (13.33s to 17.0s)
+      // Camera pulls far back and up; corridors resolve into MARKETMIND PRO; orange light traces the O.
+      // ----------------------------------------------------
+      else if (shotIdx === 4) {
+        const ease = easeInOutQuart(u);
+        const startPos = new THREE.Vector3(heroCardMesh.basePos.x, heroCardMesh.basePos.y + 0.35, heroCardMesh.basePos.z + 3.4);
+        const endPos = new THREE.Vector3(0, 120.0, 38.0);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        const startLook = heroCardMesh.basePos.clone();
+        const endLook = new THREE.Vector3(0, 0, 0);
+        lookTarget.lerpVectors(startLook, endLook, ease);
+
+        camera.fov = 48;
+        camera.updateProjectionMatrix();
+
+        // Orange light sweeps around the circular "O" pavilion ring
+        const theta = u * Math.PI * 2.5;
+        const ox = 35 + Math.cos(theta) * 5.4;
+        const oz = Z_BOT + Math.sin(theta) * 5.4;
+        orangePulseLight.intensity = 2.8;
+        orangePulseLight.position.set(ox, 3.6, oz);
+
+        cardsList.filter(c => c.userData.isCircleO).forEach(c => {
+          const dTheta = Math.abs(c.userData.theta - (theta % (Math.PI * 2)));
+          if (dTheta < 0.6) {
+            c.mesh.rotation.y = c.baseRotY + Math.sin(dTheta * 5) * 0.16;
+          }
+        });
+      }
+
+      // ----------------------------------------------------
+      // SHOT 6: Wordmark Settle (17.0s to 20.0s)
+      // Locked, pristine architectural perspective settling on MARKETMIND PRO.
+      // ----------------------------------------------------
+      else if (shotIdx === 5) {
+        const ease = easeInOutCubic(u);
+        const startPos = new THREE.Vector3(0, 120.0, 38.0);
+        const endPos = new THREE.Vector3(0, 112.0, 34.0);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        lookTarget.set(0, 0, 0);
+        camera.fov = 48;
+        camera.updateProjectionMatrix();
+
+        // Soft orange light breathing at the Thinking Orb
+        orangePulseLight.intensity = 1.2 + Math.sin(t * 4.0) * 0.3;
+        orangePulseLight.position.set(35, 2.5, Z_BOT);
+      }
+
+      camera.position.copy(camPos);
+      camera.lookAt(lookTarget);
+
+      // Render Active Stock Candlestick Canvases
+      renderStockCanvases(t);
+
+      // Render Scene
+      renderer.render(scene, camera);
+    }
+
+    // ----------------------------------------------------
+    // Playback Loop & Render Hook
+    // ----------------------------------------------------
+    let startTime = null;
+
+    function animate(now) {
+      if (!isRenderMode) {
+        if (!startTime) startTime = now;
+        const elapsed = (now - startTime) / 1000.0;
+        const loopTime = elapsed % TOTAL_DURATION;
+        updateCameraAndScene(loopTime);
+        requestAnimationFrame(animate);
+      }
+    }
+
+    if (!isRenderMode) {
+      requestAnimationFrame(animate);
+    }
+
+    // Interactive Controls
+    const scrubberTrack = document.getElementById('scrubber-track');
+    if (scrubberTrack && !isRenderMode) {
+      let isDragging = false;
+      function seek(e) {
+        const rect = scrubberTrack.getBoundingClientRect();
+        const p = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const seekTime = p * TOTAL_DURATION;
+        startTime = performance.now() - (seekTime * 1000);
+        updateCameraAndScene(seekTime);
+      }
+      scrubberTrack.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        seek(e);
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (isDragging) seek(e);
+      });
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      document.querySelectorAll('.shot-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const s = parseInt(btn.getAttribute('data-shot'), 10);
+          const t = SHOT_STARTS[s] + 0.05;
+          startTime = performance.now() - (t * 1000);
+          updateCameraAndScene(t);
+        });
+      });
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ----------------------------------------------------
+    // Deterministic API for Playwright Capture (?render mode)
+    // ----------------------------------------------------
+    window.renderAtTime = function(tSec) {
+      updateCameraAndScene(tSec);
+      return true;
+    };
+    window.seekFrame = function(frameIndex, totalFrames, fps) {
+      const tSec = (frameIndex / fps);
+      updateCameraAndScene(tSec);
+      return true;
+    };
+    window.isReady = true;
+
+  </script>
+</body>
+</html>

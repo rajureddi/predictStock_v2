@@ -1,0 +1,1400 @@
+{
+ "product": "MarketMind Pro",
+ "version": "2.0",
+ "run_date": "2026-10-23",
+ "data_as_of": "2026-10-23",
+ "target_date": "2026-10-30",
+ "horizon": "7 calendar days (5 trading days)",
+ "universe_counts": {
+  "nse": 2613,
+  "bse": 5374,
+  "total": 7987
+ },
+ "stage_counts": {
+  "universe": 7987,
+  "with_data": 6904,
+  "nse_with_data": 2363,
+  "bse_with_data": 4541,
+  "liquid": 2784,
+  "stage2": 141,
+  "quality_passed": 73
+ },
+ "picks": [
+  {
+   "symbol": "SSWL",
+   "name": "STEEL STRIPS WHEELS LTD.",
+   "exchange": "BSE",
+   "current_price": 469.7,
+   "trader_score": 100.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9402.23) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram negative",
+    "ADX 25 \u2014 strong uptrend",
+    "Volume 10.2\u00d7 20-day average on an up day",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Bullish engulfing",
+    "Morning star",
+    "Breakout candle above 20-day high"
+   ],
+   "support": 287.2,
+   "resistance": 469.7,
+   "high52": 469.7,
+   "stop_loss": 421.32,
+   "target": 518.08,
+   "target2": 542.27,
+   "risk_reward": 1.0,
+   "rsi": 70.8,
+   "adx": 25.3,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 10.16,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 7.9,
+   "predicted_price": 506.8,
+   "range_low": 463.53,
+   "range_high": 550.08,
+   "backtest": {
+    "ml_mape": 3.69,
+    "ml_dir_acc": 91.7,
+    "drift_mape": 5.21,
+    "drift_dir_acc": 75.0,
+    "naive_mape": 6.04,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 3.69,
+    "best_dir_acc": 91.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": null,
+   "news": {
+    "headlines": [
+     {
+      "title": "One stock is bucking the trend in a weak market with a 20% jump after its Q2 results",
+      "source": "CNBC TV18",
+      "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxONEx2dXVlOG9rZkdwb1pJaFZGbWpQdVZPMmJULW9CMGxzMmNpOUJBbUhfb0l0aS1RR0tQakpzVjk0ZHJDSDlnZ0NROUNMMEdQWVB3M1ZuT29nTGlqc3NlN01hY1JzbmZRTExHckczZG5ZTEVINDEtcnFOUjhuTk9LeXpvQmxhZGRLTlo1TkhURlc4SDNLdFlfNVptM2N3M1U1TGxSZmxGNERlMDB1aUc1cVltZGh1LU5NRUxvZzl2Mnk2VHUtZFp6Y04zYjVBdUs3cHBKZkV5ZjRYbFE4X3FuWdIB5gFBVV95cUxPVjQxcmlRVmtHTFVhdm9IWFk5bnNlUWxiYkRmR0xUWk1wN2xycjJHNUl1VW1lZERubXpVQTVhRWJoV2MwdmwyLUpsTTBnMExPTXV0T1BuMXNhY2lBZXY2R1gtY3lGc1F0T09FTm01ekJZc1RhY1pPa3ZOWWduUXpWVUNEZHBzeFQwTVhQb3ZmOTZsZWN3MjF5MWdFbjUyYmY3X25PRDdoT1N0dkt1Q3VXRzUwNGhoemYxT3ozai0zdTV5UFBzYms5MWFOa2FWQ1JBZEkxMll2dzhRdWlrMkxnUFdRTzI2dw?oc=5",
+      "date": "2026-10-23"
+     },
+     {
+      "title": "Steel Strips Wheels Q2FY27 Results: Net profit rises 212% to \u20b9119 crore",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOUXdnZHBKVkJwb2F1WU4zeTlXNUo3d0pKLWNOM1JlNFpiMzA3UC1JTVdzTkV0Wmx6WnJvWlVVT0hBMWVpazBvQ2llMkIyRGlGdTY1Z0NDam1yME5YTzdvemg2OTdraTZFRXY0S19ISUJoMXN6MElUVG5wakpOYnQ1WmVZbFdENUUwTXFYaEhNRHMyMk83VmZDRmFnRXJMT3ZzcDk4M09lR0VKb3V4Q2RNZkNB?oc=5",
+      "date": "2026-10-23"
+     },
+     {
+      "title": "Price Band Hitters Today, 23 October 2026 at 3:30 PM IST : Steel Strips Wheels Leads The List",
+      "source": "HDFC Sky",
+      "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPU3prTGRtaDJvZEZQdV81SzA4RTQ5UmhVb2xyN2JMakZmcUZvbTdOSElVQlBmQi1QYkJlbHJoRWI3ai1obGtqcUFLdmdnanh3aU9jekl2ZU5lX3BRNzRhWDQyQ0l4eHU4eTR5V20tTzU5VkQ4Nkcwb25TejhSSXZsMjFB?oc=5",
+      "date": "2026-10-23"
+     },
+     {
+      "title": "109.83% Return in One Year: Analysing Steel Strips Wheels Ltd\u2019s Multibagger Performance",
+      "source": "MarketsMojo",
+      "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxQSW9GS1NKeEhBbU5OTGIybTBGWGRnUHpSeVZaOXZvajZwSTZWcW10MWF0R2xkLTFmUVM3SThvQU00WDFBeThDVWNOclhSMHI4NFlzR29mZ2hrYWU3VktDQUotdERWZ0xIQk90Zm1HS0xodHRLeUwzYU0zckQ2ZldfRk9CVDNBanpCdjlOMWdzUnBsbWJSZ0VPX3MxeFlrVXRWblBhR2Mxd0VCWVQyOEtkMUVIOHp1TUY0bGZmNXR3Ny1HUnBHbjlkYk5GR3lIRjBkbXltWXhpcVhEMzdj?oc=5",
+      "date": "2026-10-23"
+     },
+     {
+      "title": "Steel Strips Wheels receives ESG rating of 64 from CRISIL",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOMEdfY1daVmlzUXBadE0td3dYM1lCQndmRUJiSEh4cTVXa1doVHVXOEtLZDIyclIzV0J5NExLd1EtemJiakJ1ZnhROHNpQnZMbTRUSXJONHljZFVFVDRHZ1hMVmtDOERzZ19ZUlp0NmZrTFRPdDBmcEpMVGFMbFZERGJzLVRIZDYweHJSNm1wWm9JMkVaM0dWXzFSUnZkVUN1a2k1SS1SeUh5QQ?oc=5",
+      "date": "2026-10-16"
+     },
+     {
+      "title": "Steel Strips Wheels Ltd is Rated Hold by MarketsMOJO",
+      "source": "MarketsMojo",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNNWNfMndWZGlGVEZwNzZhc1ppYUdtaEF3UWdRQU9hZVQzRmRyaDVFdTl2RnF4SVVFd2dnS3BRYjJzMmVQaGFhY3Y4cklhVE1FTzg5ektpQU5RVHVtSllncERLSzJTaGo3VHZEUUxRUk9fR3cyWWE5OTl0STlvYUJtRUJBUG16TGN6Wm9PTG9qNGlKaGFyYS1ZQ1kxV1MxSXhGa0x5d29xXzZ0dzZfM09rQjNielo?oc=5",
+      "date": "2026-10-14"
+     }
+    ],
+    "sentiment_score": 1.0,
+    "sentiment_label": "Positive",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "SANCODE",
+   "name": "Sancode Technologies Limited",
+   "exchange": "BSE",
+   "current_price": 1011.2,
+   "trader_score": 96.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9868.50) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 94 \u2014 overbought, chase risk",
+    "MACD histogram positive",
+    "ADX 93 \u2014 strong uptrend",
+    "Volume 1.6\u00d7 20-day average on an up day"
+   ],
+   "patterns": [
+    "Doji (indecision)"
+   ],
+   "support": 341.0,
+   "resistance": 1011.2,
+   "high52": 1011.2,
+   "stop_loss": 978.34,
+   "target": 1044.06,
+   "target2": 1060.49,
+   "risk_reward": 1.0,
+   "rsi": 93.5,
+   "adx": 92.9,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 1.6,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 7.96,
+   "predicted_price": 1091.7,
+   "range_low": 1062.31,
+   "range_high": 1121.09,
+   "backtest": {
+    "ml_mape": 1.57,
+    "ml_dir_acc": 100.0,
+    "drift_mape": 1.99,
+    "drift_dir_acc": 100.0,
+    "naive_mape": 8.54,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 1.57,
+    "best_dir_acc": 100.0,
+    "windows": 8
+   },
+   "quality_pass": true,
+   "fundamentals": null,
+   "news": {
+    "headlines": [
+     {
+      "title": "Sancode Technologies appoints Jerry A. Agnes as CEO of subsidiary Sancode Semi",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQQ01VcUpoOHRTQU1QLTc1dmdBZ0xIeXJrZzBJTmVuUUM2NFA0eDlfSXR0RW82OG53M3pHNk54Y3ktX19wY0FXRlg0cW5pSWFSMS13N0ZZUUdqYmJpdUV4Y1VTUzEzWEhzR2UyVHppbkJlLXdySGJ5YlNNcWhEMS10LUhFazdoeGhONTg5R2ExcEFGMnF1LUF0bjVJY0s4UTJGWGNadmN5MVNVT1JZYmRxcTJ1WHRaR3ZzWnIzNHFuTFhOY2dN?oc=5",
+      "date": "2026-10-12"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "MAHASTEEL",
+   "name": "Mahamaya Steel Industries Limited",
+   "exchange": "NSE",
+   "current_price": 1473.5,
+   "trader_score": 97.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b91235.89) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "ADX 26 \u2014 strong uptrend",
+    "Volume 3.3\u00d7 20-day average on an up day",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Hammer",
+    "Three white soldiers"
+   ],
+   "support": 799.1,
+   "resistance": 1488.0,
+   "high52": 1488.0,
+   "stop_loss": 1334.85,
+   "target": 1612.15,
+   "target2": 1681.47,
+   "risk_reward": 1.0,
+   "rsi": 74.1,
+   "adx": 26.1,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 3.29,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 9.6,
+   "predicted_price": 1615.0,
+   "range_low": 1490.99,
+   "range_high": 1739.01,
+   "backtest": {
+    "ml_mape": 7.06,
+    "ml_dir_acc": 66.7,
+    "drift_mape": 8.4,
+    "drift_dir_acc": 58.3,
+    "naive_mape": 7.7,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 7.06,
+    "best_dir_acc": 66.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 241.95401,
+    "forward_pe": null,
+    "roe": null,
+    "debt_to_equity": 0.36563,
+    "market_cap": 24216088576.0,
+    "revenue_growth": 0.293,
+    "earnings_growth": 0.226,
+    "dividend_yield": 0.0,
+    "score": 68.0,
+    "flags": [
+     "Earnings growth +23%",
+     "Revenue growth +29%",
+     "Expensive \u2014 PE 242"
+    ]
+   },
+   "news": {
+    "headlines": [
+     {
+      "title": "Mahamaya Steel Industries (NSE:MAHASTEEL): What Does Its Reg 74(5) Certificate for Q2 FY27 Mean?",
+      "source": "Kalkine India",
+      "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNU1ZXOEhuakd2RWROS200U1RFYVNfYXZCd3o1QXhrU3FvNTNkYzE2RnA4Y0ZSdlFUX1hWRm1pUExZa1JfQzdFNlVjc0hvbHNDcVdKdThLWnE0ZjE4T2RuUVp0TFBfRFJOMk8zeGRnVXpMUk1MU2tZOVo0Mm82MVVzTFQ2OUlkbjdrSkhWM05aQkpSZ3hSWnhGYmhtMDRBMklYaHdaN0FKcUFfQW11VUhGM000S3R3alhkUFdJcm5yS2NKbGo2S1RJcG1ISmViSmVGX1VJ?oc=5",
+      "date": "2026-10-10"
+     },
+     {
+      "title": "Amal Ltd (AMAL.NS) stock price, news, quote and history",
+      "source": "Yahoo Finance UK",
+      "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE92VGhnUEFVMF9hc2sySEJ1Ri1ZVlVUWXRIWlJranVIM3VZQndGY3dyTVJvMU5Ya2lZem9WZEQ2cWR1cUJ4SUN4cHdwNUJ5Yk5ieUYyWW1B?oc=5",
+      "date": "2026-10-22"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "PCJEWELLER",
+   "name": "PC Jeweller Limited",
+   "exchange": "NSE",
+   "current_price": 18.04,
+   "trader_score": 85.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b915.21) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "ADX 36 \u2014 strong uptrend",
+    "Volume 1.7\u00d7 average but on a down day \u2014 distribution",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Doji (indecision)"
+   ],
+   "support": 8.98,
+   "resistance": 20.1,
+   "high52": 20.1,
+   "stop_loss": 15.7,
+   "target": 20.38,
+   "target2": 21.56,
+   "risk_reward": 1.0,
+   "rsi": 74.0,
+   "adx": 35.8,
+   "delivery_pct": 19.2,
+   "delivery_avg5": 18.8,
+   "volume_ratio": 1.73,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 12.79,
+   "predicted_price": 20.35,
+   "range_low": 18.25,
+   "range_high": 22.44,
+   "backtest": {
+    "ml_mape": 7.75,
+    "ml_dir_acc": 91.7,
+    "drift_mape": 10.63,
+    "drift_dir_acc": 50.0,
+    "naive_mape": 10.57,
+    "naive_dir_acc": 8.3,
+    "best_model": "ml",
+    "best_mape": 7.75,
+    "best_dir_acc": 91.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 19.608696,
+    "forward_pe": 0.88000005,
+    "roe": 0.1083,
+    "debt_to_equity": 0.0365,
+    "market_cap": 176931946496.0,
+    "revenue_growth": 0.278,
+    "earnings_growth": 0.619,
+    "dividend_yield": 0.0,
+    "score": 78.0,
+    "flags": [
+     "Earnings growth +62%",
+     "Revenue growth +28%"
+    ]
+   },
+   "news": {
+    "headlines": [
+     {
+      "title": "Swiggy Sinks to Record Low; PC Jeweller, VIL, Zetwerk in Focus",
+      "source": "HDFC Sky",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNQ2lYSlVaejUyT2VydUdOanpIdDhRNXZoY1UzMkxONnVUSzVnQ3ZQaWJLY3l5aEhWTHo2amVsWGtNZzI1am1vTURJM010UVotVkxkM3JwWHgwX3lWSXZ1bE1uSFkxZ3llNTV2VklXbXNHWXl5N0kzZWc1cVQzTkFCZlFUYkctQUM3RDBnU0ROSmpIcC14MHpqQUluWVFHcU5iVGQ0Y0ZiYWRCNVB6RU5z?oc=5",
+      "date": "2026-10-23"
+     },
+     {
+      "title": "PC Jeweller FY26 PAT rises 58% to \u20b9710 crore",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQaVRKd2FiN2RsdXJXdlhFaU1WT2JvZHJCVlNYdnBHUm1jRnJQRkRpMHBOR21FNGliSWc5UG9EYTItOWJ3VnJoV0hNVkRZLVl1Njl6ZjEyU25fUzdUTHF5SEU1WE1XcFo1VEpaR3VLWTEydl9DODdhQ0hYMkdhWHZCZnU5UXdsSUQwcm14U01yT3diT2YtYVNwYVdJdE03LTNBbC1kLXZGd1hpV1NHd0hiSGY1TnRHazJNM3Q0?oc=5",
+      "date": "2026-10-18"
+     },
+     {
+      "title": "PC Jeweller Limited Reports Earnings Results for the Second Quarter and Six Months Ended September 30, 2026",
+      "source": "www.marketscreener.com",
+      "url": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxOWk5pVk04b0FndmFsSmtpMjRiYWZvRXlWRktCRmpvZjZpVFRkN2JMdjgtYmM3R08wLVNFSGRkWnpUeHVIUmlET1pEemRKX2JwY2ExUUVrMWxFQkYxdE1ES0NFa2Q2RGFvYnVDc1Q4YUlROHdkekpDOFVWbEd2S29TN2RUVHRhZGFjS1QwVEhjalluN1BDZUt4cVVjV0VLMHFaSDFnTzJNSzRQYjFCcFg4UEs4TUwwVU96bF9nMUlZNl90aWxVZER5TFdoVkg5dEJFVDdud3NaQzRCWVE4VUxzeDN6MzN5dmVO?oc=5",
+      "date": "2026-10-21"
+     },
+     {
+      "title": "PC Jeweller Hits New Debt-Free Milestone! Jewellery Stock Up 200% in 3 Yrs | What It Means For Investors?",
+      "source": "Goodreturns",
+      "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxNMlpOQ2Z6Nk5iWnl6a2hhRWFsS1NVandtWFRnWmtLQ1ZBSWg3MWtCbU9FR0NFTGNQTjBDMWpuYUxBdHNUcXVLcXJ5bDVtZ05jTnlYM2ViTUY5TmVoc1huMUJXZjVmNWw5T3o1eWdxeVhMR3NRTUVHTzQ1azE0RHgxazk2LVZBMldwckxndTdMN1Q5YjhVMnZ0dmFyYk5zSm10a2lzTDRhRTB5bVFTMF9CWFNWQ0cxd200cHAyZ1ViMEw1VUJCWUwzd2JCamJYN1BJTmFYV1ZmSl8?oc=5",
+      "date": "2026-10-16"
+     },
+     {
+      "title": "PC Jeweller Share Price and Technical Outlook",
+      "source": "Kalkine India",
+      "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOaVJ1NWtjdmpnS1N2T2w3SmxoM3N6dzNKc1JNWElOTXdNTFZlUWQ0bFlVb292NjB3UkRaOGRwcFEyNHRNT3NubmJINnBvNEFnMkFCeUNjTW1MZG1tdFRnU0RMbmpiODNVWXRia2VCaXRMRGp4M1ZadXlVclFxNlRPXzFpQTB3Wk5Ca1M4Z0U0Y1lRQjZSN0NDYjZYVWc2MC1wUUV5THlJQi1WWUdEeWdnN3hlelhxQ2FNLWhhdGsySnJKWFFkS20takcycTlzcGdfdHh0X01OVThwdmdCZXpJ?oc=5",
+      "date": "2026-10-19"
+     },
+     {
+      "title": "Trending Stocks Today: PC Jeweller Extends Rally, Vodafone Idea, YES Bank, Jaiprakash Power Fall",
+      "source": "HDFC Sky",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQaDVCLTgxYXJDNDh4RE0tdFlKTjl3VUJYZ3IxMlZnQlhzbjV0ckZqbzNhc0pmRzdRS0VJbnNBbWdIanFGUTN5RExQMDZvUnRBVXNSeHJzR3lFZ3pZbFRMdE55Mng2a2E5M3NnR19Wby16aUpaMldIVmJtOV8zNE1Md0hTVDY0MTBvZWNIbUQxRl9HNkhuaDZYUnVOSVBPUTlld2VZaV9kTEp5OThfT1pKeVJkR0ZXVFFm?oc=5",
+      "date": "2026-10-21"
+     }
+    ],
+    "sentiment_score": 0.33,
+    "sentiment_label": "Positive",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "ONWARDTEC",
+   "name": "Onward Technologies Limited",
+   "exchange": "NSE",
+   "current_price": 436.45,
+   "trader_score": 84.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9359.15) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "ADX 50 \u2014 strong uptrend",
+    "OBV trending up \u2014 accumulation",
+    "Higher-high / higher-low structure"
+   ],
+   "patterns": [],
+   "support": 274.8,
+   "resistance": 495.65,
+   "high52": 495.65,
+   "stop_loss": 379.16,
+   "target": 493.74,
+   "target2": 522.38,
+   "risk_reward": 1.0,
+   "rsi": 73.4,
+   "adx": 50.1,
+   "delivery_pct": 42.1,
+   "delivery_avg5": 35.2,
+   "volume_ratio": 0.68,
+   "model_used": "ml+drift blend, best=drift",
+   "predicted_return_pct": 10.27,
+   "predicted_price": 481.27,
+   "range_low": 430.03,
+   "range_high": 532.52,
+   "backtest": {
+    "ml_mape": 4.34,
+    "ml_dir_acc": 66.7,
+    "drift_mape": 4.24,
+    "drift_dir_acc": 75.0,
+    "naive_mape": 4.37,
+    "naive_dir_acc": 0.0,
+    "best_model": "drift",
+    "best_mape": 4.24,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 20.529163,
+    "forward_pe": null,
+    "roe": 0.19891001,
+    "debt_to_equity": 0.17670000000000002,
+    "market_cap": 9563112448.0,
+    "revenue_growth": 0.225,
+    "earnings_growth": 0.455,
+    "dividend_yield": 1.74,
+    "score": 90.0,
+    "flags": [
+     "Strong ROE 20%",
+     "Earnings growth +46%",
+     "Revenue growth +22%"
+    ]
+   },
+   "news": {
+    "headlines": [
+     {
+      "title": "Onward Technologies (ONWARDTEC) Share Price Today, Live Chart, News",
+      "source": "TechGraph",
+      "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBfTXJTOHE0dGZFaUJ5R1VSNEVoNk1ZTjlKR2k0ZHMxdGZkYlpqaGVSVHZoTGJNbnNRc0g4b19CVWNvOVlhdzhkRjBTMnVlNVQ0c1FLd01QOEN1ay1Bbkd5VHJ4OA?oc=5",
+      "date": "2026-10-13"
+     },
+     {
+      "title": "Onward Technologies Q2FY27 Results: Revenue up 22.2% YoY, EBITDA rises 33.7%",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQeXZBcEZYbjhDd0JMQ1g3LWp0bGxxRkl1aGVUVWZLZ3d1TDRJaVhnaU5laFBlNFRsdzJKNXVlX0Z5aXR4LXNKRDduWG5Dam1vR00tMXJwZkpjQXhXNXZZZUt5Zjh3M1B1STZRZkpmNHVlOU12ckJ1Y0YzeTI2Zmc0aV84REVNUkRxOFZJc0tzaFctY0FfdTczME9jMGFOV0t5U19veUlwY1JwNkx6dXRuNHl2dks?oc=5",
+      "date": "2026-10-18"
+     },
+     {
+      "title": "Onward Technologies promoters confirm no share encumbrance in FY26",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQVzZVQ09Kbm13TERlZGlEc2RYNUlJT1dpYjNoTE9KZUlDQlA2cGZpbzJYa25QMnNOSWRHWHliR3EzdFBhM25CVzh1a3kxZjd5WFB4cFhMbWpfdXJCQlRGR2hvNlhIVjlwbGFwSnVrcmswS2U3QjVjTkhrdkxXdFdxXzRjWFJwYTg4MjlOMFlwSFF3Z2FWNW0wYUpxaUxBNkR5b2NJVkFIQzdBLUw1VW9QRzRnOV9uLWlCaEszSEdsX00?oc=5",
+      "date": "2026-10-13"
+     }
+    ],
+    "sentiment_score": 1.0,
+    "sentiment_label": "Positive",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "PCJEWELLER",
+   "name": "PC JEWELLER LTD.",
+   "exchange": "BSE",
+   "current_price": 18.07,
+   "trader_score": 85.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b915.21) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "ADX 36 \u2014 strong uptrend",
+    "Volume 1.6\u00d7 average but on a down day \u2014 distribution",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Doji (indecision)"
+   ],
+   "support": 8.98,
+   "resistance": 20.17,
+   "high52": 20.17,
+   "stop_loss": 15.74,
+   "target": 20.4,
+   "target2": 21.57,
+   "risk_reward": 1.0,
+   "rsi": 74.3,
+   "adx": 35.7,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 1.59,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 15.21,
+   "predicted_price": 20.82,
+   "range_low": 18.73,
+   "range_high": 22.91,
+   "backtest": {
+    "ml_mape": 5.81,
+    "ml_dir_acc": 91.7,
+    "drift_mape": 10.71,
+    "drift_dir_acc": 50.0,
+    "naive_mape": 10.65,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 5.81,
+    "best_dir_acc": 91.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": null,
+   "news": {
+    "headlines": [
+     {
+      "title": "PC Jeweller shares zoom 9% after Q2 net profit soars 58% YoY; stock up over 108% in 2026",
+      "source": "Moneycontrol.com",
+      "url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxON1l4NWFIaFY0dUJ4UDc4ZU1uUUJDTGNibjBpOHRIQTdvbzVoYlNfYVc4Q1NHM0ZfdEw2WDBWS2c0YmJEcDhOR0VPMlZMWElSbk1pckQ1MmcwbDZIYnhRRXJXT2NWVmdrcHdPaVZhZlFrZl9WUVNOTDdRV292Y3BQUE51bXpwNDB4VjZzakZtZlM1Mm00M3ExVTYtdjBWUlJQV0JkbGJQOXNTX2NkenlYWERDUmdJS2JsVGxDSHRyc252cEhBZGgtR0x0OFhjcTA5ckNUM0lRUjdkTFV0NWFadWxJSdIB6AFBVV95cUxPSGE0VEZ1dGZrZmJLTXhOZUxteVVnYUk1bi15alRfVVVZOHJEbm5nbnNyLU5Nd19MVG4xWlE1XzRCaEJJeWRNMWEySE9EYkozOTc4YzBnUjZkSlV0dXBzQ1FucEtiUGpielQzRk4yc2psVTBfWHBKMmxwWUMwQ0ZlTnhtVWFZc2NDcHpZMTlVeEtqbFF4MS1fRU1HeklfTFdoZ0QxNDJCcDlJZ2VlWTlHOGpjbnl3Y2dvNHd2QVRHQzd6V1FuaU9lVFMtSzhoZ1VqQVhnbTRBS1c4aXQzNWkydTZRY3h1MHhX?oc=5",
+      "date": "2026-10-22"
+     },
+     {
+      "title": "Multibagger alert! PC Jeweller shares jump 6% to fresh 52-week high, rally over 100% in 2026",
+      "source": "The Economic Times",
+      "url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxQWTRPQlZTQWZrSTRsVTNOc2Y2LVFmZV9Jd0JsVW1QZWhuZ3RrYjZ2eUpDZGwzUzRTRHl5UVlReTVEMFZXdnZMVDBOSndfdEo4STFsUWpjZDBqdzQzazU5aU1mOTBpdGVuU2VCcjNrVnNibXA5VGh3N1R0cXF0ekY0Z0ZhQXJwemtXTUlqNEFtV0NNNzVramo5ekJaNXFlM0dQV3BjRnI2T1NJOWhtNzBiQ2dWRVFMYTlJM0Vld0FhWTU0Mm9ySmlBWnJmYktQNm1BdlFRWXY3NDRRYTlPY0JuZjNOY3IyYlhjYk5YeHVlYjVOR1JD0gH6AUFVX3lxTFB1eVZwa3EzOFdiRmhJeVVvUDFUQ3Vtc1JteXI5aFFsVkFNSm5YZmRZRmhobERYajByeDJORlV5MGUtZDJOLXIzVEpvSWlFbVdiMjBlMDBPbDhRYkVGWkdOOFNsaENzc0NKY0VCYWJIdGRYS3JjeklHMlhDRjh0a1A5RHJfZ2p2b2hBTTQ4VnU5U2FHeHdrb2g1eXBpMUxmVGMyaUFycjZHU0JGZXQyUmhYOE1XOUhUeFJNOXFwREQ2dlNQX0xEWkZ1ekxYQS1ZbnNra0U1ZHZ6VFZQMC1qNThna0dlUEh6VHpCaTlPRXZwdTFja080UEhBMEE?oc=5",
+      "date": "2026-10-21"
+     },
+     {
+      "title": "PC Jewellers Share Price slumps more than 2% after gaining almost 29% in a week",
+      "source": "India Infoline",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNckJ6Tk1NZFNFU1dTZlE2V3NUNnRrTVRGeFhfTEliYWpPTVFRSzdZRC1EeVpHZGlyTll0czhBUHN0R204djhQVGFseHk3aVJ4S3ZtcnRCLWx1VHlDUWd5S0ZvNms1bWlBWTVHZGFJQ1FGS1ZQQUhFNi1qOEM4S1lhSnJDRU5oc1VzVS1lSDV4SU5tQzdpMnF0TlRBOWlzX3h6WVYxQzlJOHNOUEl3VFdDLTBmRFZ4M2VpSE9GVVpjTQ?oc=5",
+      "date": "2026-10-22"
+     },
+     {
+      "title": "Multibagger penny stock: PC Jeweller zooms 9% post Q2 nos, debt-free status",
+      "source": "Business Standard",
+      "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxOLS1lZUlPRDYzbWdlczYtTGMybzhTa3NuS05FdFVRM2VQSWM3QjE4cVFLX0U3Mnp0ZUJMUEJVT0tyaWxiWlJlTkF3a0lxOXlvNWstaXNzN2VrLUYteVJPbzNRdDUxemFIbkdNYVc2VHdiTVRycFI5dktNLVcxYVowUlB0TG43MTBNYVAxMWpVRHUzeVdTNmd2endOaFJEZU5OeGRFTXhjQ29ZSkJaR0NXNm1kcUMzNW40M1QwNEtfS3dMNlozcGE0M1ZoWDZTdFQ4YXdib2530gHbAUFVX3lxTFBEZlBkbTBKNlAtbmtxMk5QMnBVaHZYY0lCOHJzdjYxVzJiZlBqRWhwOWJxRGZyclVjcmVSenFsdVZxd0VlYkw1YkV3eWtxTFdyeEpsZC1kYmpITDRRTlNMTkVRQUhSSmNlZjBiOXdTMkFSLVEtOW5obW9DZjVyWGhBM3hycnBNZW1waWlvYkRjWGJ6ZTAtbVJydFlYcWNQQnBPcXRzcWUtMEVnN2RMZXlnay12a2xFX2MyOFNncmhRZENqbGZiQUZJQXNwR1ZUNG9GRmpYZWstTEFoQQ?oc=5",
+      "date": "2026-10-22"
+     },
+     {
+      "title": "Q2 Results Highlights: PC Jeweller profit soars 58% YoY to \u20b9331 crore; Eternal revenue jumps 78%",
+      "source": "Upstox",
+      "url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxPMktSLUdoUlpONFFKQnN3eEJWcVExSkNGcWRHTmZHRXdIeEpKQnJxM3hObmFqd29OT2VwSXFSMnJSZW5ERk1WcmFqbVB4TzFzSWR5cjR0ajFkc3FEaW0xMTJBeldmQk1OT3hFdGVvcTNoU25POFVNVHJYVG9wQjhCQVc2c0hVUnBJa0dSU0l2NVpBdHkyYXFEdktKbW5kVjlHRG5KMURUWVBZYS1INVo0eWF0V0o5SXJvTmdCSWxETjZTdGx0bDdXanFUSVBRcGQ0NkNNMXhTWEFGMjZwTG5maExoaWtqV2ZHZTVVdVlUT0oycG5v?oc=5",
+      "date": "2026-10-21"
+     },
+     {
+      "title": "Small-Cap Stock Under Rs 20: Multibagger PC Jewellers Q2 Profit Jumps 57% On 'Debt-Free Status', Margins Expand",
+      "source": "NDTV Profit",
+      "url": "https://news.google.com/rss/articles/CBMi5AFBVV95cUxPb2ZYc2tlWkxUZjBQaGNsWHRseWl5cWxwbERFbmg4U09tRlVmUXRVNHV5RlYwa2JvQjRKRU1OOWNVelZrMnljZmpYNkc5SjlOLXdYUVUzUjRwUC1BTEJjQ0VaaHpGOXZhNE1qa1hhRXZCc0dUZXJwMWlvZ3d3b1dSTWlDWTFlVFdXbDdpV044WTByRDVXRkRlSkRpQ2h0SGFmUXR2UUJsZzk1Mm9SQm5CMWNUcnkyQnB6bjlrSlJkWHpwWkszZkNITWZpYzdyNU85Nk5HM2hlMmRxTlJJazREV1F4YnPSAewBQVVfeXFMUEZ3cjlaTEcxR19rRmJTbkN2WVhubloyVUxXWlhwT1FfM3QyT2hFemh3MzhPRjVfWktJcEV4Q1lfd21rbmpXZHkyUE5YcGk5MzVvdjJwVnlQVFROUkY0TUNEOTNsMHpHV1QxaUpPaW54bGJuM05BUVZGNzhDUVVWLXlqc0xVb3ZROFZ3aTZpaXQxSlhOWnFyUnhETUpyVnhrakgxclVfd3Y5Wi05V0xoMUU4ZThVRk0yNHpfT0xESUNqcXY2bVplZ2wtclRtaFlIdUQwRl84TmpvcG1KUzRHZVp4NXZyakc5SkI0VWs?oc=5",
+      "date": "2026-10-21"
+     }
+    ],
+    "sentiment_score": 1.0,
+    "sentiment_label": "Positive",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "DCMSRIND",
+   "name": "DCM SHRIRAM INDUSTRIES LTD.",
+   "exchange": "BSE",
+   "current_price": 50.1,
+   "trader_score": 90.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b943.32) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Below 200-EMA \u2014 long-term trend down",
+    "9/21 EMA bullish crossover structure",
+    "RSI 64 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "ADX 32 \u2014 strong uptrend",
+    "Volume 2.4\u00d7 20-day average on an up day"
+   ],
+   "patterns": [
+    "Inside bar (compression)"
+   ],
+   "support": 37.4,
+   "resistance": 57.32,
+   "high52": 180.95,
+   "stop_loss": 42.54,
+   "target": 57.66,
+   "target2": 61.44,
+   "risk_reward": 1.0,
+   "rsi": 64.4,
+   "adx": 31.5,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 2.35,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 15.5,
+   "predicted_price": 57.87,
+   "range_low": 51.11,
+   "range_high": 64.63,
+   "backtest": {
+    "ml_mape": 4.01,
+    "ml_dir_acc": 75.0,
+    "drift_mape": 6.29,
+    "drift_dir_acc": 25.0,
+    "naive_mape": 5.55,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 4.01,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": null,
+   "news": {
+    "headlines": [
+     {
+      "title": "DCM Shriram Industries Ltd Share Price Today NSE/BSE Charts",
+      "source": "Alice Blue",
+      "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE56NXdDU0JkYVFkTDBjWjlkZTdLVmM5RmtqNHNhVUNEZlR3M1F3Z1pxcDM5TVhaRzEyZDlxNU1zeHF1SnNMM1RrZ3pyOC1QWjk5REdiLUFBa1JVLVpoal9jc3lnaDJVQ1hpbllJTG5TOWl0N3BtYkZyeTZ2bFc?oc=5",
+      "date": "2026-10-21"
+     },
+     {
+      "title": "Price Band Hitters on October 19, 2026, at 12:00 PM IST: Kross, DCM Shriram Industries, Midwest",
+      "source": "HDFC Sky",
+      "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE1PN20xZVBKcUpBLXUxZlJ0UEcySW1ZUHZlSTNRZnV1aC1obVZVTW45UmdCNTNaU0dBcW4xNkdPd2pieXU3bEw2Z0dwZ2M4SUEzR1R3cTZueHRfeGdjSVZNaFVxazFLNjVsay1JSHpzNFprOXotRTlGX2VLdw?oc=5",
+      "date": "2026-10-19"
+     },
+     {
+      "title": "DCM Shriram Industries Upper Circuit Today: Price, Data and Peers",
+      "source": "Univest",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9LYW1YVXFsa1FfUnExZ2xYaDBvUVA1YklyS0x4T2FBX013UktjLXVwVGpWdDJiOGNvYWNJUGZtTE9RZ1c0QVV5a0FLTnhoMlJULVpnazdIcGtHZEd2Z3lrLW1jNUVIVlIwdHZkYm5zRzIwUGRFVHRxbnY4RVh1Rm8?oc=5",
+      "date": "2026-10-19"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  }
+ ],
+ "allocation": null,
+ "vetoed": [],
+ "red_flag_demoted": [],
+ "stage1_top50": [
+  {
+   "symbol": "SGMART",
+   "name": "SG Mart Limited",
+   "exchange": "NSE",
+   "current_price": 796.8,
+   "trader_score": 100.0,
+   "delivery_pct": 58.5,
+   "rsi": 57.9,
+   "ret21_pct": 10.39,
+   "reasons": [
+    "Price above 21-EMA (\u20b9762.66) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SSWL",
+   "name": "STEEL STRIPS WHEELS LTD.",
+   "exchange": "BSE",
+   "current_price": 469.7,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 70.8,
+   "ret21_pct": 29.02,
+   "reasons": [
+    "Price above 21-EMA (\u20b9402.23) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CYIENT",
+   "name": "CYIENT LIMITED",
+   "exchange": "BSE",
+   "current_price": 1229.25,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 66.6,
+   "ret21_pct": 13.99,
+   "reasons": [
+    "Price above 21-EMA (\u20b91142.22) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SHREERAMA",
+   "name": "Shree Rama Multi-Tech Limited",
+   "exchange": "NSE",
+   "current_price": 58.97,
+   "trader_score": 99.0,
+   "delivery_pct": 55.5,
+   "rsi": 66.5,
+   "ret21_pct": 34.97,
+   "reasons": [
+    "Price above 21-EMA (\u20b948.55) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CYIENT",
+   "name": "Cyient Limited",
+   "exchange": "NSE",
+   "current_price": 1233.0,
+   "trader_score": 98.0,
+   "delivery_pct": 10.5,
+   "rsi": 66.7,
+   "ret21_pct": 14.27,
+   "reasons": [
+    "Price above 21-EMA (\u20b91142.22) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "JINDALPOLY",
+   "name": "JINDAL POLY FILMS LIMITED",
+   "exchange": "BSE",
+   "current_price": 738.3,
+   "trader_score": 98.0,
+   "delivery_pct": null,
+   "rsi": 62.2,
+   "ret21_pct": 2.41,
+   "reasons": [
+    "Price above 21-EMA (\u20b9682.31) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MAHASTEEL",
+   "name": "Mahamaya Steel Industries Limited",
+   "exchange": "NSE",
+   "current_price": 1473.5,
+   "trader_score": 97.0,
+   "delivery_pct": null,
+   "rsi": 74.1,
+   "ret21_pct": 33.74,
+   "reasons": [
+    "Price above 21-EMA (\u20b91235.89) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SGMART",
+   "name": "SG MART LIMITED",
+   "exchange": "BSE",
+   "current_price": 794.05,
+   "trader_score": 97.0,
+   "delivery_pct": null,
+   "rsi": 57.2,
+   "ret21_pct": 9.94,
+   "reasons": [
+    "Price above 21-EMA (\u20b9762.23) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "JINDALPOLY",
+   "name": "Jindal Poly Films Limited",
+   "exchange": "NSE",
+   "current_price": 739.35,
+   "trader_score": 96.0,
+   "delivery_pct": 2.7,
+   "rsi": 61.7,
+   "ret21_pct": 2.42,
+   "reasons": [
+    "Price above 21-EMA (\u20b9681.86) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PANACHE",
+   "name": "Panache Digilife Limited",
+   "exchange": "NSE",
+   "current_price": 652.7,
+   "trader_score": 96.0,
+   "delivery_pct": null,
+   "rsi": 66.9,
+   "ret21_pct": 28.08,
+   "reasons": [
+    "Price above 21-EMA (\u20b9605.43) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SANCODE",
+   "name": "Sancode Technologies Limited",
+   "exchange": "BSE",
+   "current_price": 1011.2,
+   "trader_score": 96.0,
+   "delivery_pct": null,
+   "rsi": 93.5,
+   "ret21_pct": 43.64,
+   "reasons": [
+    "Price above 21-EMA (\u20b9868.50) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "NAZARA",
+   "name": "Nazara Technologies Limited",
+   "exchange": "NSE",
+   "current_price": 402.15,
+   "trader_score": 95.0,
+   "delivery_pct": 55.3,
+   "rsi": 58.2,
+   "ret21_pct": 8.56,
+   "reasons": [
+    "Price above 21-EMA (\u20b9390.77) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "REGAAL",
+   "name": "Regaal Resources Limited",
+   "exchange": "NSE",
+   "current_price": 88.43,
+   "trader_score": 95.0,
+   "delivery_pct": 55.4,
+   "rsi": 52.5,
+   "ret21_pct": -9.03,
+   "reasons": [
+    "Price above 21-EMA (\u20b987.41) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KROSS",
+   "name": "Kross Limited",
+   "exchange": "BSE",
+   "current_price": 306.65,
+   "trader_score": 95.0,
+   "delivery_pct": null,
+   "rsi": 68.6,
+   "ret21_pct": 19.97,
+   "reasons": [
+    "Price above 21-EMA (\u20b9265.93) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SVRL",
+   "name": "Shri Venkatesh Refineries Limi",
+   "exchange": "BSE",
+   "current_price": 756.0,
+   "trader_score": 95.0,
+   "delivery_pct": null,
+   "rsi": 83.3,
+   "ret21_pct": 30.12,
+   "reasons": [
+    "Price above 21-EMA (\u20b9686.50) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "REGENCY",
+   "name": "REGENCY FINCORP LIMITED",
+   "exchange": "BSE",
+   "current_price": 62.35,
+   "trader_score": 94.0,
+   "delivery_pct": null,
+   "rsi": 65.4,
+   "ret21_pct": 36.67,
+   "reasons": [
+    "Price above 21-EMA (\u20b957.17) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TANLA",
+   "name": "TANLA PLATFORMS LIMITED",
+   "exchange": "BSE",
+   "current_price": 557.1,
+   "trader_score": 94.0,
+   "delivery_pct": null,
+   "rsi": 59.3,
+   "ret21_pct": 14.78,
+   "reasons": [
+    "Price above 21-EMA (\u20b9532.06) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SEJALLTD",
+   "name": "SEJAL GLASS LIMITED",
+   "exchange": "BSE",
+   "current_price": 850.45,
+   "trader_score": 94.0,
+   "delivery_pct": null,
+   "rsi": 61.2,
+   "ret21_pct": 26.94,
+   "reasons": [
+    "Price above 21-EMA (\u20b9773.07) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ANANDRATHI",
+   "name": "Anand Rathi Wealth Limited",
+   "exchange": "NSE",
+   "current_price": 2235.0,
+   "trader_score": 93.0,
+   "delivery_pct": 50.0,
+   "rsi": 63.3,
+   "ret21_pct": 2.57,
+   "reasons": [
+    "Price above 21-EMA (\u20b92159.43) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Below 200-EMA \u2014 long-term trend down"
+   ]
+  },
+  {
+   "symbol": "HILINFRA",
+   "name": "Highway Infrastructure Limited",
+   "exchange": "NSE",
+   "current_price": 54.52,
+   "trader_score": 93.0,
+   "delivery_pct": 60.7,
+   "rsi": 69.8,
+   "ret21_pct": 26.03,
+   "reasons": [
+    "Price above 21-EMA (\u20b950.05) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KROSS",
+   "name": "Kross Limited",
+   "exchange": "NSE",
+   "current_price": 306.55,
+   "trader_score": 93.0,
+   "delivery_pct": 12.3,
+   "rsi": 68.3,
+   "ret21_pct": 19.69,
+   "reasons": [
+    "Price above 21-EMA (\u20b9266.05) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CRISIL",
+   "name": "CRISIL LTD.",
+   "exchange": "BSE",
+   "current_price": 4748.1,
+   "trader_score": 93.0,
+   "delivery_pct": null,
+   "rsi": 61.9,
+   "ret21_pct": 3.99,
+   "reasons": [
+    "Price above 21-EMA (\u20b94561.83) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ALGOQUANT",
+   "name": "Algoquant Fintech Limited",
+   "exchange": "NSE",
+   "current_price": 74.73,
+   "trader_score": 92.0,
+   "delivery_pct": 22.5,
+   "rsi": 65.0,
+   "ret21_pct": 3.45,
+   "reasons": [
+    "Price above 21-EMA (\u20b970.38) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BMWVENTLTD",
+   "name": "BMW Ventures Limited",
+   "exchange": "NSE",
+   "current_price": 63.7,
+   "trader_score": 92.0,
+   "delivery_pct": 70.3,
+   "rsi": 58.2,
+   "ret21_pct": 22.69,
+   "reasons": [
+    "Price above 21-EMA (\u20b960.57) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "COMFINTE",
+   "name": "Comfort Intech Limited",
+   "exchange": "NSE",
+   "current_price": 8.72,
+   "trader_score": 92.0,
+   "delivery_pct": null,
+   "rsi": 64.5,
+   "ret21_pct": 50.34,
+   "reasons": [
+    "Price above 21-EMA (\u20b97.33) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "FSL",
+   "name": "Firstsource Solutions Limited",
+   "exchange": "NSE",
+   "current_price": 290.4,
+   "trader_score": 92.0,
+   "delivery_pct": 30.0,
+   "rsi": 62.3,
+   "ret21_pct": 7.76,
+   "reasons": [
+    "Price above 21-EMA (\u20b9275.48) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "UTTAMSUGAR",
+   "name": "Uttam Sugar Mills Limited",
+   "exchange": "NSE",
+   "current_price": 352.4,
+   "trader_score": 92.0,
+   "delivery_pct": 26.9,
+   "rsi": 58.3,
+   "ret21_pct": 36.46,
+   "reasons": [
+    "Price above 21-EMA (\u20b9331.64) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ORIENTHOT",
+   "name": "ORIENTAL HOTELS LTD.",
+   "exchange": "BSE",
+   "current_price": 152.0,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 62.4,
+   "ret21_pct": 6.41,
+   "reasons": [
+    "Price above 21-EMA (\u20b9144.70) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "RAPICUT",
+   "name": "RAPICUT CARBIDES LTD.",
+   "exchange": "BSE",
+   "current_price": 301.0,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 54.4,
+   "ret21_pct": 3.37,
+   "reasons": [
+    "Price above 21-EMA (\u20b9288.28) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ITBEES",
+   "name": "Nippon India Mutual Fund - Per",
+   "exchange": "BSE",
+   "current_price": 35.6,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 68.0,
+   "ret21_pct": 12.02,
+   "reasons": [
+    "Price above 21-EMA (\u20b933.46) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ALGOQUANT",
+   "name": "ALGOQUANT FINTECH LIMITED",
+   "exchange": "BSE",
+   "current_price": 74.75,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 64.9,
+   "ret21_pct": 3.33,
+   "reasons": [
+    "Price above 21-EMA (\u20b970.41) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SKYGOLD",
+   "name": "Sky Gold And Diamonds Limited",
+   "exchange": "BSE",
+   "current_price": 1047.8,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 76.7,
+   "ret21_pct": 30.79,
+   "reasons": [
+    "Price above 21-EMA (\u20b9940.30) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "OAL",
+   "name": "ORIENTAL AROMATICS LIMITED",
+   "exchange": "BSE",
+   "current_price": 575.6,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 58.8,
+   "ret21_pct": 3.46,
+   "reasons": [
+    "Price above 21-EMA (\u20b9551.63) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BAJAJHLDNG",
+   "name": "BAJAJ HOLDINGS & INVESTMENT LT",
+   "exchange": "BSE",
+   "current_price": 11175.0,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 55.1,
+   "ret21_pct": -0.16,
+   "reasons": [
+    "Price above 21-EMA (\u20b910983.26) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BHARTIHEXA",
+   "name": "Bharti Hexacom Limited",
+   "exchange": "NSE",
+   "current_price": 1637.9,
+   "trader_score": 90.0,
+   "delivery_pct": 55.1,
+   "rsi": 65.0,
+   "ret21_pct": 6.75,
+   "reasons": [
+    "Price above 21-EMA (\u20b91556.24) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CRISIL",
+   "name": "Crisil Limited",
+   "exchange": "NSE",
+   "current_price": 4751.1,
+   "trader_score": 90.0,
+   "delivery_pct": 30.1,
+   "rsi": 62.4,
+   "ret21_pct": 4.2,
+   "reasons": [
+    "Price above 21-EMA (\u20b94562.34) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "DHANBANK",
+   "name": "Dhanlaxmi Bank Limited",
+   "exchange": "NSE",
+   "current_price": 35.76,
+   "trader_score": 90.0,
+   "delivery_pct": 34.8,
+   "rsi": 60.9,
+   "ret21_pct": 22.55,
+   "reasons": [
+    "Price above 21-EMA (\u20b933.26) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "GCSL",
+   "name": "Gretex Corporate Services Limited",
+   "exchange": "NSE",
+   "current_price": 726.2,
+   "trader_score": 90.0,
+   "delivery_pct": 27.9,
+   "rsi": 69.0,
+   "ret21_pct": 13.61,
+   "reasons": [
+    "Price above 21-EMA (\u20b9695.47) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "LTTS",
+   "name": "L&T Technology Services Limited",
+   "exchange": "NSE",
+   "current_price": 3910.3,
+   "trader_score": 90.0,
+   "delivery_pct": 29.5,
+   "rsi": 69.2,
+   "ret21_pct": 18.72,
+   "reasons": [
+    "Price above 21-EMA (\u20b93545.11) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SOUTHBANK",
+   "name": "The South Indian Bank Limited",
+   "exchange": "NSE",
+   "current_price": 52.57,
+   "trader_score": 90.0,
+   "delivery_pct": 40.3,
+   "rsi": 60.5,
+   "ret21_pct": 16.23,
+   "reasons": [
+    "Price above 21-EMA (\u20b950.29) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SSWL",
+   "name": "Steel Strips Wheels Limited",
+   "exchange": "NSE",
+   "current_price": 468.75,
+   "trader_score": 90.0,
+   "delivery_pct": 15.6,
+   "rsi": 70.8,
+   "ret21_pct": 28.5,
+   "reasons": [
+    "Price above 21-EMA (\u20b9402.39) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TANLA",
+   "name": "Tanla Platforms Limited",
+   "exchange": "NSE",
+   "current_price": 557.15,
+   "trader_score": 90.0,
+   "delivery_pct": 39.8,
+   "rsi": 59.3,
+   "ret21_pct": 14.79,
+   "reasons": [
+    "Price above 21-EMA (\u20b9532.01) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "UNIONBANK",
+   "name": "Union Bank of India",
+   "exchange": "NSE",
+   "current_price": 178.9,
+   "trader_score": 90.0,
+   "delivery_pct": 52.6,
+   "rsi": 54.1,
+   "ret21_pct": 0.51,
+   "reasons": [
+    "Price above 21-EMA (\u20b9176.11) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "DHANBANK",
+   "name": "DHANLAXMI BANK LIMITED",
+   "exchange": "BSE",
+   "current_price": 35.73,
+   "trader_score": 90.0,
+   "delivery_pct": null,
+   "rsi": 60.8,
+   "ret21_pct": 22.49,
+   "reasons": [
+    "Price above 21-EMA (\u20b933.25) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "COMFINTE",
+   "name": "COMFORT INTECH LTD.",
+   "exchange": "BSE",
+   "current_price": 8.73,
+   "trader_score": 90.0,
+   "delivery_pct": null,
+   "rsi": 64.6,
+   "ret21_pct": 49.49,
+   "reasons": [
+    "Price above 21-EMA (\u20b97.33) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "FSL",
+   "name": "FIRSTSOURCE SOLUTIONS LTD.",
+   "exchange": "BSE",
+   "current_price": 290.3,
+   "trader_score": 90.0,
+   "delivery_pct": null,
+   "rsi": 62.3,
+   "ret21_pct": 7.72,
+   "reasons": [
+    "Price above 21-EMA (\u20b9275.45) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "UNIONBANK",
+   "name": "UNION BANK OF INDIA",
+   "exchange": "BSE",
+   "current_price": 178.5,
+   "trader_score": 90.0,
+   "delivery_pct": null,
+   "rsi": 54.6,
+   "ret21_pct": 0.28,
+   "reasons": [
+    "Price above 21-EMA (\u20b9176.00) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "DCMSRIND",
+   "name": "DCM SHRIRAM INDUSTRIES LTD.",
+   "exchange": "BSE",
+   "current_price": 50.1,
+   "trader_score": 90.0,
+   "delivery_pct": null,
+   "rsi": 64.4,
+   "ret21_pct": 32.64,
+   "reasons": [
+    "Price above 21-EMA (\u20b943.32) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Below 200-EMA \u2014 long-term trend down"
+   ]
+  },
+  {
+   "symbol": "SOUTHBANK",
+   "name": "SOUTH INDIAN BANK LTD.",
+   "exchange": "BSE",
+   "current_price": 52.57,
+   "trader_score": 90.0,
+   "delivery_pct": null,
+   "rsi": 60.6,
+   "ret21_pct": 16.15,
+   "reasons": [
+    "Price above 21-EMA (\u20b950.29) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BAJAJHLDNG",
+   "name": "Bajaj Holdings & Investment Limited",
+   "exchange": "NSE",
+   "current_price": 11175.0,
+   "trader_score": 89.0,
+   "delivery_pct": 40.7,
+   "rsi": 54.2,
+   "ret21_pct": -0.09,
+   "reasons": [
+    "Price above 21-EMA (\u20b911003.81) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  }
+ ],
+ "evaluated_count": 141
+}

@@ -1,0 +1,1349 @@
+{
+ "product": "MarketMind Pro",
+ "version": "2.0",
+ "run_date": "2026-10-29",
+ "data_as_of": "2026-10-28",
+ "target_date": "2026-11-05",
+ "horizon": "7 calendar days (5 trading days)",
+ "universe_counts": {
+  "nse": 2613,
+  "bse": 5374,
+  "total": 7987
+ },
+ "stage_counts": {
+  "universe": 7987,
+  "with_data": 6893,
+  "nse_with_data": 2350,
+  "bse_with_data": 4543,
+  "liquid": 1808,
+  "stage2": 143,
+  "quality_passed": 82
+ },
+ "picks": [
+  {
+   "symbol": "SGMART",
+   "name": "SG Mart Limited",
+   "exchange": "NSE",
+   "isin": "INE385F01024",
+   "current_price": 896.8,
+   "trader_score": 96.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9783.48) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "ADX 32 \u2014 strong uptrend",
+    "Volume 4.4\u00d7 20-day average on an up day",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Breakout candle above 20-day high"
+   ],
+   "support": 678.1,
+   "resistance": 901.0,
+   "high52": 901.0,
+   "stop_loss": 811.3,
+   "target": 982.3,
+   "target2": 1025.05,
+   "risk_reward": 1.0,
+   "rsi": 72.7,
+   "adx": 32.4,
+   "delivery_pct": null,
+   "delivery_avg5": 63.6,
+   "volume_ratio": 4.43,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 8.44,
+   "predicted_price": 972.46,
+   "range_low": 895.98,
+   "range_high": 1048.93,
+   "backtest": {
+    "ml_mape": 3.68,
+    "ml_dir_acc": 91.7,
+    "drift_mape": 4.33,
+    "drift_dir_acc": 58.3,
+    "naive_mape": 4.19,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 3.68,
+    "best_dir_acc": 91.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 80.81136,
+    "forward_pe": 39.64179,
+    "roe": null,
+    "debt_to_equity": 0.16781,
+    "market_cap": 100456079360.0,
+    "revenue_growth": 0.144,
+    "earnings_growth": 0.346,
+    "dividend_yield": 0.0,
+    "score": 62.0,
+    "flags": [
+     "Earnings growth +35%",
+     "Expensive \u2014 PE 81"
+    ]
+   },
+   "news": {
+    "headlines": [
+     {
+      "title": "SG Mart Limited Reports Earnings Results for the Second Quarter and Six Months Ended September 30, 2026",
+      "source": "www.marketscreener.com",
+      "url": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxQYWgwZDBNT1RXZHhTRk5BN1RndjRjOWJUZGV2clZJeHoxcHlGUFh6XzFyNnZOUkwwMWdkUG5CWDBEd0NGZ0VuY3pBM1lkVVQ5MUljQ3pHOVJhY2htTmkza0ZfSXpYV1c2MDRWdUxqNTFORnoxWE9sWlJrM3hJS2hGb0VfWFBhN3ZfMWpTUU9zVVVadzZrQnF2Umt5MHNpRHVtZzZ1amZESXN0aWVLMDFQQTBEODJ5S3pabXdqQ2xYWTdkcl84YVByQ0JIRWVuYVN0NlctakFoVGRIVXVMbjUwNTNpcmdXQ3c?oc=5",
+      "date": "2026-10-27"
+     },
+     {
+      "title": "SG Mart Q2FY27 Results: Net profit jumps 104% to \u20b954 crore",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQdlNoSGdFSUtoSE1oelZ3dVBYQVRoNnlzbHR1aFMwVnRoelRkamVIZVRnSlo1MHB0ZlNsbnYzV1k5VTFjeFZubk5SUllTWHdha1dfTkVFY3lMV0J6OUVESGdXOW1LSm5vRTdFQ1lNWTFxbWpSZ3JpcXhNdVRUeVNhZ3d6UE1BekdiZUZLcFU4RzdQYmxkSUxrY0hzcnVnNUE0eThv?oc=5",
+      "date": "2026-10-27"
+     }
+    ],
+    "sentiment_score": 1.0,
+    "sentiment_label": "Positive",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "SANCODE",
+   "name": "Sancode Technologies Limited",
+   "exchange": "BSE",
+   "isin": "INE0P7001013",
+   "current_price": 1073.0,
+   "trader_score": 88.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9914.50) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 95 \u2014 overbought, chase risk",
+    "MACD histogram positive",
+    "ADX 92 \u2014 strong uptrend",
+    "Volume well below average \u2014 low conviction"
+   ],
+   "patterns": [
+    "Doji (indecision)"
+   ],
+   "support": 361.8,
+   "resistance": 1073.0,
+   "high52": 1073.0,
+   "stop_loss": 1038.47,
+   "target": 1107.53,
+   "target2": 1124.8,
+   "risk_reward": 1.0,
+   "rsi": 95.1,
+   "adx": 92.2,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 0.19,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 9.21,
+   "predicted_price": 1171.87,
+   "range_low": 1140.98,
+   "range_high": 1202.75,
+   "backtest": {
+    "ml_mape": 1.38,
+    "ml_dir_acc": 100.0,
+    "drift_mape": 1.83,
+    "drift_dir_acc": 100.0,
+    "naive_mape": 8.61,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 1.38,
+    "best_dir_acc": 100.0,
+    "windows": 9
+   },
+   "quality_pass": true,
+   "fundamentals": null,
+   "news": {
+    "headlines": [
+     {
+      "title": "Sancode subsidiary to acquire Philippine OSAT firm for $20.2 million",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOVUV2cDdDNmVvNDkwUFZRUE5hbVpNcDFIM2dSQkVueUVyMngzd3pVX3FuaFZVOTRkbzcweXpqWk5JNGNENjdLbDRBUDhhZEZ2RVYydU1yZ1NqUXg1VEVITENOMktwTzJFeVN2WXJ5Q1VLYTBXWkg2RE9UMjYydVUzamFqd1NSSmhuQWFJdDdKbVJhLVU0VVJ1R2VCNTRpejBCNjhscFNZRnU4VG90Wk40eldFT3RwUHdG?oc=5",
+      "date": "2026-10-23"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "SHREEPUSHK",
+   "name": "Shree Pushkar Chemicals & Fertilisers Limited",
+   "exchange": "NSE",
+   "isin": "INE712K01011",
+   "current_price": 569.8,
+   "trader_score": 99.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9502.79) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 69 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "ADX 29 \u2014 strong uptrend",
+    "Volume 2.1\u00d7 20-day average on an up day"
+   ],
+   "patterns": [
+    "Three white soldiers"
+   ],
+   "support": 368.1,
+   "resistance": 578.7999877929688,
+   "high52": 578.7999877929688,
+   "stop_loss": 509.83,
+   "target": 629.77,
+   "target2": 659.75,
+   "risk_reward": 1.0,
+   "rsi": 69.1,
+   "adx": 28.9,
+   "delivery_pct": null,
+   "delivery_avg5": 47.1,
+   "volume_ratio": 2.09,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 7.33,
+   "predicted_price": 611.58,
+   "range_low": 557.94,
+   "range_high": 665.21,
+   "backtest": {
+    "ml_mape": 4.21,
+    "ml_dir_acc": 66.7,
+    "drift_mape": 5.25,
+    "drift_dir_acc": 41.7,
+    "naive_mape": 4.89,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 4.21,
+    "best_dir_acc": 66.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 22.886364,
+    "forward_pe": 31.176472,
+    "roe": null,
+    "debt_to_equity": 0.21542000000000003,
+    "market_cap": 16282028032.0,
+    "revenue_growth": 0.1,
+    "earnings_growth": 0.069,
+    "dividend_yield": 0.43,
+    "score": 62.0,
+    "flags": []
+   },
+   "news": null
+  },
+  {
+   "symbol": "WESTLIFE",
+   "name": "WESTLIFE FOODWORLD LIMITED",
+   "exchange": "NSE",
+   "isin": "INE274F01020",
+   "current_price": 607.85,
+   "trader_score": 93.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9578.75) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 60 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "Stochastic turning up",
+    "ADX 33 \u2014 strong uptrend"
+   ],
+   "patterns": [
+    "Bullish engulfing"
+   ],
+   "support": 512.0,
+   "resistance": 636.0,
+   "high52": 636.0,
+   "stop_loss": 546.77,
+   "target": 668.93,
+   "target2": 699.48,
+   "risk_reward": 1.0,
+   "rsi": 60.2,
+   "adx": 33.5,
+   "delivery_pct": null,
+   "delivery_avg5": 33.9,
+   "volume_ratio": 0.07,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 6.58,
+   "predicted_price": 647.87,
+   "range_low": 593.23,
+   "range_high": 702.5,
+   "backtest": {
+    "ml_mape": 2.81,
+    "ml_dir_acc": 91.7,
+    "drift_mape": 4.62,
+    "drift_dir_acc": 41.7,
+    "naive_mape": 3.85,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 2.81,
+    "best_dir_acc": 91.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 4620.7695,
+    "forward_pe": 103.65511,
+    "roe": 0.00315,
+    "debt_to_equity": 3.1456,
+    "market_cap": 93238108160.0,
+    "revenue_growth": 0.163,
+    "earnings_growth": null,
+    "dividend_yield": 0.14,
+    "score": 30.0,
+    "flags": [
+     "Weak ROE 0%",
+     "High debt \u2014 D/E 3.1",
+     "Revenue growth +16%",
+     "Expensive \u2014 PE 4621"
+    ]
+   },
+   "news": {
+    "headlines": [
+     {
+      "title": "\u20b9596 - That's What Analysts Think Westlife Foodworld Limited (NSE:WESTLIFE) Is Worth After These Results",
+      "source": "Simply Wall Street",
+      "url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxQeDVVYlNOaFVIQXVDVjJtMDFtVGdCNXVHemZreWVMTnE5bGo2LXl6dEppSUpqT3h3SXdvZ3pkQ1ZqNjNjeW1UMGxyOUYydkNRLVB4bk1ZaEZHaUtYUVdTcjZLNHotQjR4SmR1bHY4SXpXeXhWRUVoN0hsSE1veDh2T1phLVRuTUlNQ19Lcy0wQmtNSlQ3bnJXV0V0RU4yeFBIOHA0ZTA3aGU2bVo1UnR4VkFTbHY4VGp2NWxJUm90eHRMNEJmWmRMb1RpNW1VNkpZWnlqV256T0JZQzN4Z3o1blFPRGpaZjJQSkHSAe8BQVVfeXFMTzNBM3ptQmw1OXdTZkNrUURpV0xrQWRnVGRjNmExU0NxMk0xUGpTbm0yNTJtenV4YkxkNWY4dHRnalpiM3ZyQl84dTJxdm84N2lSNmlIcWlGWlA0X3R3NVM3bkdMUVBSWW1ROHJhU3hZa3k3YWxEZzlqaGVTbFFueThjQVZXUGM2WkMzLWtQeXg1aHZuUURpeGdkVlpGT29LNTNId3BQR2xsZkJNRk5LQVdOQS0zT0tHNnluQ0pwdjFpT3A1ellyYXpZNWQxVEhCTlVGN192UUpFcmkyay1LUENQaVFuVzZCY3VOSnowZVk?oc=5",
+      "date": "2026-10-27"
+     },
+     {
+      "title": "Westlife Foodworld Q2FY27 results: Shares soar over 8% on stellar earnings growth for the quarter; check details",
+      "source": "Upstox",
+      "url": "https://news.google.com/rss/articles/CBMiggJBVV95cUxNcHNGcWlZSjgxckJkNU8wVmN3d3dqZ1RsZjExQlRUUnVRS29rTnY1ZVNiUHduODdCRy1xY1hWOWs0NmF1NG5jQk1LT1gtUFhyV0FzM3E0bHdZQnNjZ1VpcnkyWnowVDRLY0F5YUgyV3VZeU01X1pCZ0h4dmR1R0hFYjlyMXVYSkRSZkVnQ1hnR0F5WlRGa0IyNDBHdWZUd3ptcU40QzVteHdIUEg1dmtKVG5nYzFpbGxlN0pKOWRjdFR2S2FRVWxYSU9XTGxiNW13Y05xUHhIczNCY1dyaDZ2aHMyVVVTQXBKemo1eGpXakNrSjlza3FWMjNIYl94RXJSa3c?oc=5",
+      "date": "2026-10-23"
+     },
+     {
+      "title": "Westlife Foodworld Limited (WESTLIFE.BO) stock price, news, quote and history",
+      "source": "Yahoo Finance UK",
+      "url": "https://news.google.com/rss/articles/CBMiakFVX3lxTE50X1BFT3NPeFhtSVBOOEtjWkNXdEFSd0s3b0NDU0xwcHVldEdqaU1wb1pScWRzdDFLdk1wbnBIZnNkTmpLdlRPZFlNeE5RbkxGMTltTnZlek52SmdKelg4TnlfaGdQb0Q4N1E?oc=5",
+      "date": "2026-10-25"
+     },
+     {
+      "title": "Westlife Foodworld uploads Q2FY27 earnings call recording on website",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOQWIzWllkOTV6Y19IZGdrc2w2UmlVNlBEanpVUmpvMThCbWg1WUEwZ0M5OHJnakhaTE5xYnVzVlA0TVpQWlRfbE5WVmFyOWVSclladHM3bjhaYkNWTS10aVh2d1V6LVZ2Q3NWRGZZcU5PVkJsdEM2MmdyNjdXUTlTOVV4bnRTSVppQUxZd1o3c2NhS19xRlB1cllSTjBnOUtnVVhtaEFyYmwwc3FjRXVGMXJ2NA?oc=5",
+      "date": "2026-10-23"
+     },
+     {
+      "title": "Westlife Foodworld (WESTLIFE.NS) Slips 1.78% to \u20b9568.85, Holding Above \u20b9540 Support - Fibonacci Extension",
+      "source": "https://www.siam.in/",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNRGlNeHEyZE1qcXBaazk5U1ZFRER1RkRLeUdhd3N3THJZaU9fS0dxcUNyS2RrWkdSZmJkVnFHbmRrOGJpZHVEcVk1MTlDdWppeTVxYnlrSlFIYWlYR0c0VUw4MjdSLWxaQWppV0pDYXNYUUlrWlhXTTN5TEQ4dllXb3dBQUpsUVRiOUlKY1JjOTZIaG9YRFdGYkQzT19GRVItUVdVZmwtTzFxajRxUE5OM1J3cDBUdlRh?oc=5",
+      "date": "2026-10-18"
+     }
+    ],
+    "sentiment_score": -1.0,
+    "sentiment_label": "Negative",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "VINYLINDIA",
+   "name": "Vinyl Chemicals (India) Limited",
+   "exchange": "NSE",
+   "isin": "INE250B01029",
+   "current_price": 246.61,
+   "trader_score": 89.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9221.49) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 64 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "ADX 35 \u2014 strong uptrend",
+    "Volume well below average \u2014 low conviction"
+   ],
+   "patterns": [
+    "Inside bar (compression)"
+   ],
+   "support": 194.62,
+   "resistance": 271.62,
+   "high52": 293.7,
+   "stop_loss": 220.5,
+   "target": 272.72,
+   "target2": 285.78,
+   "risk_reward": 1.0,
+   "rsi": 64.1,
+   "adx": 34.6,
+   "delivery_pct": null,
+   "delivery_avg5": 47.8,
+   "volume_ratio": 0.16,
+   "model_used": "ml+drift blend, best=drift",
+   "predicted_return_pct": 5.61,
+   "predicted_price": 260.44,
+   "range_low": 237.08,
+   "range_high": 283.8,
+   "backtest": {
+    "ml_mape": 2.03,
+    "ml_dir_acc": 83.3,
+    "drift_mape": 1.8,
+    "drift_dir_acc": 83.3,
+    "naive_mape": 2.49,
+    "naive_dir_acc": 0.0,
+    "best_model": "drift",
+    "best_mape": 1.8,
+    "best_dir_acc": 83.3,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 17.38638,
+    "forward_pe": null,
+    "roe": 0.21200001,
+    "debt_to_equity": 0.00362,
+    "market_cap": 4728040960.0,
+    "revenue_growth": 0.431,
+    "earnings_growth": 2.949,
+    "dividend_yield": 2.92,
+    "score": 90.0,
+    "flags": [
+     "Strong ROE 21%",
+     "Earnings growth +295%",
+     "Revenue growth +43%"
+    ]
+   },
+   "news": {
+    "headlines": [
+     {
+      "title": "Vinyl Chemicals India Ltd Reports Strong Q2 and H1 FY2026-27 Financial Results with Net Profit Surging to \u20b91,803 Lakhs",
+      "source": "EquityBulls",
+      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPRExHa2dSbktidTloS1UwaTJjYWVFU3lYY3RuTXNrTkxrcmRZVVRBZ2oycHp0Vkp2M2N4SzVoZWhqR0p1ekk5WTZ3UEVoZnhhVVVzZjhVUFFHbk1qX2RTTjZJRFp3Y3RfSndrX1BvcEdEYXRPYnBnWUdSZmptMWZhTkY4SnJxdGRvbENOWTJrc1JfcmpTTEtkcHAxcDJJOUtnemZOeTF3VGwzRHdLZUdERmlBa1dxeWdaLUtWcA?oc=5",
+      "date": "2026-10-26"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "MANBA",
+   "name": "Manba Finance Limited",
+   "exchange": "NSE",
+   "isin": "INE939X01013",
+   "current_price": 151.75,
+   "trader_score": 100.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9141.36) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 68 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "Stochastic turning up",
+    "ADX 44 \u2014 strong uptrend"
+   ],
+   "patterns": [
+    "Breakout candle above 20-day high"
+   ],
+   "support": 125.55,
+   "resistance": 156.0,
+   "high52": 156.0,
+   "stop_loss": 140.26,
+   "target": 163.24,
+   "target2": 168.99,
+   "risk_reward": 1.0,
+   "rsi": 68.2,
+   "adx": 43.9,
+   "delivery_pct": null,
+   "delivery_avg5": 29.6,
+   "volume_ratio": 3.01,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 3.71,
+   "predicted_price": 157.37,
+   "range_low": 147.1,
+   "range_high": 167.65,
+   "backtest": {
+    "ml_mape": 1.66,
+    "ml_dir_acc": 75.0,
+    "drift_mape": 2.93,
+    "drift_dir_acc": 33.3,
+    "naive_mape": 2.5,
+    "naive_dir_acc": 8.3,
+    "best_model": "ml",
+    "best_mape": 1.66,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 15.742472,
+    "forward_pe": null,
+    "roe": 0.1244,
+    "debt_to_equity": 3.62238,
+    "market_cap": 7616294400.0,
+    "revenue_growth": 0.777,
+    "earnings_growth": 0.203,
+    "dividend_yield": 0.72,
+    "score": 58.0,
+    "flags": [
+     "High debt \u2014 D/E 3.6",
+     "Earnings growth +20%",
+     "Revenue growth +78%"
+    ]
+   },
+   "news": {
+    "headlines": [
+     {
+      "title": "Manba Finance appoints CARE Ratings as monitoring agency for preferential issue",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPM1ZBRHRpVnRkcTlDNzE2Xy1icHVWb01ROFpVdHZpOHFfRjVIZ0ZyQjA0MFFWNGs2ZFNuVXE1SUJpeGRMR01RejBNM29pSm1nRm9TNGJHcGdLUjdmU1VDRzlZZ0ZiWUJyX2MtM0NKRktVNHdwd3BBUEpXZUs2cXJYYlczT2pFVW1adjBWZlp3ZUxaX3A3OEhKd2RwSVg2djc1dnhpWWM2Ql8zcEwybDdTMlI4LVk5OGM0bTBCeXoxRGg?oc=5",
+      "date": "2026-10-26"
+     },
+     {
+      "title": "Manba Finance Limited: Rs 100 Crore SBI Loan and Q4FY26 SEBI Compliance Update",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPMkJqYnFka2tUWmRFV20yd21xREJxSzRzLXNNdndMdU4tNDFOS3AwT1pMYmU0dkVMc05Yd1FJdjVmbmxQMXdBeHJNemVwRGNMakVKRDhaTlRYTm9TS0NFWkJzbXlIWmhxdlNkQl90OTl4NU55enU0MDNmYUlUYVNvY1JHLXJQUUwyN1VUbGFPYnkxeU5aajNxTGktQm9aTUlsY2xHQWYtWGd2MG5pSll3T3MySTdWVVdlVm1Gck8zMHhXS0FuYk1xWHVqUmdrdTA?oc=5",
+      "date": "2026-10-18"
+     }
+    ],
+    "sentiment_score": -1.0,
+    "sentiment_label": "Negative",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "TRISHAKT",
+   "name": "Trishakti Industries Limited",
+   "exchange": "BSE",
+   "isin": "INE238C01022",
+   "current_price": 303.9,
+   "trader_score": 95.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9267.60) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "Volume 2.2\u00d7 20-day average on an up day",
+    "OBV trending up \u2014 accumulation",
+    "Three white soldiers"
+   ],
+   "patterns": [
+    "Three white soldiers",
+    "Breakout candle above 20-day high"
+   ],
+   "support": 210.0,
+   "resistance": 305.8,
+   "high52": 305.8,
+   "stop_loss": 273.47,
+   "target": 334.33,
+   "target2": 349.55,
+   "risk_reward": 1.0,
+   "rsi": 72.4,
+   "adx": 19.7,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 2.22,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 5.48,
+   "predicted_price": 320.57,
+   "range_low": 293.35,
+   "range_high": 347.79,
+   "backtest": {
+    "ml_mape": 4.4,
+    "ml_dir_acc": 75.0,
+    "drift_mape": 5.0,
+    "drift_dir_acc": 66.7,
+    "naive_mape": 4.88,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 4.4,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": null,
+   "news": {
+    "headlines": [
+     {
+      "title": "Trishakti Industries Q2FY27 net profit jumps 223% YoY; outlines Mission 2030",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQOXhvdmY4R0VLUHAtVVhlU25BMmwtODcwMUdTYWpSeU9lc3lvRE9iLU1qeGxIYm1Va29DWnlJckJYSnY4YUs1SFZEOE1FMnpIUXJUX0lwWlF4b0NpdVJLQlJwZnBLcVZ6VnFOVm02cnN1YkpYUWFTRTYwa1VDQzM5NG5raFVTLWl1MndUbmVTRktxT1M0dHM2TXRvTy03ZTZ3OExtWnE4WUJ3dkVHNE5yNkZSUVFBREp0bTNEemxqUmZPUQ?oc=5",
+      "date": "2026-10-26"
+     },
+     {
+      "title": "Trishakti Industries Launches \u201cMission 2030: Lifting India Building Tomorrow\u201d",
+      "source": "EquityBulls",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNd0JGdTVUM3prRko5aktvSGJCQzJra2o2TTJYQVRwZ3BzTExxb0pINzdtTkxKSE9qa2JwY09QMHMydDJZMDlKNHlYRUxMNnM1SGJzZldKX3U5ZlBaQkJOaDFrZkxyT1k3alBZemJQWEpzbmxPYVh4YXNkaHJPWGlyNVpiYmtYRXYxd0lxekZqaXIzcEI0N2tvbmhBU3ozVXU0WWpPSUxJMGswclBFZ1JPMWd6ZG0?oc=5",
+      "date": "2026-10-22"
+     },
+     {
+      "title": "Trishakti Industries Delivers 133% Revenue Growth and 141% EBITDA Growth in Q2FY27, Accelerating its Next Phase of Expansion",
+      "source": "Big News Network.com",
+      "url": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxNN0hZQ1RfWVRUWk1qY3hSSGhpbXlZYVg5VjVIbS1NMnpwR01fV2J3WTVxRkNmMXhpa2pkU3JaRWIwOUZ1Zkt2REI4LXNNMkRrQ3lDQ3daMmpyQTFfajY3bVoxN0hoWnV2N0liZnAxYjF3WWc1dC14MWVsQUxScFJ0RWhCTlhyMzBURDNzYXNkUnlJaDAzNmdZaXZqSjFpUm00YzBEVTVPQWlwZkpoZDNYc1d6elBhZkJ6aWJEQWhsanowOFJfdkFrN0NOOGxOSlpXcGI3cFhwc3hHOVhjc3JlY3RYdkt2ck9Pa2dlSEczd1cwVzNJdkRLZWZnRQ?oc=5",
+      "date": "2026-10-23"
+     }
+    ],
+    "sentiment_score": 1.0,
+    "sentiment_label": "Positive",
+    "veto": false,
+    "veto_reason": null
+   }
+  }
+ ],
+ "allocation": null,
+ "vetoed": [],
+ "red_flag_demoted": [],
+ "stage1_top50": [
+  {
+   "symbol": "AAATECH",
+   "name": "AAA Technologies Limited",
+   "exchange": "NSE",
+   "current_price": 123.24,
+   "trader_score": 100.0,
+   "delivery_pct": 15.5,
+   "rsi": 65.8,
+   "ret21_pct": 21.42,
+   "reasons": [
+    "Price above 21-EMA (\u20b9106.53) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CRAFTSMAN",
+   "name": "Craftsman Automation Limited",
+   "exchange": "NSE",
+   "current_price": 11014.0,
+   "trader_score": 100.0,
+   "delivery_pct": 33.4,
+   "rsi": 55.0,
+   "ret21_pct": 2.6,
+   "reasons": [
+    "Price above 21-EMA (\u20b910793.31) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "EMKAY",
+   "name": "Emkay Global Financial Services Limited",
+   "exchange": "NSE",
+   "current_price": 287.4,
+   "trader_score": 100.0,
+   "delivery_pct": 61.8,
+   "rsi": 59.8,
+   "ret21_pct": 6.31,
+   "reasons": [
+    "Price above 21-EMA (\u20b9271.20) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KROSS",
+   "name": "Kross Limited",
+   "exchange": "NSE",
+   "current_price": 294.7,
+   "trader_score": 100.0,
+   "delivery_pct": 25.3,
+   "rsi": 61.6,
+   "ret21_pct": 10.02,
+   "reasons": [
+    "Price above 21-EMA (\u20b9272.56) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SGMART",
+   "name": "SG Mart Limited",
+   "exchange": "NSE",
+   "current_price": 802.95,
+   "trader_score": 100.0,
+   "delivery_pct": 55.3,
+   "rsi": 59.1,
+   "ret21_pct": 9.84,
+   "reasons": [
+    "Price above 21-EMA (\u20b9772.14) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SHREEPUSHK",
+   "name": "Shree Pushkar Chemicals & Fertilisers Limited",
+   "exchange": "NSE",
+   "current_price": 542.7,
+   "trader_score": 100.0,
+   "delivery_pct": 48.8,
+   "rsi": 64.3,
+   "ret21_pct": 7.24,
+   "reasons": [
+    "Price above 21-EMA (\u20b9496.09) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TVSMOTOR",
+   "name": "TVS Motor Company Limited",
+   "exchange": "NSE",
+   "current_price": 4239.9,
+   "trader_score": 100.0,
+   "delivery_pct": 43.5,
+   "rsi": 63.4,
+   "ret21_pct": 1.99,
+   "reasons": [
+    "Price above 21-EMA (\u20b94048.61) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "UYFINCORP",
+   "name": "U. Y. Fincorp Limited",
+   "exchange": "NSE",
+   "current_price": 27.83,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 73.3,
+   "ret21_pct": 44.05,
+   "reasons": [
+    "Price above 21-EMA (\u20b924.00) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SOUTHBANK",
+   "name": "SOUTH INDIAN BANK LTD.",
+   "exchange": "BSE",
+   "current_price": 54.62,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 66.1,
+   "ret21_pct": 9.35,
+   "reasons": [
+    "Price above 21-EMA (\u20b951.20) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "AAYUSHBULL",
+   "name": "AAYUSH ART AND BULLION LIMITED",
+   "exchange": "BSE",
+   "current_price": 1316.4,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 66.1,
+   "ret21_pct": 1.09,
+   "reasons": [
+    "Price above 21-EMA (\u20b91298.19) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TLL",
+   "name": "Trident Lifeline Limited",
+   "exchange": "BSE",
+   "current_price": 430.9,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 65.2,
+   "ret21_pct": 5.69,
+   "reasons": [
+    "Price above 21-EMA (\u20b9394.08) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TANLA",
+   "name": "TANLA PLATFORMS LIMITED",
+   "exchange": "BSE",
+   "current_price": 598.8,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 68.8,
+   "ret21_pct": 20.97,
+   "reasons": [
+    "Price above 21-EMA (\u20b9544.74) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "FEDERALBNK",
+   "name": "The Federal Bank  Limited",
+   "exchange": "NSE",
+   "current_price": 346.0,
+   "trader_score": 99.0,
+   "delivery_pct": 61.3,
+   "rsi": 58.1,
+   "ret21_pct": 7.45,
+   "reasons": [
+    "Price above 21-EMA (\u20b9337.45) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "LENSKART",
+   "name": "Lenskart Solutions Limited",
+   "exchange": "NSE",
+   "current_price": 689.7,
+   "trader_score": 99.0,
+   "delivery_pct": 59.5,
+   "rsi": 59.6,
+   "ret21_pct": 1.39,
+   "reasons": [
+    "Price above 21-EMA (\u20b9659.26) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SAREGAMA",
+   "name": "Saregama India Limited",
+   "exchange": "NSE",
+   "current_price": 523.95,
+   "trader_score": 99.0,
+   "delivery_pct": 44.8,
+   "rsi": 59.3,
+   "ret21_pct": 5.44,
+   "reasons": [
+    "Price above 21-EMA (\u20b9501.94) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "WSI",
+   "name": "W S Industries (I) Limited",
+   "exchange": "NSE",
+   "current_price": 68.5,
+   "trader_score": 99.0,
+   "delivery_pct": 55.5,
+   "rsi": 62.3,
+   "ret21_pct": 22.45,
+   "reasons": [
+    "Price above 21-EMA (\u20b961.58) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PANACHE",
+   "name": "Panache Digilife Limited",
+   "exchange": "NSE",
+   "current_price": 660.0,
+   "trader_score": 98.0,
+   "delivery_pct": null,
+   "rsi": 66.5,
+   "ret21_pct": 25.71,
+   "reasons": [
+    "Price above 21-EMA (\u20b9618.89) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SONACOMS",
+   "name": "Sona BLW Precision Forgings Limited",
+   "exchange": "NSE",
+   "current_price": 879.45,
+   "trader_score": 98.0,
+   "delivery_pct": 43.3,
+   "rsi": 67.0,
+   "ret21_pct": 6.66,
+   "reasons": [
+    "Price above 21-EMA (\u20b9804.02) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SUDARCOLOR",
+   "name": "Sudarshan Colorants India Limited",
+   "exchange": "NSE",
+   "current_price": 427.9,
+   "trader_score": 98.0,
+   "delivery_pct": 40.4,
+   "rsi": 69.3,
+   "ret21_pct": 8.45,
+   "reasons": [
+    "Price above 21-EMA (\u20b9365.73) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ALIVUS",
+   "name": "ALIVUS LIFE SCIENCES LIMITED",
+   "exchange": "BSE",
+   "current_price": 1400.5,
+   "trader_score": 98.0,
+   "delivery_pct": null,
+   "rsi": 60.9,
+   "ret21_pct": 2.59,
+   "reasons": [
+    "Price above 21-EMA (\u20b91328.31) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "AARTIDRUGS",
+   "name": "AARTI DRUGS LTD.",
+   "exchange": "BSE",
+   "current_price": 447.7,
+   "trader_score": 98.0,
+   "delivery_pct": null,
+   "rsi": 65.3,
+   "ret21_pct": 4.18,
+   "reasons": [
+    "Price above 21-EMA (\u20b9407.52) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "OAL",
+   "name": "ORIENTAL AROMATICS LIMITED",
+   "exchange": "BSE",
+   "current_price": 627.0,
+   "trader_score": 98.0,
+   "delivery_pct": null,
+   "rsi": 66.8,
+   "ret21_pct": 18.19,
+   "reasons": [
+    "Price above 21-EMA (\u20b9570.28) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TIPSMUSIC",
+   "name": "Tips Music Limited",
+   "exchange": "NSE",
+   "current_price": 793.9,
+   "trader_score": 97.0,
+   "delivery_pct": 37.4,
+   "rsi": 68.0,
+   "ret21_pct": 18.68,
+   "reasons": [
+    "Price above 21-EMA (\u20b9707.82) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CANTABIL",
+   "name": "Cantabil Retail India Limited",
+   "exchange": "NSE",
+   "current_price": 260.06,
+   "trader_score": 96.0,
+   "delivery_pct": 51.1,
+   "rsi": 70.0,
+   "ret21_pct": 9.85,
+   "reasons": [
+    "Price above 21-EMA (\u20b9244.22) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CORONA",
+   "name": "CORONA Remedies Limited",
+   "exchange": "NSE",
+   "current_price": 2200.6,
+   "trader_score": 96.0,
+   "delivery_pct": 45.0,
+   "rsi": 66.1,
+   "ret21_pct": 3.91,
+   "reasons": [
+    "Price above 21-EMA (\u20b92074.14) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ORICONENT",
+   "name": "Oricon Enterprises Limited",
+   "exchange": "NSE",
+   "current_price": 54.3,
+   "trader_score": 96.0,
+   "delivery_pct": 52.1,
+   "rsi": 57.7,
+   "ret21_pct": 5.64,
+   "reasons": [
+    "Price above 21-EMA (\u20b951.88) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Below 200-EMA \u2014 long-term trend down"
+   ]
+  },
+  {
+   "symbol": "ORIENTHOT",
+   "name": "Oriental Hotels Limited",
+   "exchange": "NSE",
+   "current_price": 159.52,
+   "trader_score": 96.0,
+   "delivery_pct": 45.6,
+   "rsi": 69.7,
+   "ret21_pct": 13.19,
+   "reasons": [
+    "Price above 21-EMA (\u20b9147.95) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "STOVEKRAFT",
+   "name": "Stove Kraft Limited",
+   "exchange": "NSE",
+   "current_price": 856.3,
+   "trader_score": 96.0,
+   "delivery_pct": 58.2,
+   "rsi": 58.6,
+   "ret21_pct": 5.14,
+   "reasons": [
+    "Price above 21-EMA (\u20b9826.54) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SUDEEPPHRM",
+   "name": "Sudeep Pharma Limited",
+   "exchange": "NSE",
+   "current_price": 1119.0,
+   "trader_score": 96.0,
+   "delivery_pct": 44.1,
+   "rsi": 56.2,
+   "ret21_pct": -3.94,
+   "reasons": [
+    "Price above 21-EMA (\u20b91058.82) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TECHM",
+   "name": "Tech Mahindra Limited",
+   "exchange": "NSE",
+   "current_price": 1776.6,
+   "trader_score": 96.0,
+   "delivery_pct": 54.6,
+   "rsi": 65.0,
+   "ret21_pct": 14.77,
+   "reasons": [
+    "Price above 21-EMA (\u20b91681.21) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "NYKAA",
+   "name": "FSN E-Commerce Ventures Limite",
+   "exchange": "BSE",
+   "current_price": 341.9,
+   "trader_score": 96.0,
+   "delivery_pct": null,
+   "rsi": 55.6,
+   "ret21_pct": 2.52,
+   "reasons": [
+    "Price above 21-EMA (\u20b9333.89) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ALGOQUANT",
+   "name": "ALGOQUANT FINTECH LIMITED",
+   "exchange": "BSE",
+   "current_price": 75.98,
+   "trader_score": 96.0,
+   "delivery_pct": null,
+   "rsi": 64.9,
+   "ret21_pct": 4.9,
+   "reasons": [
+    "Price above 21-EMA (\u20b971.66) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "INTLCONV",
+   "name": "International Conveyors Limited",
+   "exchange": "NSE",
+   "current_price": 81.41,
+   "trader_score": 95.0,
+   "delivery_pct": 84.3,
+   "rsi": 55.6,
+   "ret21_pct": 0.3,
+   "reasons": [
+    "Price above 21-EMA (\u20b979.43) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MIDWESTLTD",
+   "name": "Midwest Limited",
+   "exchange": "NSE",
+   "current_price": 1130.7,
+   "trader_score": 95.0,
+   "delivery_pct": 74.7,
+   "rsi": 60.7,
+   "ret21_pct": 21.65,
+   "reasons": [
+    "Price above 21-EMA (\u20b91044.72) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Below 200-EMA \u2014 long-term trend down"
+   ]
+  },
+  {
+   "symbol": "TRISHAKT",
+   "name": "Trishakti Industries Limited",
+   "exchange": "BSE",
+   "current_price": 303.9,
+   "trader_score": 95.0,
+   "delivery_pct": null,
+   "rsi": 72.4,
+   "ret21_pct": 27.69,
+   "reasons": [
+    "Price above 21-EMA (\u20b9267.60) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "63MOONS",
+   "name": "63 moons technologies limited",
+   "exchange": "NSE",
+   "current_price": 932.5,
+   "trader_score": 94.0,
+   "delivery_pct": 52.6,
+   "rsi": 63.7,
+   "ret21_pct": 8.73,
+   "reasons": [
+    "Price above 21-EMA (\u20b9871.60) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KESORAMIND",
+   "name": "Kesoram Industries Limited",
+   "exchange": "NSE",
+   "current_price": 12.77,
+   "trader_score": 94.0,
+   "delivery_pct": 51.1,
+   "rsi": 60.8,
+   "ret21_pct": 10.37,
+   "reasons": [
+    "Price above 21-EMA (\u20b911.71) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MAHLOG",
+   "name": "Mahindra Logistics Limited",
+   "exchange": "NSE",
+   "current_price": 431.35,
+   "trader_score": 94.0,
+   "delivery_pct": 33.5,
+   "rsi": 59.6,
+   "ret21_pct": 2.64,
+   "reasons": [
+    "Price above 21-EMA (\u20b9405.77) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BOSCHLTD",
+   "name": "Bosch Limited",
+   "exchange": "NSE",
+   "current_price": 47625.0,
+   "trader_score": 93.0,
+   "delivery_pct": 27.0,
+   "rsi": 61.4,
+   "ret21_pct": -1.3,
+   "reasons": [
+    "Price above 21-EMA (\u20b945491.27) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "DIVISLAB",
+   "name": "Divi's Laboratories Limited",
+   "exchange": "NSE",
+   "current_price": 9558.5,
+   "trader_score": 93.0,
+   "delivery_pct": 53.5,
+   "rsi": 59.5,
+   "ret21_pct": -0.63,
+   "reasons": [
+    "Price above 21-EMA (\u20b99258.75) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KINGFA",
+   "name": "Kingfa Science & Technology (India) Limited",
+   "exchange": "NSE",
+   "current_price": 6852.0,
+   "trader_score": 93.0,
+   "delivery_pct": 49.2,
+   "rsi": 62.8,
+   "ret21_pct": 9.85,
+   "reasons": [
+    "Price above 21-EMA (\u20b96533.09) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "NITINSPIN",
+   "name": "Nitin Spinners Limited",
+   "exchange": "NSE",
+   "current_price": 639.0,
+   "trader_score": 93.0,
+   "delivery_pct": 38.8,
+   "rsi": 56.0,
+   "ret21_pct": 4.35,
+   "reasons": [
+    "Price above 21-EMA (\u20b9619.76) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "WORKMATES",
+   "name": "WORKMATES CORE2CLOUD SOLUTION",
+   "exchange": "BSE",
+   "current_price": 442.0,
+   "trader_score": 93.0,
+   "delivery_pct": null,
+   "rsi": 60.5,
+   "ret21_pct": 6.65,
+   "reasons": [
+    "Price above 21-EMA (\u20b9412.88) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KARURVYSYA",
+   "name": "KARUR VYSYA BANK LTD.",
+   "exchange": "BSE",
+   "current_price": 351.25,
+   "trader_score": 93.0,
+   "delivery_pct": null,
+   "rsi": 55.9,
+   "ret21_pct": 7.06,
+   "reasons": [
+    "Price above 21-EMA (\u20b9343.21) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "AJMERA",
+   "name": "Ajmera Realty & Infra India Limited",
+   "exchange": "NSE",
+   "current_price": 133.8,
+   "trader_score": 92.0,
+   "delivery_pct": 63.2,
+   "rsi": 69.7,
+   "ret21_pct": 10.74,
+   "reasons": [
+    "Price above 21-EMA (\u20b9123.40) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Below 200-EMA \u2014 long-term trend down"
+   ]
+  },
+  {
+   "symbol": "COMFINTE",
+   "name": "Comfort Intech Limited",
+   "exchange": "NSE",
+   "current_price": 7.49,
+   "trader_score": 92.0,
+   "delivery_pct": null,
+   "rsi": 52.0,
+   "ret21_pct": 15.05,
+   "reasons": [
+    "Price above 21-EMA (\u20b97.46) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "FSL",
+   "name": "Firstsource Solutions Limited",
+   "exchange": "NSE",
+   "current_price": 307.95,
+   "trader_score": 92.0,
+   "delivery_pct": 33.9,
+   "rsi": 70.7,
+   "ret21_pct": 18.69,
+   "reasons": [
+    "Price above 21-EMA (\u20b9281.61) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "INDHOTEL",
+   "name": "The Indian Hotels Company Limited",
+   "exchange": "NSE",
+   "current_price": 805.2,
+   "trader_score": 92.0,
+   "delivery_pct": 65.7,
+   "rsi": 68.3,
+   "ret21_pct": 10.79,
+   "reasons": [
+    "Price above 21-EMA (\u20b9757.82) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "OMNI",
+   "name": "Omnitech Engineering Limited",
+   "exchange": "NSE",
+   "current_price": 719.25,
+   "trader_score": 92.0,
+   "delivery_pct": 24.1,
+   "rsi": 66.1,
+   "ret21_pct": 34.7,
+   "reasons": [
+    "Price above 21-EMA (\u20b9631.82) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SHIVAUM",
+   "name": "Shiv Aum Steels Limited",
+   "exchange": "NSE",
+   "current_price": 545.45,
+   "trader_score": 92.0,
+   "delivery_pct": 97.0,
+   "rsi": 62.2,
+   "ret21_pct": 6.92,
+   "reasons": [
+    "Price above 21-EMA (\u20b9537.38) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  }
+ ],
+ "evaluated_count": 143
+}

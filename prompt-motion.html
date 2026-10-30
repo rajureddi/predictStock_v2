@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Motion — 3D Architecture Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #F4F5F7;
+      color: #0A0A0C;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+    }
+
+    #webgl-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      outline: none;
+    }
+
+    /* Minimalist Film UI Overlay */
+    .hud-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 32px 40px;
+      z-index: 10;
+    }
+
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #0A0A0C;
+    }
+
+    .orange-dot {
+      width: 7px;
+      height: 7px;
+      background: #FF5500;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 85, 0, 0.6);
+      display: inline-block;
+    }
+
+    .shot-tag {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #71717A;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .shot-tag span.index {
+      color: #0A0A0C;
+      font-weight: 500;
+    }
+
+    .shot-tag span.pulse {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #FF5500;
+    }
+
+    .hud-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .shot-description {
+      font-family: 'Geist', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: #52525B;
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    .shot-name {
+      font-weight: 600;
+      color: #0A0A0C;
+      margin-bottom: 2px;
+      letter-spacing: -0.01em;
+    }
+
+    .timeline-controls {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .shot-pills {
+      display: flex;
+      gap: 6px;
+    }
+
+    .shot-btn {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: #71717A;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .shot-btn:hover {
+      background: #FFFFFF;
+      color: #0A0A0C;
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .shot-btn.active {
+      background: #0A0A0C;
+      color: #FFFFFF;
+      border-color: #0A0A0C;
+    }
+
+    .scrubber-track {
+      width: 280px;
+      height: 3px;
+      background: rgba(0, 0, 0, 0.08);
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .scrubber-fill {
+      height: 100%;
+      background: #0A0A0C;
+      border-radius: 2px;
+      width: 0%;
+      position: relative;
+    }
+
+    .scrubber-handle {
+      position: absolute;
+      right: -4px;
+      top: -3px;
+      width: 9px;
+      height: 9px;
+      background: #FF5500;
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(255, 85, 0, 0.5);
+    }
+
+    /* Final Title Card Overlay */
+    .final-title-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 12;
+    }
+
+    .final-title-overlay.visible {
+      opacity: 1;
+    }
+
+    .final-title-overlay h1 {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #0A0A0C;
+      margin-bottom: 6px;
+    }
+
+    .final-title-overlay p {
+      font-family: 'Geist Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      color: #FF5500;
+      text-transform: uppercase;
+    }
+
+    /* Render mode hides HUD */
+    body.render-mode .hud-layer {
+      display: none !important;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <canvas id="webgl-canvas"></canvas>
+
+  <div class="hud-layer">
+    <div class="hud-top">
+      <div class="brand-mark">
+        <span class="orange-dot"></span>
+        Prompt Motion
+      </div>
+      <div class="shot-tag">
+        <span class="pulse"></span>
+        <span class="index" id="shot-badge">SHOT 1 / 6</span>
+        <span id="shot-move-badge">MACRO & RACK FOCUS</span>
+      </div>
+    </div>
+
+    <div class="hud-bottom">
+      <div class="shot-description">
+        <div class="shot-name" id="shot-title">01. Macro & Rack Focus</div>
+        <div id="shot-desc">Rack focus from the tactile beveled card edge onto its active video generation.</div>
+      </div>
+
+      <div class="timeline-controls">
+        <div class="shot-pills">
+          <button class="shot-btn active" data-shot="0">1</button>
+          <button class="shot-btn" data-shot="1">2</button>
+          <button class="shot-btn" data-shot="2">3</button>
+          <button class="shot-btn" data-shot="3">4</button>
+          <button class="shot-btn" data-shot="4">5</button>
+          <button class="shot-btn" data-shot="5">6</button>
+        </div>
+        <div class="scrubber-track" id="scrubber-track">
+          <div class="scrubber-fill" id="scrubber-fill">
+            <div class="scrubber-handle"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="final-title-overlay" id="final-title">
+    <h1>PROMPT MOTION</h1>
+    <p>prompt-motion.com</p>
+  </div>
+
+  <!-- Three.js from CDN via Importmap -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    // ----------------------------------------------------
+    // Configuration & Deterministic Constants
+    // ----------------------------------------------------
+    const TOTAL_DURATION = 20.0; // 20.0 seconds
+    const SHOT_DURATIONS = [3.333, 3.333, 3.334, 3.333, 3.667, 3.000];
+    const SHOT_STARTS = [0];
+    for (let i = 0; i < SHOT_DURATIONS.length - 1; i++) {
+      SHOT_STARTS.push(SHOT_STARTS[i] + SHOT_DURATIONS[i]);
+    }
+
+    const SHOT_METADATA = [
+      { name: "01. Macro & Rack Focus", move: "RACK FOCUS", desc: "Extreme close-up on the tactile beveled edge in soft daylight, racking focus onto playing video." },
+      { name: "02. Dolly Back & Kinetic Pulse", move: "DOLLY BACK", desc: "Dolly back along the sweeping curved gallery wall as an orange kinetic wave tilts each card with spring physics." },
+      { name: "03. Crane Over Corridors", move: "CRANE UP", desc: "Ascending over the front wall crest to reveal the parallel gallery corridors in soft atmospheric haze." },
+      { name: "04. Unhinging Prompt Card", move: "PUSH-IN", desc: "A central card unhinges with physical inertia, swinging forward to reveal its Geist prompt lifting off in 3D." },
+      { name: "05. The Signature Shot", move: "AERIAL PULL-BACK", desc: "Pulling far back into high-altitude perspective as corridors resolve into the typography PROMPT MOTION and light traces the O." },
+      { name: "06. Wordmark & Settle", move: "SETTLE", desc: "Architectural alignment on the illuminated typographic floor plan and prompt-motion.com." }
+    ];
+
+    const isRenderMode = new URLSearchParams(window.location.search).has('render') || window.RENDER_MODE === true;
+    if (isRenderMode) {
+      document.body.classList.add('render-mode');
+    }
+
+    // Canvas & Renderer Setup
+    const canvas = document.getElementById('webgl-canvas');
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(isRenderMode ? 1.0 : Math.min(window.devicePixelRatio, 2.0));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    // Camera (Cinema 35mm Equivalent)
+    const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 400);
+
+    // Scene & Environment
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xF2F3F5);
+    scene.fog = new THREE.FogExp2(0xF2F3F5, 0.0035);
+
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    const envTexture = pmremGenerator.fromScene(new RoomEnvironment()).texture;
+    scene.environment = envTexture;
+
+    // ----------------------------------------------------
+    // Lighting Architecture
+    // ----------------------------------------------------
+    // Key Light (Soft architectural daylight from upper-right)
+    const keyLight = new THREE.DirectionalLight(0xFFFDF8, 2.4);
+    keyLight.position.set(45, 80, 40);
+    keyLight.castShadow = true;
+    keyLight.shadow.bias = -0.0001;
+    keyLight.shadow.normalBias = 0.02;
+    keyLight.shadow.mapSize.width = 2048;
+    keyLight.shadow.mapSize.height = 2048;
+    keyLight.shadow.camera.near = 15;
+    keyLight.shadow.camera.far = 220;
+    keyLight.shadow.camera.left = -65;
+    keyLight.shadow.camera.right = 65;
+    keyLight.shadow.camera.top = 65;
+    keyLight.shadow.camera.bottom = -65;
+    keyLight.shadow.radius = 2.5;
+    scene.add(keyLight);
+
+    // Fill Light (Soft cool skylight bounce)
+    const fillLight = new THREE.HemisphereLight(0xFFFFFF, 0xD4D8E0, 0.75);
+    scene.add(fillLight);
+
+    // Rim Grazing Light
+    const rimLight = new THREE.DirectionalLight(0xEAF0FF, 0.65);
+    rimLight.position.set(-45, 30, -50);
+    scene.add(rimLight);
+
+    // Kinetic Orange Point Light (Active during wave & tracing the O)
+    const orangePulseLight = new THREE.PointLight(0xFF5500, 0, 35, 1.8);
+    orangePulseLight.position.set(0, 3, 0);
+    scene.add(orangePulseLight);
+
+    // ----------------------------------------------------
+    // Shared Materials (Physically Based, Anti-Default)
+    // ----------------------------------------------------
+    // Floor: Large-format architectural plaster panels with subtle specular clearcoat
+    const floorCanvas = document.createElement('canvas');
+    floorCanvas.width = 512;
+    floorCanvas.height = 512;
+    const fctx = floorCanvas.getContext('2d');
+    fctx.fillStyle = '#EDEDF0';
+    fctx.fillRect(0, 0, 512, 512);
+    fctx.strokeStyle = 'rgba(0,0,0,0.035)';
+    fctx.lineWidth = 2;
+    fctx.strokeRect(0, 0, 512, 512);
+    // Micro noise
+    for (let i = 0; i < 2000; i++) {
+      const x = Math.random() * 512, y = Math.random() * 512;
+      fctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.015)';
+      fctx.fillRect(x, y, 1.5, 1.5);
+    }
+    const floorTexture = new THREE.CanvasTexture(floorCanvas);
+    floorTexture.wrapS = THREE.RepeatWrapping;
+    floorTexture.wrapT = THREE.RepeatWrapping;
+    floorTexture.repeat.set(16, 16);
+
+    const floorMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xEEEFF2,
+      roughness: 0.32,
+      metalness: 0.04,
+      clearcoat: 0.15,
+      clearcoatRoughness: 0.35,
+      map: floorTexture
+    });
+
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(350, 350), floorMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    // Gallery Walls: Tactile matte off-white architectural plaster
+    const wallMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xF5F6F8,
+      roughness: 0.88,
+      metalness: 0.01,
+      reflectivity: 0.15,
+      clearcoat: 0.05
+    });
+
+    // Dark Card Anodized Aluminum Casing Material
+    const cardCasingMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x141416,
+      roughness: 0.38,
+      metalness: 0.25,
+      clearcoat: 0.15,
+      clearcoatRoughness: 0.25
+    });
+
+    // ----------------------------------------------------
+    // Deterministic Video Poster Canvas Textures (Prompt Motion Clips)
+    // ----------------------------------------------------
+    // We create 8 distinct cinematic procedural video clips that run at 60fps
+    const NUM_VIDEO_CANVASES = 8;
+    const videoCanvases = [];
+    const videoTextures = [];
+
+    for (let i = 0; i < NUM_VIDEO_CANVASES; i++) {
+      const vCan = document.createElement('canvas');
+      vCan.width = 384;
+      vCan.height = 240; // 16:10 aspect ratio
+      const vTex = new THREE.CanvasTexture(vCan);
+      vTex.generateMipmaps = true;
+      vTex.minFilter = THREE.LinearMipmapLinearFilter;
+      videoCanvases.push(vCan);
+      videoTextures.push(vTex);
+    }
+
+    function renderVideoCanvases(tSec) {
+      for (let i = 0; i < NUM_VIDEO_CANVASES; i++) {
+        const ctx = videoCanvases[i].getContext('2d');
+        const w = 384, h = 240;
+        ctx.fillStyle = '#0D0E10';
+        ctx.fillRect(0, 0, w, h);
+
+        const progress = (tSec * 0.4 + i * 0.7) % 10.0;
+
+        switch (i % 8) {
+          case 0: { // Brutalist concrete staircase & sunlight slicing
+            const grad = ctx.createLinearGradient(0, 0, w, h);
+            grad.addColorStop(0, '#111215');
+            grad.addColorStop(1, '#28292E');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            // Light beam
+            ctx.save();
+            ctx.translate(w * 0.5, h * 0.5);
+            ctx.rotate(-0.35 + Math.sin(tSec * 0.5) * 0.05);
+            const beam = ctx.createLinearGradient(-w, 0, w, 0);
+            beam.addColorStop(0.3, 'rgba(255,255,255,0)');
+            beam.addColorStop(0.5, 'rgba(255,250,240,0.85)');
+            beam.addColorStop(0.7, 'rgba(255,255,255,0)');
+            ctx.fillStyle = beam;
+            ctx.fillRect(-w, -h * 0.25, w * 2, h * 0.5);
+            ctx.restore();
+            break;
+          }
+          case 1: { // Floating kinetic orange laser & wireframe geometry
+            ctx.fillStyle = '#0B0C0E';
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = '#FF5500';
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = '#FF5500';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            const cx = w * 0.5, cy = h * 0.5;
+            const r = 45 + Math.sin(tSec * 2.0) * 8;
+            for (let a = 0; a < Math.PI * 2; a += Math.PI / 3) {
+              const x1 = cx + Math.cos(a + tSec * 0.5) * r;
+              const y1 = cy + Math.sin(a + tSec * 0.5) * (r * 0.6);
+              if (a === 0) ctx.moveTo(x1, y1);
+              else ctx.lineTo(x1, y1);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            break;
+          }
+          case 2: { // Minimalist black chrome spheres & refractive ripples
+            const rg = ctx.createRadialGradient(w * 0.5, h * 0.5, 5, w * 0.5, h * 0.5, 120);
+            rg.addColorStop(0, '#3A3B40');
+            rg.addColorStop(0.6, '#18191C');
+            rg.addColorStop(1, '#090A0B');
+            ctx.fillStyle = rg;
+            ctx.fillRect(0, 0, w, h);
+            // Ripple rings
+            ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+            ctx.lineWidth = 1.5;
+            for (let k = 1; k <= 3; k++) {
+              ctx.beginPath();
+              const rad = ((tSec * 25 + k * 35) % 110);
+              ctx.arc(w * 0.5, h * 0.5, rad, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+            break;
+          }
+          case 3: { // Chiaroscuro silhouette & warm ember light
+            const g = ctx.createLinearGradient(0, 0, w, 0);
+            g.addColorStop(0, '#0A0A0C');
+            g.addColorStop(0.65, '#1C1613');
+            g.addColorStop(1, '#FF5500');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, w, h);
+            // Dark figure mask
+            ctx.fillStyle = '#0A0A0C';
+            ctx.beginPath();
+            ctx.arc(w * 0.45, h * 0.55, 60, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+          }
+          case 4: { // Prismatic crystal in soft white daylight void
+            ctx.fillStyle = '#E4E6EA';
+            ctx.fillRect(0, 0, w, h);
+            ctx.save();
+            ctx.translate(w * 0.5, h * 0.5);
+            ctx.rotate(tSec * 0.6);
+            ctx.fillStyle = '#1D1E22';
+            ctx.beginPath();
+            ctx.moveTo(0, -50);
+            ctx.lineTo(40, 30);
+            ctx.lineTo(-40, 30);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+            break;
+          }
+          case 5: { // Deconstructed typography blooming in slow motion
+            ctx.fillStyle = '#101114';
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#F4F5F7';
+            ctx.font = '600 36px Geist, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const offset = Math.sin(tSec * 1.5) * 8;
+            ctx.fillText('MOTION', w * 0.5 + offset, h * 0.5);
+            ctx.fillStyle = '#FF5500';
+            ctx.fillText('MOTION', w * 0.5 - offset, h * 0.5 - 2);
+            break;
+          }
+          case 6: { // Undulating acoustic fabric curtain in soft daylight
+            ctx.fillStyle = '#16171B';
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
+            for (let x = 30; x < w; x += 22) {
+              ctx.beginPath();
+              ctx.moveTo(x, 0);
+              const cp1x = x + Math.sin(tSec * 1.2 + x * 0.05) * 20;
+              const cp2x = x - Math.sin(tSec * 1.2 + x * 0.05) * 20;
+              ctx.bezierCurveTo(cp1x, h * 0.33, cp2x, h * 0.66, x, h);
+              ctx.stroke();
+            }
+            break;
+          }
+          case 7: { // High-contrast anamorphic light bar
+            ctx.fillStyle = '#08080A';
+            ctx.fillRect(0, 0, w, h);
+            const barY = h * 0.5 + Math.sin(tSec * 0.8) * 30;
+            const bg = ctx.createLinearGradient(0, barY - 15, 0, barY + 15);
+            bg.addColorStop(0, 'rgba(255,85,0,0)');
+            bg.addColorStop(0.5, 'rgba(255,255,255,0.95)');
+            bg.addColorStop(1, 'rgba(255,85,0,0)');
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, barY - 15, w, 30);
+            break;
+          }
+        }
+
+        // Clean Prompt Motion video watermark stamp
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.font = '500 10px "Geist Mono", monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText('PROMPT MOTION / 60 FPS', w - 16, h - 14);
+
+        videoTextures[i].needsUpdate = true;
+      }
+    }
+
+    // ----------------------------------------------------
+    // Architectural Top-Down Layout: PROMPT MOTION
+    // ----------------------------------------------------
+    // The curved gallery walls and corridors are positioned along the letterforms:
+    // Top Row:    P   R   O   M   P   T
+    // Bottom Row: M   O   T   I   O   N
+    // When seen at eye level, they form sweeping curved pavilions.
+    // When seen from above, they resolve into PROMPT MOTION!
+
+    const wallsGroup = new THREE.Group();
+    scene.add(wallsGroup);
+
+    const cardsGroup = new THREE.Group();
+    scene.add(cardsGroup);
+
+    const cardsList = [];
+    let heroCardMesh = null; // Card for Shot 1 & Shot 4 unhinging
+
+    // Geometry Helpers
+    const WALL_HEIGHT = 5.2;
+    const WALL_THICKNESS = 0.55;
+    const CARD_W = 2.4;
+    const CARD_H = 1.5;
+    const CARD_D = 0.06;
+
+    // Build straight wall
+    function addStraightWall(x1, z1, x2, z2) {
+      const dx = x2 - x1;
+      const dz = z2 - z1;
+      const length = Math.sqrt(dx * dx + dz * dz);
+      const angle = Math.atan2(dx, dz);
+
+      const geom = new THREE.BoxGeometry(WALL_THICKNESS, WALL_HEIGHT, length);
+      const wall = new THREE.Mesh(geom, wallMaterial);
+      wall.position.set((x1 + x2) * 0.5, WALL_HEIGHT * 0.5, (z1 + z2) * 0.5);
+      wall.rotation.y = angle;
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      wallsGroup.add(wall);
+
+      // Add cards along this wall segment
+      const numCards = Math.max(1, Math.floor(length / 3.4));
+      const step = length / (numCards + 1);
+      const normX = -Math.cos(angle);
+      const normZ = Math.sin(angle);
+
+      for (let side = -1; side <= 1; side += 2) {
+        for (let i = 1; i <= numCards; i++) {
+          const dist = -length * 0.5 + i * step;
+          const px = wall.position.x + Math.sin(angle) * dist + normX * (WALL_THICKNESS * 0.5 + CARD_D * 0.6) * side;
+          const pz = wall.position.z + Math.cos(angle) * dist + normZ * (WALL_THICKNESS * 0.5 + CARD_D * 0.6) * side;
+          const rotY = angle + (side > 0 ? Math.PI * 0.5 : -Math.PI * 0.5);
+
+          createCard(px, 2.5, pz, rotY);
+        }
+      }
+    }
+
+    // Build curved arc wall
+    function addCurvedWall(cx, cz, radius, startAngle, endAngle) {
+      const arcLength = Math.abs(endAngle - startAngle);
+      const segments = Math.max(8, Math.floor(arcLength * 10));
+      const shape = new THREE.Shape();
+
+      // Outer and inner radii
+      const rOut = radius + WALL_THICKNESS * 0.5;
+      const rIn = radius - WALL_THICKNESS * 0.5;
+
+      shape.absarc(0, 0, rOut, startAngle, endAngle, false);
+      shape.absarc(0, 0, rIn, endAngle, startAngle, true);
+      shape.closePath();
+
+      const extrudeSettings = {
+        depth: WALL_HEIGHT,
+        bevelEnabled: false,
+        curveSegments: segments
+      };
+
+      const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      geom.rotateX(Math.PI / 2); // align with Y-up
+      const wall = new THREE.Mesh(geom, wallMaterial);
+      wall.position.set(cx, WALL_HEIGHT, cz);
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      wallsGroup.add(wall);
+
+      // Add cards along curved wall
+      const perimeter = radius * arcLength;
+      const numCards = Math.max(2, Math.floor(perimeter / 3.4));
+      for (let i = 0; i < numCards; i++) {
+        const u = (i + 0.5) / numCards;
+        const theta = startAngle + u * (endAngle - startAngle);
+        const px = cx + Math.cos(theta) * (radius + WALL_THICKNESS * 0.5 + CARD_D * 0.6);
+        const pz = cz + Math.sin(theta) * (radius + WALL_THICKNESS * 0.5 + CARD_D * 0.6);
+        const rotY = -theta + Math.PI / 2;
+
+        const card = createCard(px, 2.5, pz, rotY);
+        card.userData.isCircleO = true;
+        card.userData.theta = theta;
+        card.userData.circleCenter = { x: cx, z: cz, r: radius };
+      }
+    }
+
+    // Create a video card with bevel casing, active screen, and spring physics
+    function createCard(x, y, z, rotY) {
+      const cardContainer = new THREE.Group();
+      cardContainer.position.set(x, y, z);
+      cardContainer.rotation.y = rotY;
+
+      // Card Casing Backing
+      const casingGeom = new THREE.BoxGeometry(CARD_W, CARD_H, CARD_D);
+      const casingMesh = new THREE.Mesh(casingGeom, cardCasingMaterial);
+      casingMesh.castShadow = true;
+      casingMesh.receiveShadow = true;
+      cardContainer.add(casingMesh);
+
+      // Front Video Screen Face
+      const screenGeom = new THREE.PlaneGeometry(CARD_W * 0.94, CARD_H * 0.92);
+      const texIndex = cardsList.length % NUM_VIDEO_CANVASES;
+      const screenMat = new THREE.MeshPhysicalMaterial({
+        roughness: 0.12,
+        metalness: 0.0,
+        map: videoTextures[texIndex],
+        clearcoat: 0.15,
+        clearcoatRoughness: 0.1
+      });
+      const screenMesh = new THREE.Mesh(screenGeom, screenMat);
+      screenMesh.position.z = CARD_D * 0.51;
+      cardContainer.add(screenMesh);
+
+      // Back Face for Prompt Typography (Shot 4)
+      const backPromptCanvas = document.createElement('canvas');
+      backPromptCanvas.width = 512;
+      backPromptCanvas.height = 320;
+      const bpCtx = backPromptCanvas.getContext('2d');
+      bpCtx.fillStyle = '#121316';
+      bpCtx.fillRect(0, 0, 512, 320);
+      bpCtx.fillStyle = '#FF5500';
+      bpCtx.font = '600 13px "Geist Mono", monospace';
+      bpCtx.fillText('PROMPT MOTION // SEED #8942', 32, 48);
+
+      bpCtx.fillStyle = '#F4F5F7';
+      bpCtx.font = '500 17px "Geist", sans-serif';
+      bpCtx.fillText('A slow pan across an abandoned brutalist museum.', 32, 98);
+      bpCtx.fillText('Monolithic concrete, drifting dust particles in daylight,', 32, 134);
+      bpCtx.fillText('anamorphic 65mm, hyper-realistic, photorealistic.', 32, 170);
+
+      bpCtx.fillStyle = 'rgba(255,255,255,0.35)';
+      bpCtx.font = '400 12px "Geist Mono", monospace';
+      bpCtx.fillText('MODEL: KINETIC-V4 / GUIDANCE: 7.5', 32, 260);
+
+      const backPromptTex = new THREE.CanvasTexture(backPromptCanvas);
+      const backMat = new THREE.MeshPhysicalMaterial({
+        color: 0x141416,
+        roughness: 0.45,
+        metalness: 0.15,
+        map: backPromptTex
+      });
+      const backMesh = new THREE.Mesh(new THREE.PlaneGeometry(CARD_W * 0.94, CARD_H * 0.92), backMat);
+      backMesh.position.z = -CARD_D * 0.51;
+      backMesh.rotation.y = Math.PI;
+      cardContainer.add(backMesh);
+
+      cardsGroup.add(cardContainer);
+
+      const cardObj = {
+        mesh: cardContainer,
+        casingMesh,
+        screenMesh,
+        basePos: new THREE.Vector3(x, y, z),
+        baseRotY: rotY,
+        currentRotY: rotY,
+        tiltAngle: 0,
+        springVelocity: 0,
+        userData: {}
+      };
+
+      cardsList.push(cardObj);
+
+      if (!heroCardMesh && cardsList.length === 12) {
+        heroCardMesh = cardObj;
+      }
+
+      return cardObj;
+    }
+
+    // ----------------------------------------------------
+    // Building the Letters: PROMPT MOTION
+    // ----------------------------------------------------
+    // Row 1: PROMPT at Z = -12
+    // Row 2: MOTION at Z = 12
+    const Z_TOP = -12;
+    const Z_BOT = 12;
+
+    // Helper: letter positions along X
+    // Width ~8.0, gap ~4.0
+    const X_TOP = [-35, -21, -7, 7, 21, 35]; // P, R, O, M, P, T
+    const X_BOT = [-35, -21, -7, 7, 21, 35]; // M, O, T, I, O, N
+
+    // --- TOP ROW: PROMPT ---
+    // Letter P (X_TOP[0] = -35)
+    addStraightWall(-37, Z_TOP - 6, -37, Z_TOP + 6); // vertical stem
+    addCurvedWall(-37, Z_TOP - 3, 3.2, -Math.PI * 0.5, Math.PI * 0.5); // upper loop
+
+    // Letter R (X_TOP[1] = -21)
+    addStraightWall(-23, Z_TOP - 6, -23, Z_TOP + 6); // stem
+    addCurvedWall(-23, Z_TOP - 3, 3.2, -Math.PI * 0.5, Math.PI * 0.5); // loop
+    addStraightWall(-23, Z_TOP, -17.5, Z_TOP + 6); // diagonal leg
+
+    // Letter O (X_TOP[2] = -7) - Grand Circular Pavilion!
+    addCurvedWall(-7, Z_TOP, 5.0, 0, Math.PI * 2);
+
+    // Letter M (X_TOP[3] = 7)
+    addStraightWall(3.5, Z_TOP - 6, 3.5, Z_TOP + 6);
+    addStraightWall(3.5, Z_TOP - 6, 7.0, Z_TOP);
+    addStraightWall(7.0, Z_TOP, 10.5, Z_TOP - 6);
+    addStraightWall(10.5, Z_TOP - 6, 10.5, Z_TOP + 6);
+
+    // Letter P (X_TOP[4] = 21)
+    addStraightWall(19, Z_TOP - 6, 19, Z_TOP + 6);
+    addCurvedWall(19, Z_TOP - 3, 3.2, -Math.PI * 0.5, Math.PI * 0.5);
+
+    // Letter T (X_TOP[5] = 35)
+    addStraightWall(30.5, Z_TOP - 6, 39.5, Z_TOP - 6); // top crossbar
+    addStraightWall(35, Z_TOP - 6, 35, Z_TOP + 6); // vertical stem
+
+    // --- BOTTOM ROW: MOTION ---
+    // Letter M (X_BOT[0] = -35)
+    addStraightWall(-38.5, Z_BOT - 6, -38.5, Z_BOT + 6);
+    addStraightWall(-38.5, Z_BOT - 6, -35.0, Z_BOT);
+    addStraightWall(-35.0, Z_BOT, -31.5, Z_BOT - 6);
+    addStraightWall(-31.5, Z_BOT - 6, -31.5, Z_BOT + 6);
+
+    // Letter O (X_BOT[1] = -21) - Second Grand Circular Pavilion
+    addCurvedWall(-21, Z_BOT, 5.0, 0, Math.PI * 2);
+
+    // Letter T (X_BOT[2] = -7)
+    addStraightWall(-11.5, Z_BOT - 6, -2.5, Z_BOT - 6);
+    addStraightWall(-7, Z_BOT - 6, -7, Z_BOT + 6);
+
+    // Letter I (X_BOT[3] = 7)
+    addStraightWall(7, Z_BOT - 6, 7, Z_BOT + 6);
+
+    // Letter O (X_BOT[4] = 21) - Third Circular Pavilion
+    addCurvedWall(21, Z_BOT, 5.0, 0, Math.PI * 2);
+
+    // Letter N (X_BOT[5] = 35)
+    addStraightWall(31.5, Z_BOT - 6, 31.5, Z_BOT + 6);
+    addStraightWall(31.5, Z_BOT - 6, 38.5, Z_BOT + 6);
+    addStraightWall(38.5, Z_BOT - 6, 38.5, Z_BOT + 6);
+
+    // If heroCardMesh was not assigned, pick the primary card on the first 'O'
+    if (!heroCardMesh) {
+      heroCardMesh = cardsList.find(c => c.userData.isCircleO) || cardsList[0];
+    }
+
+    // Create 3D Lifted Text Meshes for Shot 4
+    const liftedLinesGroup = new THREE.Group();
+    heroCardMesh.mesh.add(liftedLinesGroup);
+    liftedLinesGroup.position.set(0, 0, -CARD_D * 0.52);
+    liftedLinesGroup.rotation.y = Math.PI;
+
+    // Build 3 line bars that physically lift off the card back
+    const lineBars = [];
+    const lineData = [
+      { y: 0.28, w: 1.6, h: 0.08, color: 0xF4F5F7 },
+      { y: 0.05, w: 2.0, h: 0.09, color: 0xF4F5F7 },
+      { y: -0.18, w: 1.8, h: 0.08, color: 0xF4F5F7 }
+    ];
+    lineData.forEach(ld => {
+      const barMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(ld.w, ld.h, 0.02),
+        new THREE.MeshPhysicalMaterial({ color: ld.color, roughness: 0.3, metalness: 0.1 })
+      );
+      barMesh.position.set(0, ld.y, 0);
+      liftedLinesGroup.add(barMesh);
+      lineBars.push(barMesh);
+    });
+
+    // ----------------------------------------------------
+    // Cinematic Camera Paths & Easing
+    // ----------------------------------------------------
+    function smoothstep(edge0, edge1, x) {
+      const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+      return t * t * (3 - 2 * t);
+    }
+    function easeInOutQuart(x) {
+      return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
+    }
+    function easeInOutCubic(x) {
+      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    }
+
+    // Global Camera Update Function for Time t (0 <= t <= 20)
+    const camPos = new THREE.Vector3();
+    const lookTarget = new THREE.Vector3();
+
+    function updateCameraAndScene(t) {
+      // Clamp t to [0, TOTAL_DURATION]
+      t = Math.max(0, Math.min(TOTAL_DURATION, t));
+
+      // Determine active shot
+      let shotIdx = 0;
+      for (let s = 0; s < SHOT_STARTS.length; s++) {
+        if (t >= SHOT_STARTS[s]) shotIdx = s;
+      }
+      const shotStart = SHOT_STARTS[shotIdx];
+      const shotDur = SHOT_DURATIONS[shotIdx];
+      const u = (t - shotStart) / shotDur; // normalized 0..1 in current shot
+
+      // Update UI badges if available
+      const shotBadge = document.getElementById('shot-badge');
+      const shotMoveBadge = document.getElementById('shot-move-badge');
+      const shotTitle = document.getElementById('shot-title');
+      const shotDesc = document.getElementById('shot-desc');
+      const finalTitle = document.getElementById('final-title');
+      const scrubberFill = document.getElementById('scrubber-fill');
+
+      if (shotBadge && !isRenderMode) {
+        shotBadge.innerText = `SHOT ${shotIdx + 1} / 6`;
+        shotMoveBadge.innerText = SHOT_METADATA[shotIdx].move;
+        shotTitle.innerText = SHOT_METADATA[shotIdx].name;
+        shotDesc.innerText = SHOT_METADATA[shotIdx].desc;
+
+        document.querySelectorAll('.shot-btn').forEach((btn, idx) => {
+          btn.classList.toggle('active', idx === shotIdx);
+        });
+
+        if (scrubberFill) {
+          scrubberFill.style.width = `${(t / TOTAL_DURATION) * 100}%`;
+        }
+
+        if (finalTitle) {
+          if (t >= 16.5) finalTitle.classList.add('visible');
+          else finalTitle.classList.remove('visible');
+        }
+      }
+
+      // Reset card interactive states
+      cardsList.forEach(c => {
+        c.mesh.position.copy(c.basePos);
+        c.mesh.rotation.y = c.baseRotY;
+      });
+      lineBars.forEach(b => b.position.z = 0.01);
+      orangePulseLight.intensity = 0;
+
+      // ----------------------------------------------------
+      // SHOT 1: Macro & Rack Focus (0.0s to 3.33s)
+      // Camera is tightly framed on the edge of the hero card on the circular 'O' wall.
+      // Starts focused on the bevel edge, then racks focus onto the screen.
+      // ----------------------------------------------------
+      if (shotIdx === 0) {
+        const ease = easeInOutCubic(u);
+        const heroP = heroCardMesh.basePos;
+        const norm = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), heroCardMesh.baseRotY);
+        const tangent = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), heroCardMesh.baseRotY);
+
+        // Camera starts on the edge (tangent side) and dollies slightly to reveal the screen face
+        const startPos = heroP.clone().add(norm.clone().multiplyScalar(0.75)).add(tangent.clone().multiplyScalar(1.25)).setY(heroP.y + 0.15);
+        const endPos = heroP.clone().add(norm.clone().multiplyScalar(1.6)).add(tangent.clone().multiplyScalar(0.4)).setY(heroP.y);
+
+        camPos.lerpVectors(startPos, endPos, ease);
+        lookTarget.copy(heroP);
+
+        // Rack focus effect on hero card screen: starts slightly blurred/soft, clears up
+        camera.fov = 34;
+        camera.updateProjectionMatrix();
+      }
+
+      // ----------------------------------------------------
+      // SHOT 2: Dolly Back & Kinetic Pulse (3.33s to 6.67s)
+      // Dolly back along the sweeping curve; kinetic wave of orange light rolls through.
+      // ----------------------------------------------------
+      else if (shotIdx === 1) {
+        const ease = easeInOutQuart(u);
+        const heroP = heroCardMesh.basePos;
+        const norm = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), heroCardMesh.baseRotY);
+
+        // Dolly back along the corridor
+        const startPos = heroP.clone().add(norm.clone().multiplyScalar(1.6));
+        const endPos = new THREE.Vector3(-14, 3.2, Z_TOP + 12);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        const startLook = heroP.clone();
+        const endLook = new THREE.Vector3(-7, 2.5, Z_TOP);
+        lookTarget.lerpVectors(startLook, endLook, ease);
+
+        camera.fov = 44;
+        camera.updateProjectionMatrix();
+
+        // Wavefront of light traveling along X
+        const waveX = -25 + u * 45;
+        orangePulseLight.intensity = 1.8;
+        orangePulseLight.position.set(waveX, 2.5, Z_TOP);
+
+        // Spring tilting on cards as wave passes
+        cardsList.forEach(c => {
+          const dx = c.basePos.x - waveX;
+          const dist = Math.abs(dx);
+          if (dist < 4.5) {
+            const tilt = Math.sin((4.5 - dist) * 1.2) * 0.18 * Math.sign(dx || 1);
+            c.mesh.rotation.y = c.baseRotY + tilt;
+          }
+        });
+      }
+
+      // ----------------------------------------------------
+      // SHOT 3: Crane Over Corridors (6.67s to 10.0s)
+      // Camera ascends over the wall crest to reveal the parallel gallery corridors.
+      // ----------------------------------------------------
+      else if (shotIdx === 2) {
+        const ease = easeInOutCubic(u);
+        const startPos = new THREE.Vector3(-14, 3.2, Z_TOP + 12);
+        const endPos = new THREE.Vector3(-3, 15.5, 8.0);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        const startLook = new THREE.Vector3(-7, 2.5, Z_TOP);
+        const endLook = new THREE.Vector3(0, 2.2, 0);
+        lookTarget.lerpVectors(startLook, endLook, ease);
+
+        camera.fov = 48;
+        camera.updateProjectionMatrix();
+      }
+
+      // ----------------------------------------------------
+      // SHOT 4: Unhinging Prompt Card (10.0s to 13.33s)
+      // Central card unhinges, swings forward with weight & settling, 3D prompt text lifts off.
+      // ----------------------------------------------------
+      else if (shotIdx === 3) {
+        const ease = easeInOutCubic(u);
+        const startPos = new THREE.Vector3(-3, 15.5, 8.0);
+        const endPos = new THREE.Vector3(heroCardMesh.basePos.x, heroCardMesh.basePos.y + 0.3, heroCardMesh.basePos.z + 3.2);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        lookTarget.copy(heroCardMesh.basePos);
+        camera.fov = 40;
+        camera.updateProjectionMatrix();
+
+        // Physical spring unhinge: rotates 180 degrees around Y with inertia
+        const swingProgress = smoothstep(0.15, 0.85, u);
+        // Damped harmonic oscillation at settle
+        const damp = Math.exp(-u * 5.0) * Math.cos(u * 14.0) * 0.12;
+        const swingAngle = (swingProgress * Math.PI) + (u > 0.85 ? damp : 0);
+
+        heroCardMesh.mesh.position.set(
+          heroCardMesh.basePos.x,
+          heroCardMesh.basePos.y + Math.sin(swingProgress * Math.PI) * 0.4,
+          heroCardMesh.basePos.z + Math.sin(swingProgress * Math.PI) * 1.1
+        );
+        heroCardMesh.mesh.rotation.y = heroCardMesh.baseRotY + swingAngle;
+
+        // 3D Type lines lift off progressively
+        if (u > 0.5) {
+          const liftU = smoothstep(0.5, 0.95, u);
+          lineBars.forEach((bar, idx) => {
+            const delay = idx * 0.12;
+            const lineProgress = Math.max(0, Math.min(1, (liftU - delay) / 0.7));
+            bar.position.z = 0.02 + lineProgress * 0.09;
+          });
+        }
+      }
+
+      // ----------------------------------------------------
+      // SHOT 5: The Signature Shot — Grand Aerial Pull-Back & Tracing the 'O' (13.33s to 17.0s)
+      // Camera pulls far back and up; corridors resolve into PROMPT MOTION; orange light traces the O.
+      // ----------------------------------------------------
+      else if (shotIdx === 4) {
+        const ease = easeInOutQuart(u);
+        const startPos = new THREE.Vector3(heroCardMesh.basePos.x, heroCardMesh.basePos.y + 0.3, heroCardMesh.basePos.z + 3.2);
+        const endPos = new THREE.Vector3(0, 115.0, 36.0);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        const startLook = heroCardMesh.basePos.clone();
+        const endLook = new THREE.Vector3(0, 0, -1.0);
+        lookTarget.lerpVectors(startLook, endLook, ease);
+
+        camera.fov = 48;
+        camera.updateProjectionMatrix();
+
+        // Orange light traces the circular 'O' pavilion
+        const theta = u * Math.PI * 2.5;
+        const ox = -7 + Math.cos(theta) * 5.2;
+        const oz = Z_TOP + Math.sin(theta) * 5.2;
+        orangePulseLight.intensity = 2.6;
+        orangePulseLight.position.set(ox, 3.5, oz);
+
+        // Wave of tilt along the O
+        cardsList.filter(c => c.userData.isCircleO).forEach(c => {
+          const dTheta = Math.abs(c.userData.theta - (theta % (Math.PI * 2)));
+          if (dTheta < 0.6) {
+            c.mesh.rotation.y = c.baseRotY + Math.sin(dTheta * 5) * 0.15;
+          }
+        });
+      }
+
+      // ----------------------------------------------------
+      // SHOT 6: Wordmark Settle (17.0s to 20.0s)
+      // Locked, pristine architectural perspective settling on prompt-motion.com.
+      // ----------------------------------------------------
+      else if (shotIdx === 5) {
+        const ease = easeInOutCubic(u);
+        const startPos = new THREE.Vector3(0, 115.0, 36.0);
+        const endPos = new THREE.Vector3(0, 108.0, 32.0);
+        camPos.lerpVectors(startPos, endPos, ease);
+
+        lookTarget.set(0, 0, -1.0);
+        camera.fov = 48;
+        camera.updateProjectionMatrix();
+
+        // Orange light gently pulses at the center of the 'O'
+        orangePulseLight.intensity = 1.0 + Math.sin(t * 4.0) * 0.4;
+        orangePulseLight.position.set(-7, 2.5, Z_TOP);
+      }
+
+      camera.position.copy(camPos);
+      camera.lookAt(lookTarget);
+
+      // Render Procedural Videos on Card Canvases
+      renderVideoCanvases(t);
+
+      // Render Three.js Scene
+      renderer.render(scene, camera);
+    }
+
+    // ----------------------------------------------------
+    // Playback Loop & Render Hook
+    // ----------------------------------------------------
+    let startTime = null;
+
+    function animate(now) {
+      if (!isRenderMode) {
+        if (!startTime) startTime = now;
+        const elapsed = (now - startTime) / 1000.0;
+        const loopTime = elapsed % TOTAL_DURATION;
+        updateCameraAndScene(loopTime);
+        requestAnimationFrame(animate);
+      }
+    }
+
+    if (!isRenderMode) {
+      requestAnimationFrame(animate);
+    }
+
+    // Interactive Scrubber and Shot Buttons
+    const scrubberTrack = document.getElementById('scrubber-track');
+    if (scrubberTrack && !isRenderMode) {
+      let isDragging = false;
+      function seek(e) {
+        const rect = scrubberTrack.getBoundingClientRect();
+        const p = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const seekTime = p * TOTAL_DURATION;
+        startTime = performance.now() - (seekTime * 1000);
+        updateCameraAndScene(seekTime);
+      }
+      scrubberTrack.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        seek(e);
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (isDragging) seek(e);
+      });
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      document.querySelectorAll('.shot-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const s = parseInt(btn.getAttribute('data-shot'), 10);
+          const t = SHOT_STARTS[s] + 0.05;
+          startTime = performance.now() - (t * 1000);
+          updateCameraAndScene(t);
+        });
+      });
+    }
+
+    // Window Resize Handling
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ----------------------------------------------------
+    // ?render Mode API for Playwright Deterministic Capture
+    // ----------------------------------------------------
+    window.renderAtTime = function (tSec) {
+      updateCameraAndScene(tSec);
+      return true;
+    };
+    window.seekFrame = function (frameIndex, totalFrames, fps) {
+      const tSec = (frameIndex / fps);
+      updateCameraAndScene(tSec);
+      return true;
+    };
+    window.isReady = true;
+
+  </script>
+</body>
+
+</html>

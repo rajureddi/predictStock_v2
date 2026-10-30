@@ -1,0 +1,20 @@
+.venv/
+node_modules/
+__pycache__/
+data/cache/
+frontend/dist/
+*.pyc
+.pytest_cache/
+test-results/
+.env
+*.log
+graphify-out/cache/
+
+# V2 generated data (rebuild: scripts/bootstrap_bhavcopy.py)
+data/bhavcopy/
+data/history/
+data/fundamentals_cache.json
+data/reports/*.log
+data/reports/stage1_checkpoint.json
+data/reports/scan_state.json
+data/reports/scan.pid

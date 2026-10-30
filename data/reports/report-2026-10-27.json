@@ -1,0 +1,1379 @@
+{
+ "product": "MarketMind Pro",
+ "version": "2.0",
+ "run_date": "2026-10-27",
+ "data_as_of": "2026-10-27",
+ "target_date": "2026-11-03",
+ "horizon": "7 calendar days (5 trading days)",
+ "universe_counts": {
+  "nse": 2613,
+  "bse": 5374,
+  "total": 7987
+ },
+ "stage_counts": {
+  "universe": 7987,
+  "with_data": 6893,
+  "nse_with_data": 2350,
+  "bse_with_data": 4543,
+  "liquid": 1803,
+  "stage2": 143,
+  "quality_passed": 77
+ },
+ "picks": [
+  {
+   "symbol": "SANCODE",
+   "name": "Sancode Technologies Limited",
+   "exchange": "BSE",
+   "isin": "INE0P7001013",
+   "current_price": 1052.0,
+   "trader_score": 88.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9898.65) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 95 \u2014 overbought, chase risk",
+    "MACD histogram positive",
+    "ADX 92 \u2014 strong uptrend",
+    "Volume well below average \u2014 low conviction"
+   ],
+   "patterns": [
+    "Doji (indecision)"
+   ],
+   "support": 354.75,
+   "resistance": 1052.0,
+   "high52": 1052.0,
+   "stop_loss": 1018.04,
+   "target": 1085.96,
+   "target2": 1102.93,
+   "risk_reward": 1.0,
+   "rsi": 94.6,
+   "adx": 92.4,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 0.38,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 9.42,
+   "predicted_price": 1151.11,
+   "range_low": 1120.74,
+   "range_high": 1181.48,
+   "backtest": {
+    "ml_mape": 1.92,
+    "ml_dir_acc": 100.0,
+    "drift_mape": 2.11,
+    "drift_dir_acc": 100.0,
+    "naive_mape": 8.61,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 1.92,
+    "best_dir_acc": 100.0,
+    "windows": 9
+   },
+   "quality_pass": true,
+   "fundamentals": null,
+   "news": {
+    "headlines": [
+     {
+      "title": "Sancode subsidiary to acquire Philippine OSAT firm for $20.2 million",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOVUV2cDdDNmVvNDkwUFZRUE5hbVpNcDFIM2dSQkVueUVyMngzd3pVX3FuaFZVOTRkbzcweXpqWk5JNGNENjdLbDRBUDhhZEZ2RVYydU1yZ1NqUXg1VEVITENOMktwTzJFeVN2WXJ5Q1VLYTBXWkg2RE9UMjYydVUzamFqd1NSSmhuQWFJdDdKbVJhLVU0VVJ1R2VCNTRpejBCNjhscFNZRnU4VG90Wk40eldFT3RwUHdG?oc=5",
+      "date": "2026-10-23"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "HILINFRA",
+   "name": "Highway Infrastructure Limited",
+   "exchange": "NSE",
+   "isin": "INE00RL01028",
+   "current_price": 72.18,
+   "trader_score": 93.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b953.01) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 87 \u2014 overbought, chase risk",
+    "MACD histogram positive",
+    "ADX 39 \u2014 strong uptrend",
+    "Volume 4.6\u00d7 20-day average on an up day"
+   ],
+   "patterns": [
+    "Three white soldiers",
+    "Breakout candle above 20-day high"
+   ],
+   "support": 40.1,
+   "resistance": 73.83,
+   "high52": 82.88,
+   "stop_loss": 64.49,
+   "target": 79.87,
+   "target2": 83.72,
+   "risk_reward": 1.0,
+   "rsi": 87.3,
+   "adx": 38.9,
+   "delivery_pct": 45.3,
+   "delivery_avg5": 44.5,
+   "volume_ratio": 4.56,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 11.84,
+   "predicted_price": 80.72,
+   "range_low": 73.84,
+   "range_high": 87.6,
+   "backtest": {
+    "ml_mape": 3.16,
+    "ml_dir_acc": 66.7,
+    "drift_mape": 3.82,
+    "drift_dir_acc": 66.7,
+    "naive_mape": 4.15,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 3.16,
+    "best_dir_acc": 66.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 14.695417,
+    "forward_pe": null,
+    "roe": null,
+    "debt_to_equity": 0.45425,
+    "market_cap": 3910208768.0,
+    "revenue_growth": 1.709,
+    "earnings_growth": -0.872,
+    "dividend_yield": 0.0,
+    "score": 60.0,
+    "flags": [
+     "Earnings fell -87%",
+     "Revenue growth +171%"
+    ]
+   },
+   "news": {
+    "headlines": [
+     {
+      "title": "Highway Infrastructure Share Price and Chart Analysis",
+      "source": "Kalkine India",
+      "url": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxOOW1ZNmYySVlmeHZVWjJnSUhxcUpobVNUZllJU2ZkQ08yZC1KNkd5UEtTM1VDd0NMYWM1YlFTaEFwSzl5Y0RYdEh5bEpIQkZaZXg2Wlk4M2RqUl94YVZwek1ra2hvWmJ3MkplMktpUnlFN3V6RlQ0NXRSc2hWUk5KUW9BUDA2YWZJTmNpZ3BtY2pmYS10bXc0RFZpQ21aYVBaMDkwRHFvbmVmaFQ1X1AtQ2QyT0NUYmFjbTVBQXhINE84ZHNIMncxektLb3ZQX0RJcGtYZHBaOWxCR1djUmhYeXFjQXlTNWcxZWtXUHZPVzNqeXFTMlVN?oc=5",
+      "date": "2026-10-26"
+     },
+     {
+      "title": "Highway Infrastructure Wins \u20b991.78 Crore NHAI Toll Contract in Uttar Pradesh",
+      "source": "Trade Brains",
+      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQYzlFXzBMNDZ5MUhYQUhEZnFUYkF4MVJwZVR1clM1UF9HOVhZdk96enVWdWxrQVk2MnJFbDZPelczNXVWZEFCNE1UYlFDZjgxd3dOMXpKM01aR0pxczdXM1N0U1A4MkF6eUlNWjMzRmY5WWZyYnBRd1RIR3Y2TXhhMWVxZVNYalNKX2Z1aEtKN2lhaHJ0TjVfNVhNZXByVHg2YmNZNmIzUGNMOVo0dV9OZEg2VFhhX3RFVVpwSm1B?oc=5",
+      "date": "2026-10-27"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "PERMAGN",
+   "name": "PERMANENT MAGNETS LTD.",
+   "exchange": "BSE",
+   "isin": "INE418E01018",
+   "current_price": 1090.0,
+   "trader_score": 94.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9898.95) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "MACD histogram positive",
+    "Stochastic turning up",
+    "ADX 29 \u2014 strong uptrend",
+    "Volume 2.6\u00d7 20-day average on an up day"
+   ],
+   "patterns": [],
+   "support": 787.0,
+   "resistance": 1137.5,
+   "high52": 1137.5,
+   "stop_loss": 982.79,
+   "target": 1197.21,
+   "target2": 1250.82,
+   "risk_reward": 1.0,
+   "rsi": 74.2,
+   "adx": 29.3,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 2.57,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 7.32,
+   "predicted_price": 1169.83,
+   "range_low": 1073.94,
+   "range_high": 1265.73,
+   "backtest": {
+    "ml_mape": 2.01,
+    "ml_dir_acc": 83.3,
+    "drift_mape": 2.1,
+    "drift_dir_acc": 66.7,
+    "naive_mape": 2.17,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 2.01,
+    "best_dir_acc": 83.3,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 52.528873,
+    "forward_pe": null,
+    "roe": 0.11055,
+    "debt_to_equity": 0.5496300000000001,
+    "market_cap": 9385641984.0,
+    "revenue_growth": 0.475,
+    "earnings_growth": 2.163,
+    "dividend_yield": 0.21,
+    "score": 66.0,
+    "flags": [
+     "Earnings growth +216%",
+     "Revenue growth +48%"
+    ]
+   },
+   "fundamentals_source": "PERMAGN.NS",
+   "news": {
+    "headlines": [
+     {
+      "title": "Permanent Magnets Q2 Results: \u0c32\u0c3e\u0c2d\u0c3e\u0c32\u0c4d\u0c32\u0c4b \u0c2d\u0c3e\u0c30\u0c40 \u0c1c\u0c02\u0c2a\u0c4d.. \u0c0f\u0c15\u0c02\u0c17\u0c3e **217%** \u0c35\u0c43\u0c26\u0c4d\u0c27\u0c3f",
+      "source": "Whalesbook",
+      "url": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxNMGFETE12Zi1QQVl4M3lTVEtKOUZPamhxc09GbnEzcVd6djJhZG9BUDdrMEZoNWJGODF1Q2QzeVF1TTZDWTh5dFpqc3l3YUk2akZmY2hESmZXdFZOTERpVjJRRnhhS3g1c2IwQ1BoejcteUhiemdNVkpKdEFqaW8yRG03aDJGYnpyaVhsaGtnWlRJUThaZFFPazFSOHR0cGUyZkhEWVJVd3B5bDBReW1zYzdUcjAzejJIMDVnRHdCRFVkdW5UR250a2Vud2tPU0xQZFZvTUptVjdadGhCNkZJWnU0MlJKWFlzNDU2Mm90ZjM?oc=5",
+      "date": "2026-10-24"
+     },
+     {
+      "title": "Permanent Magnets Limited Announces Standalone and Consolidated Financial Results for Q2 and H1 FY 2026-27",
+      "source": "EquityBulls",
+      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPRldJb3d2QmV3RVcxSlZHYUVhLS05OFNWMkpGLTQzUlJOUWVwU2VRd2V3WjI1Xy1QS1drSG5KWGw1LVVpZTQwUVR4VTZaM0pHZ05WRU5McXZ4SHBrOHp1Rk41RDMwb05WOXFRT2FXMEFNeEdabklDOGZ1TlJZaGRqLVVWSk5zMmRDYmdadjlOQzl0TTRyU0JrTy1mRlAyYUY1VmZaT2dnT0FPeHQ1bXZ0QzlsTkhnUWs5dWN6bw?oc=5",
+      "date": "2026-10-24"
+     },
+     {
+      "title": "Price Band Hitters Today, 26 October 2026 at 12:00 PM: Upper and Lower Band Stocks",
+      "source": "HDFC Sky",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE5sNWFiNTdSeFN4R1Roa0Uxek1MUjQ1azhBSHUySFVzSXk5YjVzaHctWnBFdFM3SHozbFVXV3pkX1VQelp6cnFZeTIwYkJPdDhFc1NOOFlUR2M5cXZIeEg3Mm1ZMm90TUFVREFTTVRraUhlV3F4N3hZQzdhallfSjQ?oc=5",
+      "date": "2026-10-26"
+     },
+     {
+      "title": "20% Upper Circuit: Microcap Stock Skyrockets After Reporting 217% YoY Increase in Net Profit",
+      "source": "Trade Brains",
+      "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxPZ2NJUHpOS0JIWXg0UXFVeDFfWTdfREthcE0tMEZ3Tk5taTlsRzdLMHZYOUlJT2Z0WE4xNHZyc2N4ODVoVERBRk9Ja1M2UTgyX1JTZmFwR3paZ21GSkQ1WGZzUU9HSHN2ZVJ0OENXY1BPakNnTGpZNC1TdS14RkhuamZtdlJGaXRDZmJnVldaejZfS1BTcVlRZV95TE9pb184eFZvLVE2TGZYTks1bk54YVIzT09KZXFtN0xzWEJQTDdPSGJoU2dfTzJDdmtIRVNDY2c?oc=5",
+      "date": "2026-10-26"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "ATHERENERG",
+   "name": "Ather Energy Limited",
+   "exchange": "BSE",
+   "isin": "INE0LEZ01016",
+   "current_price": 1671.0,
+   "trader_score": 94.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b91490.08) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 67 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "Volume 3.2\u00d7 20-day average on an up day",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Breakout candle above 20-day high"
+   ],
+   "support": 1232.1,
+   "resistance": 1741.9,
+   "high52": 1741.9,
+   "stop_loss": 1519.12,
+   "target": 1822.88,
+   "target2": 1898.82,
+   "risk_reward": 1.0,
+   "rsi": 67.0,
+   "adx": 18.0,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 3.17,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 6.78,
+   "predicted_price": 1784.23,
+   "range_low": 1648.38,
+   "range_high": 1920.08,
+   "backtest": {
+    "ml_mape": 3.74,
+    "ml_dir_acc": 66.7,
+    "drift_mape": 5.47,
+    "drift_dir_acc": 50.0,
+    "naive_mape": 4.94,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 3.74,
+    "best_dir_acc": 66.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": null,
+    "forward_pe": 1164.9269,
+    "roe": -0.066989996,
+    "debt_to_equity": 0.22454999999999997,
+    "market_cap": 664106106880.0,
+    "revenue_growth": 0.699,
+    "earnings_growth": null,
+    "dividend_yield": 0.0,
+    "score": 56.0,
+    "flags": [
+     "Weak ROE -7%",
+     "Revenue growth +70%"
+    ]
+   },
+   "fundamentals_source": "ATHERENERG.NS",
+   "news": {
+    "headlines": [
+     {
+      "title": "Ather Energy swings into profit in Q2; shares surge 14%",
+      "source": "Moneycontrol.com",
+      "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxOLVp5bDN2Y09PaTVicFhGSnlhbGxNR2Y3MGlmM2c4SHNDMVdUY0dYdXdfV2JYdlltMXZtQ090VkM2R1NSWWNOR1l5NXl0bU92OVNZT2Y3dkp1MXRGc2p3OEw5R05WbUNrNDBTalI5eExnMm9NSkVrRFVaQ3JxM1R0RzN1Y2s2VlFNU0J0Q0kyOU1SRlVwVnRlY2k0b1luQ3gtaFVIdkFUSVFxdWNiM183aTRYQlAteXdzbEE4Z0IweUpBUVhsbUh1clUyRdIB0AFBVV95cUxObG03NmItejRZLWNGdC1fQkl2MGs1d2hDYVJfMDZvUUhzWkM1UHV1TWtyQXBoMk9qbTdFcTV0ZzM5X2Z1T21RUTQ2M1p3Tk5jUUN3Y1pEQ2V3RmFsRE1DMlpFeEFJMDNBVFIzcHg1R0F6d18xV3RPMmdreHJ4bS1XYU05LTZqSWhsdWd5S2haVlRLWWI0M1hjd01aT2FtS0dEUXd4c3MtYXZnV1BKTUdDU3drQkVDdUYwNnBqSGR3Qk9mQnZsVU9DTk5YeEZ5cC1w?oc=5",
+      "date": "2026-10-26"
+     },
+     {
+      "title": "ATHER ENERGY LTD. Share Price Today Up 6%",
+      "source": "Equitymaster",
+      "url": "https://news.google.com/rss/articles/CBMinwJBVV95cUxQT2g2Q0Z0NzhrbVJzM1BmLUhjX3lERGlMdXNKMnBkNHlMS1B3X2ZzclZYQ2dHOERQWmhXWkVXeUZpUW1mUHQyYzRkYTdRbWhKU0tNYVA4bWliSjF6dmI5aUkwRzJfenJydXhDMTk4MTRRcTNZZ1NTc0doSE5PbFMybzlSZUlmS0w2VDF2S0taWTA4WFZzUk16N09XYWVkaEloNmp4VFEtNWFfT0NPaW1pQmZWMTFzTDlRa1pKUXBTSXJCZjA4TVFibzZTX0dhbTFDUFB0YWJ1dDVPaExjcS1meEZscHpiSkU0bVBKYXZYUF9tZjhHSUk2MC03N2s1YzBkVTFOcWFlR3luZXB6ZVhDVFQxbHVSWGRWQ1ZpazV4Yw?oc=5",
+      "date": "2026-10-27"
+     },
+     {
+      "title": "Ather Energy shares: Buy, hold or sell? Target prices after Ebitda turns positive in Q2",
+      "source": "Business Today",
+      "url": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxPRnR5RmxHM0JQZC13ZGs0a0RCM1BmWVlXZDQ0am0tZjZTY1JMX2RlSnEyNW5hUEE1QTRlSWVRdkxJQU1mcUVNUTRuY1R4dUd5TEFiZ3p6Sk4waXIzUmFQUmhVZVRYcVpaTlZCNV9jQnVyN1RhUVFFRnhRRVg1ODF6TTlpbmZ5dlAwZDBvRkpnZGRUbmtGV1JPWVBHUFZHU1JLTk04blZRWXdZNzkxenRxdWZjYkViQThmVDE2eGpXMGp3QWJOaUI0RHVwaDNYM3VBTGtuVVlvMF9MejZ5ZnZKTy1lNEhaaEXSAewBQVVfeXFMT2lpQjBncXJyUktYUEktX2ZqdjFsOS1iZEgyQkdiZzludVJyRmxYMzVueDExNTFhUFhHN2lQSVRFV3NWSnRyNlUtSkFEWTJhcDBrQlp3cnpZYnhnRURaTWNobElqY1dTS19uRGd2UERBUzBfaEVBQllPY2dzcENCRDRtSE1lYzZpd2ljRUdwUFA4Z0I3VjdBOUN4eFlnV2JTcUMzVUVrZWxxdmRVMjY2U0ZxUWZtemwxWUp4Q1EyQVlkNjROYzZFN192MTBSUVRkX29VY053ZjZCcTZZdEFsNm1VREZtcUhqUV9yc2Q?oc=5",
+      "date": "2026-10-27"
+     },
+     {
+      "title": "Ather Energy shares: 125% YTD returns! Experts give 'portfolio stock' tag after Q2 results 2026 | Target, stop-loss",
+      "source": "Livemint",
+      "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxQcjRKZWJ6bXJaNTRhOUpwQVY1RjZYcWJMaW5vVlI5R3ZwbEM1UmVYVDN1b2YzRTJfYXZuVEFKQU9pRnVDZ0J2RDFzcDVMa2V6NTIxZ01CVnRlcHlmUnlzdkI5eWlza0xueEJLZzd4aUZWUEN1S0h5U0R0M2phOXlybUM0YS1TMGg1c0FLNFVFemNsQ2ZyeXpSd3lZeDI3QThLbGs4MWtmMXYya3ktUjBvNEtlZEdWWFhpX2I3d2RFUXdxaWVLTlJIamNhU0RyWUpJZEQtNjRIY1pxWF9OWF81dGd0N0tPejNaUks3ajdIQ3JqczZmeVpQLXJZdHpDODBiYlZzcnQwWdIBjAJBVV95cUxNR01XWnVKN0haR3c1bF8ySkx3Mkg1UjZiT0lzMTVQQzZ0QW55YjZfZ2FlZzZxMXRsS0tQMXdnOWxjckY3OGp0d1k3anQ5LUJyNHYzZklzSE1ZLUxrMXctbmtSaGt4MVBJTjRWVGhJMjF6T1FmYmpWNV9FMGdpeERqSTNJS0FEeTNvbFVaSkROQ052ZGRPRE1jZEpQLVUyVzVWZXprd1pZaDY4S1Uzb2praFc4R2E1ekhJaFNBa2RJdy1BRzhRc0l2SWd4UGxod240ZVhjZzVRcWJvVXlPUmlHSEZLZllNTWFHMEpkZExna290S0ZRZ0hfZktjeTljMldhMks3UnRLa040c2g4?oc=5",
+      "date": "2026-10-27"
+     },
+     {
+      "title": "Ather Energy Q2 Results: Stock jumps 17% after turning profitable; Volumes aid topline gowth",
+      "source": "CNBC TV18",
+      "url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxQaWE5VDgtamhPMTZXcFRyeEtadEFWaVczX0JRcVNwRDdsUVZCSUczUmVxbXNkQ0oxb2V0WTRBa3I0NGFXM3l3eWtmTnF0Q0pienpIWERiNlQwSGhhbFBFMWQyR2JLWDlrVGtON0c2bXhaeE9MS0JvdHVJbThUME9EWkpTcUpoYU1UeWpoMUtoOHVyUjN3YW1fRXJ6c3V5bWo1Z1BZOFpKdGhrVWdyNFJuLVQtUUFwQVNneFhPUWFvbHdpR1J1UHlvaTZ2SWJmdmVxUlJSYmFFa2xmU09jcU9wSS1nb21xU3dqR2VCb3J4LVdnTU3SAfgBQVVfeXFMTmNQcGhBdjYzOERsSnJJZ05ucFFDRmQtdFJZdm8wYWxfckFySnREZDF0M0R6TzlPNjFhRGdLbWlvZFdNTHduYS1ObmNVUUZ2WEd5QV91NXp1dkt6empfbnQ3dEhfNWYyQUlqMzRWTEUzSllpb05WaF9OeFJRV25hOEpxN01HNEZnVFM0UnZIWTFRdFplejF2M2xsVlJ2M1FzcVR1d3o5ZzItckNBY2RpZkhjWnFnTVBJbnJoWjBJcjZFYm9ERC1nQ09tOER2azBsT3ZlOW1PQmhLdUEyZHZTYVJydkZwZkxIN3E1bE5sMVJyc3FsWVZCeGQ?oc=5",
+      "date": "2026-10-26"
+     },
+     {
+      "title": "Ather Energy Share Price surges 14% as company turns profitable",
+      "source": "India Infoline",
+      "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOS2phZjRlTWQ5MDl4dHFiemY4MjV6TDZqanFVdkJqbThLVlZKVFNzUTM1TVhNZ1hBM3RFMEgyVlBTX2xRSTVaaTdTcDNfUzlSWmZfUjFFVDRHd1lsSkV1SWx2RGZ6SDNwUTJycHVrano5VmJScDdZdmRNNkEzVUc2VEpwU2IwTUVVeWwxWTVKdnhRd1JZV1hCV0JxYXU1T0wyZG9ISFBKRlN1Qmc?oc=5",
+      "date": "2026-10-26"
+     }
+    ],
+    "sentiment_score": 1.0,
+    "sentiment_label": "Positive",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "TLL",
+   "name": "Trident Lifeline Limited",
+   "exchange": "BSE",
+   "isin": "INE0MKA01014",
+   "current_price": 434.5,
+   "trader_score": 98.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b9390.40) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 67 \u2014 strong but not overbought",
+    "MACD histogram negative",
+    "ADX 32 \u2014 strong uptrend",
+    "Volume 1.6\u00d7 20-day average on an up day"
+   ],
+   "patterns": [
+    "Three white soldiers",
+    "Breakout candle above 20-day high"
+   ],
+   "support": 250.0,
+   "resistance": 437.9,
+   "high52": 437.9,
+   "stop_loss": 391.15,
+   "target": 477.85,
+   "target2": 499.53,
+   "risk_reward": 1.0,
+   "rsi": 66.7,
+   "adx": 31.8,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 1.63,
+   "model_used": "ml+drift blend, best=drift",
+   "predicted_return_pct": 4.79,
+   "predicted_price": 455.33,
+   "range_low": 416.56,
+   "range_high": 494.11,
+   "backtest": {
+    "ml_mape": 6.34,
+    "ml_dir_acc": 41.7,
+    "drift_mape": 5.54,
+    "drift_dir_acc": 75.0,
+    "naive_mape": 5.58,
+    "naive_dir_acc": 0.0,
+    "best_model": "drift",
+    "best_mape": 5.54,
+    "best_dir_acc": 75.0,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": null,
+   "news": {
+    "headlines": [
+     {
+      "title": "Trident Lifeline Q2FY27 Results: Net profit up 38% YoY, declares \u20b90.50 dividend",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOYm1DT2h1akpzMmwxM1BvZUVhWnhFMXg2Z1cxVWZqTnQtSDNNczVwWTJYazhDakVFcTU1VDg2ejh4VW8wSXpmLTRfb3U3bDNMRmpnWUtIbnNFZlpocmlHR1J6bGZyY2xjLUJ1VnAtbnl6TlBTOHE4eE5Qd1ZSWmp2RHZ4cFVaRjNuOWc4RGd0dkxfTFVLTE9UYjBtSzBiZW9Qc3dPVERHMWRTM2Q3YzdJa3MwVFlWeDlvaTVqQUFOeDQ?oc=5",
+      "date": "2026-10-26"
+     },
+     {
+      "title": "Trident Lifeline stake in subsidiary Mediquip falls to 58.23%",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNeFNaVmpXUFFKQTljWk9VY2FUOVREVXBxVUowMlRURGZpQmlkYUd3NS14UTljN05pQkN1Yjk0aWtZVVQwLUFsVk1LZXZBWFdobTllMzh3Zy1nNTRvRWlxbEc3UFE2bzZ2d0pFYTl2TGZtTE1Oa0doNFRjM2xWUUxiU3NDSG9IeXVsQXhQREUwbE9MX2NIN25YbVVhNVZYQTQ0YXp4WkQxVV9oMlN0MUtzVw?oc=5",
+      "date": "2026-10-15"
+     },
+     {
+      "title": "Trident Lifeline issues corrigendum to EGM notice for Oct 27 meeting",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOZ3FWdU5NeHJfUHdROExnTlg4bEFPZkQ5cmE4UGtoc2RtNWZjd2V1VUh6SGVSWDRhY2w3Y3VfN19pZVlqcDROeGctLVhWa25RWlNZRmhVU1ZGSjZrTS1NMzV4Sk1uLXJud3Ezb05feVUwYXJhTkNyU0NsendvSWNwSHBDVjhNOFpZOGd1V09JWUlTeVpYbFJESDN3MEwtVDNNUENKeTNUREFkcXRYdDM1SXBVVlRWSzFaVWFVaW53a1dXYVc1?oc=5",
+      "date": "2026-10-16"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  },
+  {
+   "symbol": "PVRINOX",
+   "name": "PVR INOX Limited",
+   "exchange": "NSE",
+   "isin": "INE191H01014",
+   "current_price": 1464.0,
+   "trader_score": 100.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b91358.89) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 68 \u2014 strong but not overbought",
+    "MACD histogram positive",
+    "ADX 40 \u2014 strong uptrend",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Morning star",
+    "Breakout candle above 20-day high"
+   ],
+   "support": 1123.1,
+   "resistance": 1475.8,
+   "high52": 1475.8,
+   "stop_loss": 1364.04,
+   "target": 1563.96,
+   "target2": 1613.93,
+   "risk_reward": 1.0,
+   "rsi": 68.4,
+   "adx": 40.1,
+   "delivery_pct": 56.9,
+   "delivery_avg5": 50.0,
+   "volume_ratio": 1.28,
+   "model_used": "ml+drift blend, best=drift",
+   "predicted_return_pct": 1.36,
+   "predicted_price": 1483.96,
+   "range_low": 1394.56,
+   "range_high": 1573.36,
+   "backtest": {
+    "ml_mape": 4.41,
+    "ml_dir_acc": 33.3,
+    "drift_mape": 3.63,
+    "drift_dir_acc": 91.7,
+    "naive_mape": 3.93,
+    "naive_dir_acc": 0.0,
+    "best_model": "drift",
+    "best_mape": 3.63,
+    "best_dir_acc": 91.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 50.3681,
+    "forward_pe": 23.622156,
+    "roe": null,
+    "debt_to_equity": 0.91874,
+    "market_cap": 134170034176.0,
+    "revenue_growth": 0.104,
+    "earnings_growth": null,
+    "dividend_yield": 0.0,
+    "score": 50.0,
+    "flags": []
+   },
+   "news": null
+  },
+  {
+   "symbol": "SHUKRAPHAR",
+   "name": "Shukra Pharmaceuticals Limited",
+   "exchange": "BSE",
+   "isin": "INE551C01044",
+   "current_price": 71.54,
+   "trader_score": 83.0,
+   "reasons": [
+    "Price above 21-EMA (\u20b964.93) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up",
+    "9/21 EMA bullish crossover structure",
+    "RSI 67 \u2014 strong but not overbought",
+    "MACD histogram negative",
+    "ADX 46 \u2014 strong uptrend",
+    "OBV trending up \u2014 accumulation"
+   ],
+   "patterns": [
+    "Three white soldiers"
+   ],
+   "support": 29.9,
+   "resistance": 75.5,
+   "high52": 75.5,
+   "stop_loss": 61.78,
+   "target": 81.3,
+   "target2": 86.18,
+   "risk_reward": 1.0,
+   "rsi": 66.5,
+   "adx": 45.9,
+   "delivery_pct": null,
+   "delivery_avg5": null,
+   "volume_ratio": 1.02,
+   "model_used": "ml+drift blend, best=ml",
+   "predicted_return_pct": 8.06,
+   "predicted_price": 77.31,
+   "range_low": 68.58,
+   "range_high": 86.04,
+   "backtest": {
+    "ml_mape": 6.47,
+    "ml_dir_acc": 66.7,
+    "drift_mape": 7.36,
+    "drift_dir_acc": 75.0,
+    "naive_mape": 8.07,
+    "naive_dir_acc": 0.0,
+    "best_model": "ml",
+    "best_mape": 6.47,
+    "best_dir_acc": 66.7,
+    "windows": 12
+   },
+   "quality_pass": true,
+   "fundamentals": {
+    "pe": 82.64103,
+    "forward_pe": null,
+    "roe": null,
+    "debt_to_equity": 0.055869999999999996,
+    "market_cap": 28524994560.0,
+    "revenue_growth": 3.363,
+    "earnings_growth": 14.0,
+    "dividend_yield": 0.02,
+    "score": 68.0,
+    "flags": [
+     "Earnings growth +1400%",
+     "Revenue growth +336%",
+     "Expensive \u2014 PE 83"
+    ]
+   },
+   "fundamentals_source": "SHUKRAPHAR.NS",
+   "news": {
+    "headlines": [
+     {
+      "title": "Shukra Pharmaceuticals opens postal ballot for name change to Shukra Medtech",
+      "source": "scanx.trade",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOS0hSYVltajYtMy1pSkJMU0d2VTVySTY1TFdFMnVvenhrczFyRlhIM0MtRG1PQVdVc2FYR2dOX1ZkdGR4VERacUxYcGdVWTRlN1k1X3lWT3hlRnYtRTBXWVdkaEY1QTd6bWozcFlJcHpMTHhrekJJWHI3bjRDZlJDQUQzLW5nQ0FTZUN6ZEFuOUYwLWlBYnBGdHhudVFneDBGTDNtRzdvRG9UNXhFQXJidEwyaWtNdw?oc=5",
+      "date": "2026-10-25"
+     },
+     {
+      "title": "SHUKRA MEDTECH (BSE:524632) - Stock Analysis",
+      "source": "Simply Wall Street",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNQ1MySE9KUmozMHpqSFdSVFh4U0szd3FKNUFZNy0wRC1LdG5vbV9BQjFRRVlTSE9ucmg3TlZtNVc0a2ZKcEU5dTB6ajVtT09mbGRkSnNyUjd5ZUhZM2xsLVVGUXZTOU90YWtTY3lJcVNZblk0OGtLLURHN0IxaENYb3FEOG5NWjBLaTYzLUd4TlFpZw?oc=5",
+      "date": "2026-10-18"
+     },
+     {
+      "title": "SHUKRA MEDTECH (NSEI:SHUKRAPHAR) - Stock Analysis",
+      "source": "Simply Wall Street",
+      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNTFNBSkdCak91a1ltNWQzNjNCaENMN3VaNFExVVl0S0Z4c1RSSHM2SU9wenNrMWF2ZURyOEdlclQ4dVBuV1hOS3hDUVJlY3h4d2U1SU5xVEl1RUpmTm9vb2ZsRkxlRnhoS05XRXl1alZqVHVNMkc0a256SENQZ05kVzBLVlJpeGFtYjYydFlSX2YxU0tSVzFz?oc=5",
+      "date": "2026-10-18"
+     }
+    ],
+    "sentiment_score": 0.0,
+    "sentiment_label": "Neutral",
+    "veto": false,
+    "veto_reason": null
+   }
+  }
+ ],
+ "allocation": null,
+ "vetoed": [],
+ "red_flag_demoted": [],
+ "stage1_top50": [
+  {
+   "symbol": "BBL",
+   "name": "Bharat Bijlee Limited",
+   "exchange": "NSE",
+   "current_price": 2585.8,
+   "trader_score": 100.0,
+   "delivery_pct": 15.1,
+   "rsi": 66.6,
+   "ret21_pct": 17.37,
+   "reasons": [
+    "Price above 21-EMA (\u20b92307.14) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MPHASIS",
+   "name": "MphasiS Limited",
+   "exchange": "NSE",
+   "current_price": 2618.4,
+   "trader_score": 100.0,
+   "delivery_pct": 61.4,
+   "rsi": 68.8,
+   "ret21_pct": 16.47,
+   "reasons": [
+    "Price above 21-EMA (\u20b92436.32) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PVRINOX",
+   "name": "PVR INOX Limited",
+   "exchange": "NSE",
+   "current_price": 1464.0,
+   "trader_score": 100.0,
+   "delivery_pct": 56.9,
+   "rsi": 68.4,
+   "ret21_pct": 16.5,
+   "reasons": [
+    "Price above 21-EMA (\u20b91358.89) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ORIENTHOT",
+   "name": "ORIENTAL HOTELS LTD.",
+   "exchange": "BSE",
+   "current_price": 158.1,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 68.4,
+   "ret21_pct": 12.45,
+   "reasons": [
+    "Price above 21-EMA (\u20b9146.74) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "RAPICUT",
+   "name": "RAPICUT CARBIDES LTD.",
+   "exchange": "BSE",
+   "current_price": 306.6,
+   "trader_score": 100.0,
+   "delivery_pct": null,
+   "rsi": 55.9,
+   "ret21_pct": 16.16,
+   "reasons": [
+    "Price above 21-EMA (\u20b9290.31) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PERSISTENT",
+   "name": "PERSISTENT SYSTEMS LTD.",
+   "exchange": "BSE",
+   "current_price": 5835.0,
+   "trader_score": 99.0,
+   "delivery_pct": null,
+   "rsi": 57.8,
+   "ret21_pct": 10.6,
+   "reasons": [
+    "Price above 21-EMA (\u20b95680.83) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BHARTIARTL",
+   "name": "Bharti Airtel Limited",
+   "exchange": "NSE",
+   "current_price": 1978.8,
+   "trader_score": 98.0,
+   "delivery_pct": 72.2,
+   "rsi": 68.6,
+   "ret21_pct": 10.19,
+   "reasons": [
+    "Price above 21-EMA (\u20b91861.48) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SOUTHBANK",
+   "name": "SOUTH INDIAN BANK LTD.",
+   "exchange": "BSE",
+   "current_price": 54.34,
+   "trader_score": 98.0,
+   "delivery_pct": null,
+   "rsi": 65.4,
+   "ret21_pct": 8.94,
+   "reasons": [
+    "Price above 21-EMA (\u20b950.86) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TLL",
+   "name": "Trident Lifeline Limited",
+   "exchange": "BSE",
+   "current_price": 434.5,
+   "trader_score": 98.0,
+   "delivery_pct": null,
+   "rsi": 66.7,
+   "ret21_pct": 14.6,
+   "reasons": [
+    "Price above 21-EMA (\u20b9390.40) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "BMWVENTLTD",
+   "name": "BMW Ventures Limited",
+   "exchange": "NSE",
+   "current_price": 63.66,
+   "trader_score": 97.0,
+   "delivery_pct": 62.4,
+   "rsi": 57.7,
+   "ret21_pct": 21.88,
+   "reasons": [
+    "Price above 21-EMA (\u20b961.04) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SGMART",
+   "name": "SG Mart Limited",
+   "exchange": "NSE",
+   "current_price": 799.4,
+   "trader_score": 96.0,
+   "delivery_pct": 66.0,
+   "rsi": 58.4,
+   "ret21_pct": 11.47,
+   "reasons": [
+    "Price above 21-EMA (\u20b9769.06) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SINGERIND",
+   "name": "Singer India Limited",
+   "exchange": "NSE",
+   "current_price": 90.37,
+   "trader_score": 96.0,
+   "delivery_pct": 49.7,
+   "rsi": 63.1,
+   "ret21_pct": 15.93,
+   "reasons": [
+    "Price above 21-EMA (\u20b982.67) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "OMNI",
+   "name": "Omnitech Engineering Limited",
+   "exchange": "NSE",
+   "current_price": 681.9,
+   "trader_score": 94.0,
+   "delivery_pct": 22.5,
+   "rsi": 61.7,
+   "ret21_pct": 24.47,
+   "reasons": [
+    "Price above 21-EMA (\u20b9623.08) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ORIENTELEC",
+   "name": "Orient Electric Limited",
+   "exchange": "NSE",
+   "current_price": 187.44,
+   "trader_score": 94.0,
+   "delivery_pct": 40.2,
+   "rsi": 60.2,
+   "ret21_pct": 14.31,
+   "reasons": [
+    "Price above 21-EMA (\u20b9179.16) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PERMAGN",
+   "name": "PERMANENT MAGNETS LTD.",
+   "exchange": "BSE",
+   "current_price": 1090.0,
+   "trader_score": 94.0,
+   "delivery_pct": null,
+   "rsi": 74.2,
+   "ret21_pct": 28.25,
+   "reasons": [
+    "Price above 21-EMA (\u20b9898.95) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ATHERENERG",
+   "name": "Ather Energy Limited",
+   "exchange": "BSE",
+   "current_price": 1671.0,
+   "trader_score": 94.0,
+   "delivery_pct": null,
+   "rsi": 67.0,
+   "ret21_pct": 11.44,
+   "reasons": [
+    "Price above 21-EMA (\u20b91490.08) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "APPL",
+   "name": "Aptus Pharma Limited",
+   "exchange": "BSE",
+   "current_price": 472.1,
+   "trader_score": 94.0,
+   "delivery_pct": null,
+   "rsi": 69.6,
+   "ret21_pct": 35.66,
+   "reasons": [
+    "Price above 21-EMA (\u20b9436.80) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "63MOONS",
+   "name": "63 moons technologies limited",
+   "exchange": "NSE",
+   "current_price": 910.05,
+   "trader_score": 93.0,
+   "delivery_pct": 35.6,
+   "rsi": 60.4,
+   "ret21_pct": 5.46,
+   "reasons": [
+    "Price above 21-EMA (\u20b9865.50) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "GULFPETRO",
+   "name": "GP Petroleums Limited",
+   "exchange": "NSE",
+   "current_price": 68.21,
+   "trader_score": 93.0,
+   "delivery_pct": null,
+   "rsi": 57.9,
+   "ret21_pct": 7.33,
+   "reasons": [
+    "Price above 21-EMA (\u20b964.96) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "HCLTECH",
+   "name": "HCL Technologies Limited",
+   "exchange": "NSE",
+   "current_price": 1420.0,
+   "trader_score": 93.0,
+   "delivery_pct": 71.5,
+   "rsi": 71.7,
+   "ret21_pct": 14.18,
+   "reasons": [
+    "Price above 21-EMA (\u20b91334.09) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "HILINFRA",
+   "name": "Highway Infrastructure Limited",
+   "exchange": "NSE",
+   "current_price": 72.18,
+   "trader_score": 93.0,
+   "delivery_pct": 45.3,
+   "rsi": 87.3,
+   "ret21_pct": 67.2,
+   "reasons": [
+    "Price above 21-EMA (\u20b953.01) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "INDHOTEL",
+   "name": "The Indian Hotels Company Limited",
+   "exchange": "NSE",
+   "current_price": 812.85,
+   "trader_score": 93.0,
+   "delivery_pct": 70.8,
+   "rsi": 71.9,
+   "ret21_pct": 11.53,
+   "reasons": [
+    "Price above 21-EMA (\u20b9753.08) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KESORAMIND",
+   "name": "Kesoram Industries Limited",
+   "exchange": "NSE",
+   "current_price": 12.63,
+   "trader_score": 93.0,
+   "delivery_pct": 46.8,
+   "rsi": 59.8,
+   "ret21_pct": 10.89,
+   "reasons": [
+    "Price above 21-EMA (\u20b911.60) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "COFORGE",
+   "name": "COFORGE LIMITED",
+   "exchange": "BSE",
+   "current_price": 1996.0,
+   "trader_score": 93.0,
+   "delivery_pct": null,
+   "rsi": 64.3,
+   "ret21_pct": 11.63,
+   "reasons": [
+    "Price above 21-EMA (\u20b91897.97) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TRISHAKT",
+   "name": "Trishakti Industries Limited",
+   "exchange": "BSE",
+   "current_price": 291.25,
+   "trader_score": 93.0,
+   "delivery_pct": null,
+   "rsi": 68.3,
+   "ret21_pct": 21.03,
+   "reasons": [
+    "Price above 21-EMA (\u20b9263.97) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "DLF",
+   "name": "DLF LTD.",
+   "exchange": "BSE",
+   "current_price": 670.0,
+   "trader_score": 93.0,
+   "delivery_pct": null,
+   "rsi": 53.7,
+   "ret21_pct": -0.1,
+   "reasons": [
+    "Price above 21-EMA (\u20b9662.50) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "PARACABLES",
+   "name": "PARAMOUNT COMMUNICATIONS LTD.",
+   "exchange": "BSE",
+   "current_price": 65.76,
+   "trader_score": 93.0,
+   "delivery_pct": null,
+   "rsi": 60.1,
+   "ret21_pct": 9.55,
+   "reasons": [
+    "Price above 21-EMA (\u20b960.08) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ALGOQUANT",
+   "name": "Algoquant Fintech Limited",
+   "exchange": "NSE",
+   "current_price": 76.32,
+   "trader_score": 92.0,
+   "delivery_pct": 19.8,
+   "rsi": 66.4,
+   "ret21_pct": 4.02,
+   "reasons": [
+    "Price above 21-EMA (\u20b971.18) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "COHANCE",
+   "name": "Cohance Lifesciences Limited",
+   "exchange": "NSE",
+   "current_price": 479.25,
+   "trader_score": 92.0,
+   "delivery_pct": 35.6,
+   "rsi": 62.1,
+   "ret21_pct": 5.53,
+   "reasons": [
+    "Price above 21-EMA (\u20b9455.29) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "COMFINTE",
+   "name": "Comfort Intech Limited",
+   "exchange": "NSE",
+   "current_price": 7.88,
+   "trader_score": 92.0,
+   "delivery_pct": null,
+   "rsi": 55.7,
+   "ret21_pct": 38.49,
+   "reasons": [
+    "Price above 21-EMA (\u20b97.46) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CORONA",
+   "name": "CORONA Remedies Limited",
+   "exchange": "NSE",
+   "current_price": 2152.0,
+   "trader_score": 92.0,
+   "delivery_pct": 46.7,
+   "rsi": 61.6,
+   "ret21_pct": 1.94,
+   "reasons": [
+    "Price above 21-EMA (\u20b92061.49) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "JINDALPOLY",
+   "name": "Jindal Poly Films Limited",
+   "exchange": "NSE",
+   "current_price": 685.4,
+   "trader_score": 92.0,
+   "delivery_pct": 23.6,
+   "rsi": 50.9,
+   "ret21_pct": -2.06,
+   "reasons": [
+    "Price above 21-EMA (\u20b9682.00) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "KARURVYSYA",
+   "name": "Karur Vysya Bank Limited",
+   "exchange": "NSE",
+   "current_price": 350.6,
+   "trader_score": 92.0,
+   "delivery_pct": 58.0,
+   "rsi": 55.6,
+   "ret21_pct": 7.88,
+   "reasons": [
+    "Price above 21-EMA (\u20b9342.47) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "NINSYS",
+   "name": "NINtec Systems Limited",
+   "exchange": "NSE",
+   "current_price": 875.05,
+   "trader_score": 92.0,
+   "delivery_pct": 71.7,
+   "rsi": 66.9,
+   "ret21_pct": 22.72,
+   "reasons": [
+    "Price above 21-EMA (\u20b9827.47) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "TANLA",
+   "name": "Tanla Platforms Limited",
+   "exchange": "NSE",
+   "current_price": 579.15,
+   "trader_score": 92.0,
+   "delivery_pct": 48.2,
+   "rsi": 64.7,
+   "ret21_pct": 18.29,
+   "reasons": [
+    "Price above 21-EMA (\u20b9539.25) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CHEMKART",
+   "name": "Chemkart India Limited",
+   "exchange": "BSE",
+   "current_price": 256.95,
+   "trader_score": 92.0,
+   "delivery_pct": null,
+   "rsi": 64.5,
+   "ret21_pct": 13.97,
+   "reasons": [
+    "Price above 21-EMA (\u20b9241.13) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SHARVAYA",
+   "name": "SHARVAYA METALS LIMITED",
+   "exchange": "BSE",
+   "current_price": 199.8,
+   "trader_score": 92.0,
+   "delivery_pct": null,
+   "rsi": 66.2,
+   "ret21_pct": 43.23,
+   "reasons": [
+    "Price above 21-EMA (\u20b9181.90) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "AGOL",
+   "name": "Ashapuri Gold Ornament Limited",
+   "exchange": "BSE",
+   "current_price": 6.07,
+   "trader_score": 92.0,
+   "delivery_pct": null,
+   "rsi": 61.0,
+   "ret21_pct": 42.49,
+   "reasons": [
+    "Price above 21-EMA (\u20b95.36) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "AAYUSHBULL",
+   "name": "AAYUSH ART AND BULLION LIMITED",
+   "exchange": "BSE",
+   "current_price": 1315.05,
+   "trader_score": 92.0,
+   "delivery_pct": null,
+   "rsi": 65.5,
+   "ret21_pct": 0.34,
+   "reasons": [
+    "Price above 21-EMA (\u20b91296.37) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "OAL",
+   "name": "ORIENTAL AROMATICS LIMITED",
+   "exchange": "BSE",
+   "current_price": 625.05,
+   "trader_score": 92.0,
+   "delivery_pct": null,
+   "rsi": 66.5,
+   "ret21_pct": 17.35,
+   "reasons": [
+    "Price above 21-EMA (\u20b9564.61) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "DEVX",
+   "name": "Dev Accelerator Limited",
+   "exchange": "NSE",
+   "current_price": 42.17,
+   "trader_score": 91.0,
+   "delivery_pct": 61.6,
+   "rsi": 61.6,
+   "ret21_pct": 16.72,
+   "reasons": [
+    "Price above 21-EMA (\u20b939.70) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "GABRIEL",
+   "name": "Gabriel India Limited",
+   "exchange": "NSE",
+   "current_price": 1449.7,
+   "trader_score": 91.0,
+   "delivery_pct": 37.1,
+   "rsi": 57.2,
+   "ret21_pct": 3.75,
+   "reasons": [
+    "Price above 21-EMA (\u20b91393.30) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "LAURUSLABS",
+   "name": "Laurus Labs Limited",
+   "exchange": "NSE",
+   "current_price": 2142.0,
+   "trader_score": 91.0,
+   "delivery_pct": 47.5,
+   "rsi": 64.8,
+   "ret21_pct": 5.72,
+   "reasons": [
+    "Price above 21-EMA (\u20b92024.09) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MANOMAY",
+   "name": "Manomay Tex India Limited",
+   "exchange": "NSE",
+   "current_price": 248.03,
+   "trader_score": 91.0,
+   "delivery_pct": 8.4,
+   "rsi": 63.2,
+   "ret21_pct": 6.35,
+   "reasons": [
+    "Price above 21-EMA (\u20b9240.23) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "MRPL",
+   "name": "Mangalore Refinery and Petrochemicals Limited",
+   "exchange": "NSE",
+   "current_price": 189.44,
+   "trader_score": 91.0,
+   "delivery_pct": 15.7,
+   "rsi": 61.8,
+   "ret21_pct": 15.17,
+   "reasons": [
+    "Price above 21-EMA (\u20b9173.85) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SAGILITY",
+   "name": "SAGILITY LIMITED",
+   "exchange": "NSE",
+   "current_price": 46.06,
+   "trader_score": 91.0,
+   "delivery_pct": 49.4,
+   "rsi": 57.8,
+   "ret21_pct": 2.36,
+   "reasons": [
+    "Price above 21-EMA (\u20b944.57) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "SONACOMS",
+   "name": "Sona BLW Precision Forgings Limited",
+   "exchange": "NSE",
+   "current_price": 851.85,
+   "trader_score": 91.0,
+   "delivery_pct": 26.4,
+   "rsi": 62.8,
+   "ret21_pct": 4.36,
+   "reasons": [
+    "Price above 21-EMA (\u20b9796.48) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "ACUTAAS",
+   "name": "ACUTAAS CHEMICALS LIMITED",
+   "exchange": "BSE",
+   "current_price": 3794.55,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 70.9,
+   "ret21_pct": 15.42,
+   "reasons": [
+    "Price above 21-EMA (\u20b93262.86) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "CRAFTSMAN",
+   "name": "Craftsman Automation Limited",
+   "exchange": "BSE",
+   "current_price": 11002.55,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 54.7,
+   "ret21_pct": 2.79,
+   "reasons": [
+    "Price above 21-EMA (\u20b910768.53) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  },
+  {
+   "symbol": "WESTLIFE",
+   "name": "WESTLIFE FOODWORLD LIMITED",
+   "exchange": "BSE",
+   "current_price": 600.25,
+   "trader_score": 91.0,
+   "delivery_pct": null,
+   "rsi": 58.4,
+   "ret21_pct": 5.33,
+   "reasons": [
+    "Price above 21-EMA (\u20b9573.78) \u2014 short-term uptrend",
+    "Price above 50-EMA \u2014 intermediate uptrend",
+    "Above 200-EMA \u2014 long-term trend up"
+   ]
+  }
+ ],
+ "evaluated_count": 143
+}
