@@ -3,6 +3,7 @@ node_modules/
 __pycache__/
 data/cache/
 frontend/dist/
+frontend/.vite/
 *.pyc
 .pytest_cache/
 test-results/
