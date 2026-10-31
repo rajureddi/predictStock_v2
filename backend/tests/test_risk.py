@@ -105,8 +105,9 @@ def test_trade_stats_and_portfolio_metrics():
     assert s["n"] == 4 and s["win_rate_pct"] == 50.0 and s["cost_round_trip_pct"] == 0.3
     assert s["avg_return_net_pct"] == round(0.25 - 0.3, 3)
     # gross R = (1, -1, .5, -.25) avg .0625 ; cost .3% on 4% risk = .075R per trade
-    assert abs(s["expectancy_R"] - (0.0625 - 0.075)) < 1e-6
-    assert s["payoff_ratio"] > 1 and s["profit_factor"] > 1 and s["max_consecutive_losses"] == 1
+    assert abs(s["expectancy_R"] - (0.0625 - 0.075)) < 1e-3  # reported to 3 dp
+    # net wins 3.7, 1.7 (avg 2.7) vs net losses 4.3, 1.3 (avg 2.8)
+    assert s["payoff_ratio"] == 0.96 and s["profit_factor"] == 0.96 and s["max_consecutive_losses"] == 1
     assert s["direction_hit_rate_pct"] == 50.0
     assert s["by_regime"]["bull"]["win_rate_pct"] == 100.0 and s["by_regime"]["bear"]["win_rate_pct"] == 0.0
     assert bt.compute_trade_stats([])["n"] == 0
@@ -124,7 +125,7 @@ def test_regime_on_and_simulate_exit():
     bars = pd.DataFrame(dict(Open=[101, 102, 103, 104, 105], High=[103, 104, 111, 106, 107],
                              Low=[99, 100, 101, 102, 103], Close=[102, 103, 104, 105, 106]), index=idx)
     ex = bt.simulate_exit(bars, entry=100, stop=95, target=110)
-    assert ex["reason"] == "target" and ex["exit"] == 110 and ex["bars_held"] == 3 and ex["mae_pct"] == -1.0
+    assert ex["reason"] == "target" and ex["exit"] == 110 and ex["bars_held"] == 3 and abs(ex["mae_pct"] + 1.0) < 1e-9
     ex2 = bt.simulate_exit(bars, entry=100, stop=99.5, target=120)
     assert ex2["reason"] == "stop" and ex2["bars_held"] == 1
     ex3 = bt.simulate_exit(bars, entry=100, stop=90, target=120)

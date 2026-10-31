@@ -18,7 +18,11 @@ _PANEL_DICTS = {}  # exchange -> {yahoo_ticker: DataFrame}
 def _clean(df):
     if df is None or len(df) == 0: return None
     if isinstance(df.columns, pd.MultiIndex):
-        df = df.copy(); df.columns = [c[0] for c in df.columns]
+        # single-ticker group_by="ticker" frames put the ticker on level 0 and the
+        # OHLCV field on level 1 — keep whichever level actually carries "Close"
+        df = df.copy()
+        lv = [i for i in range(df.columns.nlevels) if "Close" in df.columns.get_level_values(i)]
+        df.columns = list(df.columns.get_level_values(lv[0])) if lv else [c[0] for c in df.columns]
     if "Close" not in df.columns: return None
     df = df.dropna(subset=["Close"])
     if len(df) == 0: return None

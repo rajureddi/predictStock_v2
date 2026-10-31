@@ -180,4 +180,5 @@ if __name__ == "__main__":
     ap.add_argument("--cost", type=float, default=bt.COST_PER_SIDE_PCT, help="%% per side")
     ap.add_argument("--fast", action="store_true", help="skip the ML walk-forward (trader_score ranking only)")
     a = ap.parse_args()
-    run(weeks=a.weeks, top=a.top, n_stocks=a.stocks, prefilter=a.prefilter, fast=a.fast, cost=a.cost)
+    run(weeks=a.weeks, top=a.top, n_stocks=a.stocks, prefilter=a.prefilter, fast=a.fast, cost=a.cost,
+        log=lambda *x: print(*x, flush=True))

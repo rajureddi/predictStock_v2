@@ -1522,5 +1522,21 @@
    ]
   }
  ],
- "evaluated_count": 145
+ "evaluated_count": 145,
+ "market_regime": {
+  "regime": "bear",
+  "headline": "Bear regime \u2014 NIFTY below its 200-DMA. Picks cut to 3, half the budget held in cash.",
+  "nifty_close": 23053.1,
+  "nifty_sma50": 23254.75,
+  "nifty_sma200": 24041.15,
+  "nifty_vs_50dma_pct": -0.87,
+  "nifty_vs_200dma_pct": -4.11,
+  "vix": 15.3,
+  "vix_change_5d_pct": -9.3,
+  "vix_note": "India VIX 15.3 (-9% in 5 days) \u2014 normal volatility",
+  "max_picks": 3,
+  "cash_pct": 0.5,
+  "size_mult": 0.9,
+  "stop_widen": 1.05
+ }
 }
