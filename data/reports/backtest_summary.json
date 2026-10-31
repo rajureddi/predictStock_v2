@@ -1,68 +1,68 @@
 {
  "generated": "2026-10-31",
  "params": {
-  "weeks": 8,
+  "weeks": 4,
   "top": 6,
   "stocks": 19,
-  "prefilter": 15,
-  "fast": true,
+  "prefilter": 10,
+  "fast": false,
   "cost_per_side_pct": 0.15,
   "horizon_bars": 5
  },
  "window": {
-  "start": "2026-08-26",
+  "start": "2026-09-24",
   "end": "2026-10-16"
  },
  "strategies": {
   "baseline": {
    "portfolio": {
-    "periods": 8,
-    "total_return_pct": 3.79,
-    "cagr_pct": 27.38,
-    "max_drawdown_pct": -3.45,
-    "sharpe": 1.23,
-    "sortino": 1.56,
-    "calmar": 7.93,
-    "best_period_pct": 5.15,
-    "worst_period_pct": -3.35,
-    "positive_periods_pct": 50.0
+    "periods": 4,
+    "total_return_pct": 20.48,
+    "cagr_pct": 1027.38,
+    "max_drawdown_pct": 0.0,
+    "sharpe": 5.22,
+    "sortino": 7.36,
+    "calmar": null,
+    "best_period_pct": 9.66,
+    "worst_period_pct": -4.84,
+    "positive_periods_pct": 75.0
    },
    "trades": {
-    "n": 48,
-    "win_rate_pct": 45.8,
-    "avg_return_gross_pct": 0.805,
-    "avg_return_net_pct": 0.505,
-    "total_return_net_pct": 24.23,
-    "avg_win_pct": 6.277,
-    "avg_loss_pct": 4.38,
-    "payoff_ratio": 1.43,
-    "profit_factor": 1.21,
-    "expectancy_pct": 0.505,
-    "expectancy_R": 0.059,
-    "r_trades": 48,
-    "max_consecutive_losses": 5,
-    "direction_hit_rate_pct": 47.9,
-    "avg_mae_pct": -3.66,
-    "avg_mfe_pct": 5.35,
+    "n": 7,
+    "win_rate_pct": 57.1,
+    "avg_return_gross_pct": 4.572,
+    "avg_return_net_pct": 4.272,
+    "total_return_net_pct": 29.91,
+    "avg_win_pct": 11.041,
+    "avg_loss_pct": 4.752,
+    "payoff_ratio": 2.32,
+    "profit_factor": 3.1,
+    "expectancy_pct": 4.272,
+    "expectancy_R": 0.233,
+    "r_trades": 7,
+    "max_consecutive_losses": 2,
+    "direction_hit_rate_pct": 57.1,
+    "avg_mae_pct": -3.53,
+    "avg_mfe_pct": 9.43,
     "cost_round_trip_pct": 0.3,
     "by_regime": {
      "bear": {
-      "n": 48,
-      "win_rate_pct": 45.8,
-      "avg_return_gross_pct": 0.805,
-      "avg_return_net_pct": 0.505,
-      "total_return_net_pct": 24.23,
-      "avg_win_pct": 6.277,
-      "avg_loss_pct": 4.38,
-      "payoff_ratio": 1.43,
-      "profit_factor": 1.21,
-      "expectancy_pct": 0.505,
-      "expectancy_R": 0.059,
-      "r_trades": 48,
-      "max_consecutive_losses": 5,
-      "direction_hit_rate_pct": 47.9,
-      "avg_mae_pct": -3.66,
-      "avg_mfe_pct": 5.35,
+      "n": 7,
+      "win_rate_pct": 57.1,
+      "avg_return_gross_pct": 4.572,
+      "avg_return_net_pct": 4.272,
+      "total_return_net_pct": 29.91,
+      "avg_win_pct": 11.041,
+      "avg_loss_pct": 4.752,
+      "payoff_ratio": 2.32,
+      "profit_factor": 3.1,
+      "expectancy_pct": 4.272,
+      "expectancy_R": 0.233,
+      "r_trades": 7,
+      "max_consecutive_losses": 2,
+      "direction_hit_rate_pct": 57.1,
+      "avg_mae_pct": -3.53,
+      "avg_mfe_pct": 9.43,
       "cost_round_trip_pct": 0.3
      }
     }
@@ -70,53 +70,53 @@
   },
   "regime_gated": {
    "portfolio": {
-    "periods": 8,
-    "total_return_pct": 8.23,
-    "cagr_pct": 67.2,
-    "max_drawdown_pct": -3.09,
-    "sharpe": 2.8,
-    "sortino": 4.06,
-    "calmar": 21.75,
-    "best_period_pct": 5.8,
-    "worst_period_pct": -3.09,
-    "positive_periods_pct": 62.5
+    "periods": 4,
+    "total_return_pct": 10.07,
+    "cagr_pct": 248.04,
+    "max_drawdown_pct": 0.0,
+    "sharpe": 5.22,
+    "sortino": 7.36,
+    "calmar": null,
+    "best_period_pct": 4.83,
+    "worst_period_pct": -2.42,
+    "positive_periods_pct": 75.0
    },
    "trades": {
-    "n": 24,
-    "win_rate_pct": 62.5,
-    "avg_return_gross_pct": 2.347,
-    "avg_return_net_pct": 2.047,
-    "total_return_net_pct": 49.12,
-    "avg_win_pct": 6.242,
-    "avg_loss_pct": 4.946,
-    "payoff_ratio": 1.26,
-    "profit_factor": 2.1,
-    "expectancy_pct": 2.047,
-    "expectancy_R": 0.33,
-    "r_trades": 24,
-    "max_consecutive_losses": 4,
-    "direction_hit_rate_pct": 62.5,
-    "avg_mae_pct": -3.28,
-    "avg_mfe_pct": 6.33,
+    "n": 7,
+    "win_rate_pct": 57.1,
+    "avg_return_gross_pct": 4.572,
+    "avg_return_net_pct": 4.272,
+    "total_return_net_pct": 29.91,
+    "avg_win_pct": 11.041,
+    "avg_loss_pct": 4.752,
+    "payoff_ratio": 2.32,
+    "profit_factor": 3.1,
+    "expectancy_pct": 4.272,
+    "expectancy_R": 0.233,
+    "r_trades": 7,
+    "max_consecutive_losses": 2,
+    "direction_hit_rate_pct": 57.1,
+    "avg_mae_pct": -3.53,
+    "avg_mfe_pct": 9.43,
     "cost_round_trip_pct": 0.3,
     "by_regime": {
      "bear": {
-      "n": 24,
-      "win_rate_pct": 62.5,
-      "avg_return_gross_pct": 2.347,
-      "avg_return_net_pct": 2.047,
-      "total_return_net_pct": 49.12,
-      "avg_win_pct": 6.242,
-      "avg_loss_pct": 4.946,
-      "payoff_ratio": 1.26,
-      "profit_factor": 2.1,
-      "expectancy_pct": 2.047,
-      "expectancy_R": 0.33,
-      "r_trades": 24,
-      "max_consecutive_losses": 4,
-      "direction_hit_rate_pct": 62.5,
-      "avg_mae_pct": -3.28,
-      "avg_mfe_pct": 6.33,
+      "n": 7,
+      "win_rate_pct": 57.1,
+      "avg_return_gross_pct": 4.572,
+      "avg_return_net_pct": 4.272,
+      "total_return_net_pct": 29.91,
+      "avg_win_pct": 11.041,
+      "avg_loss_pct": 4.752,
+      "payoff_ratio": 2.32,
+      "profit_factor": 3.1,
+      "expectancy_pct": 4.272,
+      "expectancy_R": 0.233,
+      "r_trades": 7,
+      "max_consecutive_losses": 2,
+      "direction_hit_rate_pct": 57.1,
+      "avg_mae_pct": -3.53,
+      "avg_mfe_pct": 9.43,
       "cost_round_trip_pct": 0.3
      }
     }
@@ -124,92 +124,24 @@
   }
  },
  "nifty": {
-  "periods": 8,
-  "total_return_pct": -6.01,
-  "cagr_pct": -33.15,
-  "max_drawdown_pct": -6.24,
-  "sharpe": -3.18,
-  "sortino": -3.21,
-  "calmar": -5.31,
+  "periods": 4,
+  "total_return_pct": -1.34,
+  "cagr_pct": -16.13,
+  "max_drawdown_pct": -1.7,
+  "sharpe": -0.92,
+  "sortino": -0.99,
+  "calmar": -9.5,
   "best_period_pct": 2.78,
   "worst_period_pct": -2.78,
-  "positive_periods_pct": 25.0
+  "positive_periods_pct": 50.0
  },
  "regime_weeks": {
   "bull": 0,
   "neutral": 0,
-  "bear": 8,
+  "bear": 4,
   "unknown": 0
  },
  "weekly": [
-  {
-   "date": "2026-08-26",
-   "regime": "bear",
-   "regime_200dma": "bear",
-   "vix": 10.57,
-   "picks": [
-    "NETWEB",
-    "PCJEWELLER",
-    "ATHERENERG",
-    "M&M",
-    "KOTAKBANK",
-    "ETERNAL"
-   ],
-   "baseline_pct": -0.003,
-   "gated_pct": 0.214,
-   "nifty_pct": -1.212
-  },
-  {
-   "date": "2026-09-02",
-   "regime": "bear",
-   "regime_200dma": "bear",
-   "vix": 11.59,
-   "picks": [
-    "PAYTM",
-    "ETERNAL",
-    "MCX",
-    "PCJEWELLER",
-    "NETWEB",
-    "KOTAKBANK"
-   ],
-   "baseline_pct": 2.259,
-   "gated_pct": 1.197,
-   "nifty_pct": -2.019
-  },
-  {
-   "date": "2026-09-09",
-   "regime": "bear",
-   "regime_200dma": "bear",
-   "vix": 11.92,
-   "picks": [
-    "ATHERENERG",
-    "PAYTM",
-    "KOTAKBANK",
-    "CUPID",
-    "MCX",
-    "PCJEWELLER"
-   ],
-   "baseline_pct": -3.347,
-   "gated_pct": -0.256,
-   "nifty_pct": -0.687
-  },
-  {
-   "date": "2026-09-17",
-   "regime": "bear",
-   "regime_200dma": "bear",
-   "vix": 12.29,
-   "picks": [
-    "PCJEWELLER",
-    "ETERNAL",
-    "KOTAKBANK",
-    "ATHERENERG",
-    "PAYTM",
-    "MCX"
-   ],
-   "baseline_pct": 2.585,
-   "gated_pct": 2.714,
-   "nifty_pct": -0.892
-  },
   {
    "date": "2026-09-24",
    "regime": "bear",
@@ -217,14 +149,10 @@
    "vix": 12.69,
    "picks": [
     "PAYTM",
-    "ETERNAL",
-    "PCJEWELLER",
-    "MCX",
-    "ATHERENERG",
-    "CUPID"
+    "ATHERENERG"
    ],
-   "baseline_pct": -2.625,
-   "gated_pct": -3.09,
+   "baseline_pct": -4.843,
+   "gated_pct": -2.421,
    "nifty_pct": -2.78
   },
   {
@@ -233,15 +161,11 @@
    "regime_200dma": "bear",
    "vix": 14.46,
    "picks": [
-    "KOTAKBANK",
-    "CUPID",
     "PCJEWELLER",
-    "PAYTM",
-    "MCX",
-    "HDFCBANK"
+    "PAYTM"
    ],
-   "baseline_pct": 5.145,
-   "gated_pct": 5.801,
+   "baseline_pct": 5.325,
+   "gated_pct": 2.663,
    "nifty_pct": 0.439
   },
   {
@@ -250,15 +174,10 @@
    "regime_200dma": "bear",
    "vix": 14.38,
    "picks": [
-    "PCJEWELLER",
-    "KOTAKBANK",
-    "AXISBANK",
-    "CUPID",
-    "MCX",
-    "TCS"
+    "PCJEWELLER"
    ],
-   "baseline_pct": 1.938,
-   "gated_pct": 2.155,
+   "baseline_pct": 9.626,
+   "gated_pct": 4.813,
    "nifty_pct": 2.778
   },
   {
@@ -268,14 +187,10 @@
    "vix": 14.06,
    "picks": [
     "TCS",
-    "BHARTIARTL",
-    "INFY",
-    "AXISBANK",
-    "ICICIBANK",
-    "BSE"
+    "PCJEWELLER"
    ],
-   "baseline_pct": -1.914,
-   "gated_pct": -0.548,
+   "baseline_pct": 9.658,
+   "gated_pct": 4.829,
    "nifty_pct": -1.698
   }
  ]
