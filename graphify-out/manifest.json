@@ -18,9 +18,9 @@
     "semantic_hash": "d48287efeaeb550a87c35bad02d421f3"
   },
   "backend/app/datafeed.py": {
-    "mtime": 1793434706.8954365,
-    "seen": 1793434976.3818927,
-    "ast_hash": "392810e13bba2bb9d8023fac7d9f8b3d",
+    "mtime": 1793435549.2077615,
+    "seen": 1793436216.3415756,
+    "ast_hash": "6055af79602dc2baafcbc7f88a0134b3",
     "semantic_hash": ""
   },
   "backend/app/engine.py": {
@@ -114,8 +114,8 @@
     "semantic_hash": "3c710da0164df10e28eb92915873d533"
   },
   "data/screen_config.json": {
-    "mtime": 1793434862.2615833,
-    "seen": 1793434976.3821743,
+    "mtime": 1793436052.9749026,
+    "seen": 1793436216.3506007,
     "ast_hash": "175affce9f27349e1311bc2f0be18536",
     "semantic_hash": "175affce9f27349e1311bc2f0be18536"
   },
@@ -900,9 +900,9 @@
     "semantic_hash": ""
   },
   "data/reports/latest.json": {
-    "mtime": 1793394184.454048,
-    "seen": 1793434976.3821,
-    "ast_hash": "b70dba1a31065c8ec3652db19d4fd1d5",
+    "mtime": 1793435565.3912385,
+    "seen": 1793436216.34951,
+    "ast_hash": "bbfafdfa181fca77a72ed040b2978a89",
     "semantic_hash": ""
   },
   "data/reports/report-2026-10-30.json": {
@@ -1272,9 +1272,9 @@
     "semantic_hash": ""
   },
   "backend/scripts/backtest_portfolio.py": {
-    "mtime": 1793434687.4996693,
-    "seen": 1793434976.3819969,
-    "ast_hash": "0de3f8f9f1e257b5182d1dbcc2f198d9",
+    "mtime": 1793435848.3746233,
+    "seen": 1793436216.3452582,
+    "ast_hash": "6b0e7d5884d1cd176f3306aae517e9fa",
     "semantic_hash": ""
   },
   "data/reports/backtest_summary.json": {
@@ -1284,15 +1284,21 @@
     "semantic_hash": ""
   },
   "data/reports/report-2026-10-31.json": {
-    "mtime": 1793394184.454048,
-    "seen": 1793434976.3821645,
-    "ast_hash": "b70dba1a31065c8ec3652db19d4fd1d5",
+    "mtime": 1793435565.397761,
+    "seen": 1793436216.3505962,
+    "ast_hash": "bbfafdfa181fca77a72ed040b2978a89",
     "semantic_hash": ""
   },
   "data/surveillance_cache.json": {
     "mtime": 1793434645.760775,
     "seen": 1793434976.3821826,
     "ast_hash": "a2eba1494be20831426423966e8b907c",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_risk.py": {
+    "mtime": 1793435294.48637,
+    "seen": 1793436216.3465934,
+    "ast_hash": "52254924f2e2fb27b22e17f0d25b4ae1",
     "semantic_hash": ""
   }
 }
