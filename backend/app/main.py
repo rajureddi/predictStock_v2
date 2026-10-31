@@ -337,7 +337,7 @@ def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = 
         try:
             import yfinance as yf
             import pandas as pd
-            df = yf.download(tickers, period="5d", progress=False, timeout=5)
+            df = yf.download(tickers, period="5d", progress=False, timeout=10, threads=True)
             if df is not None and len(df) and "Close" in df:
                 close_obj = df["Close"]
                 if isinstance(close_obj, pd.Series):
