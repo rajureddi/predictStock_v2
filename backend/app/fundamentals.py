@@ -15,7 +15,7 @@ CACHE_F = ROOT / "data" / "fundamentals_cache.json"
 FIELDS = ["trailingPE", "forwardPE", "returnOnEquity", "debtToEquity",
           "marketCap", "revenueGrowth", "earningsGrowth", "dividendYield"]
 CACHE_DAYS = 7
-FETCH_TIMEOUT = 45  # seconds per symbol batch wait
+FETCH_TIMEOUT = 4  # fast 4-second timeout prevents stalls on unmapped tickers
 
 
 def _clean_num(v):

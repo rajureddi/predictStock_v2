@@ -1,23 +1,28 @@
 # Graph Report - marketmind-pro-WINDOWS-FINAL  (2026-10-31)
 
 ## Corpus Check
-- 201 files · ~531,134 words
+- 208 files · ~540,812 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: .toml 4, (none) 2, .css 2)
 
 ## Summary
-- 3638 nodes · 8024 edges · 168 communities (158 shown, 10 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 166 edges (avg confidence: 0.86)
+- 3721 nodes · 8219 edges · 170 communities (160 shown, 10 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 169 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `7f475860`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - SimClock
 - Market Scan Lifecycle Control
 - test_pro.py
-- Trader Score & Red Flag Rules
+- test_v2.py
 - Frontend React Application UI
 - Bhavcopy Exchange Ingestion
-- fundamentals.py
+- sectors.py
 - FastAPI REST Endpoints
 - Tool Orchestration
 - Historical Market Datafeed
@@ -53,7 +58,7 @@
 - run-checks.sh
 - SESSION_FAILURES.md
 - trader-entry/entry.py
-- cmd_watch
+- backtest_portfolio.py
 - time_machine
 - trader/timemachine.py
 - trader-broker/ticket.py
@@ -72,7 +77,7 @@
 - os
 - datetime
 - trader-risk/check.py
-- gzip
+- AlertError
 - trader-alerts
 - trader-budget
 - trader-pelosi
@@ -91,23 +96,25 @@
 - trader/market.py
 - trader-broker/market.py
 - applyEditing
-- trader-exit/market.py
+- surveillance.py
 - trader-scanner/market.py
 - trader-news/market.py
 - trader/entry.py
 - resumeSession
 - initPageChat
 - history_replay
-- get_chart
+- simulation.py
+- cmd_watch
 - pipeline.py
 - modern-screenshot.umd.js
 - TMError
 - watch_loop
 - trader-scanner
 - trader-timemachine/timemachine.py
+- market_status
 - fetch_chart
-- trader-entry/entry.py
-- hashlib
+- evaluate
+- to_eastern
 - el
 - initGlobalBar
 - new-work.md
@@ -121,6 +128,7 @@
 - createLiveBrowserDomHelpers
 - onboard.md
 - mountSvelteComponentVariant
+- bolder.md
 - The Toolkit
 - createLiveBrowserSessionState
 - ui-backup-original/App.tsx
@@ -137,7 +145,7 @@
 - Impeccable Asset Producer
 - Scan mode (approach C: auto-extract, then confirm descriptive language)
 - generate.md
-- os
+- Visualize: Direction Comps & Asset Production
 - critique.md
 - Simplify the Design
 - Hardening Dimensions
@@ -145,15 +153,16 @@
 - clarify.md
 - Nielsen's 10 Heuristics
 - Generate Combined Critique Report
+- entry_doc
 - polish.md
 - quieter.md
 - doctor.md
-- fetch_spark
+- Read
 - Product
 - Init flow
 - Common Cognitive Load Violations
 - iOS platform
-- Operate mode depth (and Read notes)
+- eastern_offset
 - Shape
 - _absorb
 - orb_window
@@ -172,9 +181,7 @@
 - interface
 - Region map
 - Heuristics Scoring Guide
-- re
 - Impeccable Documenter
-- entry_doc
 - hasTextRows
 
 ## God Nodes (most connected - your core abstractions)
@@ -207,35 +214,35 @@
 ## Hyperedges (group relationships)
 - **End-to-End Market Screening Pipeline** — readme_stage1_screen, readme_stage2_deep_evaluation, readme_fundamentals_check, readme_news_veto [INFERRED 0.85]
 
-## Communities (168 total, 10 thin omitted)
+## Communities (170 total, 10 thin omitted)
 
 ### Community 1 - "Market Scan Lifecycle Control"
 Cohesion: 0.11
-Nodes (20): checkpoint_progress(), find_scan_pids(), get_status(), _log_stage(), _pid_alive(), _read_json(), scan_running(), start_scan() (+12 more)
+Nodes (21): scan_status(), checkpoint_progress(), find_scan_pids(), get_status(), _log_stage(), _pid_alive(), _read_json(), scan_running() (+13 more)
 
 ### Community 2 - "test_pro.py"
-Cohesion: 0.10
-Nodes (26): allocate(), add_indicators(), _adx(), _atr(), build_features(), detect_patterns(), _ema(), _fit_predict() (+18 more)
+Cohesion: 0.12
+Nodes (22): add_indicators(), _adx(), _atr(), build_features(), detect_patterns(), _ema(), _fit_predict(), _rsi() (+14 more)
 
-### Community 3 - "Trader Score & Red Flag Rules"
-Cohesion: 0.14
-Nodes (15): severe_red_flag(), analyse_headlines(), apply_red_flag_demotion(), dedupe_by_isin(), rank_key(), _frame(), _pick(), test_dedupe_by_isin_keeps_best_listing() (+7 more)
+### Community 3 - "test_v2.py"
+Cohesion: 0.11
+Nodes (20): attach_fundamentals(), _clean_num(), fetch_fundamentals(), _fetch_one(), _load_cache(), _save_cache(), score_fundamentals(), severe_red_flag() (+12 more)
 
 ### Community 4 - "Frontend React Application UI"
 Cohesion: 0.08
 Nodes (33): dependencies, @fontsource-variable/geist@^5.3.0, @fontsource-variable/geist-mono@^5.3.0, @phosphor-icons/react@^2.1.10, react@^18.3.1, react-dom@^18.3.1, thinking-orbs@^0.3.2, devDependencies (+25 more)
 
 ### Community 5 - "Bhavcopy Exchange Ingestion"
-Cohesion: 0.13
-Nodes (15): build_panels(), download_day(), download_range(), one(), existing_dates(), _fetch(), load_missing(), mark_missing() (+7 more)
+Cohesion: 0.10
+Nodes (21): build_panels(), download_day(), download_range(), one(), existing_dates(), _fetch(), load_missing(), mark_missing() (+13 more)
 
-### Community 6 - "fundamentals.py"
-Cohesion: 0.14
-Nodes (11): attach_fundamentals(), _clean_num(), fetch_fundamentals(), _fetch_one(), _load_cache(), _save_cache(), score_fundamentals(), test_fundamentals_scoring_and_flags() (+3 more)
+### Community 6 - "sectors.py"
+Cohesion: 0.23
+Nodes (6): apply_sector_cap(), attach_sectors(), _fetch_one(), fetch_sectors(), _load(), _save()
 
 ### Community 7 - "FastAPI REST Endpoints"
-Cohesion: 0.10
-Nodes (28): The universe, What it reads and writes, local_history(), BudgetIn, get_budget(), get_live_quotes(), get_simulation(), health() (+20 more)
+Cohesion: 0.09
+Nodes (26): The universe, What it reads and writes, local_history(), backtest_summary(), BudgetIn, get_budget(), get_live_quotes(), get_simulation() (+18 more)
 
 ### Community 8 - "Tool Orchestration"
 Cohesion: 0.06
@@ -302,8 +309,8 @@ Cohesion: 0.19
 Nodes (7): count_source_files(), detect_language(), main(), suggest_budget(), main(), detect_language(), run_verification()
 
 ### Community 25 - "trader-news/news.py"
-Cohesion: 0.09
-Nodes (26): cik_map(), collect(), collect_moves(), dedupe(), eastern_offset(), Fetcher, fingerprint(), _json_ready() (+18 more)
+Cohesion: 0.08
+Nodes (28): cik_map(), collect(), collect_moves(), dedupe(), eastern_offset(), Fetcher, fingerprint(), _json_ready() (+20 more)
 
 ### Community 26 - "GRAVITAS -- Engineering Reliability Runtime"
 Cohesion: 0.14
@@ -350,28 +357,28 @@ Cohesion: 0.25
 Nodes (7): Dependency-Directed Recon, Extended Recon (unfamiliar codebase or high fan-out), Gravitas -- Reconnaissance Reference, Recon Completeness Check, Recon Principle, Standard Recon (Tier 1 tasks), What Not to Do
 
 ### Community 37 - "trader-scanner/scan.py"
-Cohesion: 0.17
-Nodes (12): cmd_daily(), daily_closes(), eastern_offset(), eastern_to_utc(), find_setups(), money(), _n(), _nth_sunday() (+4 more)
+Cohesion: 0.16
+Nodes (15): chart_path(), cmd_daily(), fetch_spark(), find_setups(), load_offline(), money(), _n(), progress() (+7 more)
 
 ### Community 38 - "trader/scan.py"
 Cohesion: 0.05
 Nodes (52): _absorb(), build_universe(), chart_path(), classify(), clock_label(), cmd_daily(), cmd_orb(), confirm() (+44 more)
 
 ### Community 42 - "trader-entry/entry.py"
-Cohesion: 0.12
-Nodes (24): chart_path(), chart_range(), cmd_check(), cmd_watch(), provider(), cmd_watchlist(), EntryError, get_chart() (+16 more)
+Cohesion: 0.16
+Nodes (12): chart_path(), chart_range(), get_chart(), _load(), offline_file(), _open_url(), parse_chart(), read_text() (+4 more)
 
-### Community 43 - "cmd_watch"
-Cohesion: 0.23
-Nodes (13): cmd_check(), cmd_watch(), cmd_watchlist(), EntryError, _load(), main(), _opts(), parse_hhmm() (+5 more)
+### Community 43 - "backtest_portfolio.py"
+Cohesion: 0.08
+Nodes (22): compute_trade_stats(), _f(), max_consecutive_losses(), portfolio_metrics(), r_multiple(), regime_on(), regime_series(), simulate_exit() (+14 more)
 
 ### Community 44 - "time_machine"
 Cohesion: 0.14
 Nodes (11): build_pool(), chart_result(), clock12(), clock24(), full_sessions(), lean(), split_sessions(), time_machine() (+3 more)
 
 ### Community 45 - "trader/timemachine.py"
-Cohesion: 0.05
-Nodes (44): to_yahoo_symbol(), build_pool(), cents_away(), chart_result(), chart_url(), clock12(), clock24(), cmd_chart() (+36 more)
+Cohesion: 0.06
+Nodes (39): to_yahoo_symbol(), build_pool(), cents_away(), chart_result(), chart_url(), clock12(), clock24(), cmd_chart() (+31 more)
 
 ### Community 46 - "trader-broker/ticket.py"
 Cohesion: 0.09
@@ -390,43 +397,43 @@ Cohesion: 0.07
 Nodes (35): allocate(), bracket_order(), eastern_offset(), eastern_to_utc(), _f(), fresh_price(), load_config(), load_prices() (+27 more)
 
 ### Community 50 - "trader-exit/exit.py"
-Cohesion: 0.08
-Nodes (40): ampm(), atr_of(), build_plan(), cents(), cmd_plan(), cmd_show(), compute(), D() (+32 more)
+Cohesion: 0.05
+Nodes (51): ampm(), atr_of(), build_plan(), cents(), cmd_plan(), cmd_show(), compute(), D() (+43 more)
 
 ### Community 51 - "trader/exit.py"
 Cohesion: 0.08
 Nodes (39): ampm(), atr_of(), build_plan(), cents(), cmd_plan(), cmd_show(), compute(), D() (+31 more)
 
 ### Community 52 - "json"
-Cohesion: 0.09
-Nodes (37): active(), AlertError, cmd_add(), cmd_check(), cmd_clock(), cmd_list(), cmd_quote(), cmd_reset() (+29 more)
+Cohesion: 0.12
+Nodes (28): active(), cmd_add(), cmd_check(), cmd_clock(), cmd_list(), cmd_quote(), cmd_reset(), _dedupe() (+20 more)
 
 ### Community 53 - "trader-alerts/alerts.py"
-Cohesion: 0.08
-Nodes (38): active(), AlertError, cmd_add(), cmd_check(), cmd_clock(), cmd_list(), cmd_quote(), cmd_reset() (+30 more)
+Cohesion: 0.11
+Nodes (31): active(), AlertError, cmd_add(), cmd_check(), cmd_clock(), cmd_list(), cmd_quote(), cmd_reset() (+23 more)
 
 ### Community 54 - "trader/news.py"
-Cohesion: 0.09
-Nodes (26): cik_map(), collect(), collect_moves(), dedupe(), eastern_offset(), Fetcher, fingerprint(), _json_ready() (+18 more)
+Cohesion: 0.08
+Nodes (28): cik_map(), collect(), collect_moves(), dedupe(), eastern_offset(), Fetcher, fingerprint(), _json_ready() (+20 more)
 
 ### Community 55 - "trader-analyst/facts.py"
 Cohesion: 0.09
 Nodes (24): analyse(), changes(), clean_title(), _date(), exhibit_name(), facts_for(), FactsError, Fetcher (+16 more)
 
 ### Community 56 - "trader/facts.py"
-Cohesion: 0.08
+Cohesion: 0.09
 Nodes (24): analyse(), changes(), clean_title(), _date(), exhibit_name(), facts_for(), FactsError, Fetcher (+16 more)
 
 ### Community 57 - "trader/check.py"
-Cohesion: 0.08
-Nodes (29): account(), business_days(), _cent(), check(), day_trades(), eastern_offset(), eastern_to_utc(), _f() (+21 more)
+Cohesion: 0.07
+Nodes (32): imported_plugin_names(), main(), sha256(), account(), business_days(), _cent(), check(), day_trades() (+24 more)
 
 ### Community 58 - "trader-pelosi/ptr.py"
 Cohesion: 0.11
 Nodes (23): _amount(), describe(), download(), _fetch_and_read(), _finish(), iso(), load_index(), load_state() (+15 more)
 
 ### Community 59 - "os"
-Cohesion: 0.12
+Cohesion: 0.10
 Nodes (23): _amount(), describe(), download(), _fetch_and_read(), _finish(), iso(), load_index(), load_state() (+15 more)
 
 ### Community 60 - "datetime"
@@ -437,9 +444,9 @@ Nodes (12): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_ti
 Cohesion: 0.05
 Nodes (41): account(), business_days(), _cent(), check(), day_trades(), eastern_offset(), eastern_to_utc(), _f() (+33 more)
 
-### Community 62 - "gzip"
-Cohesion: 0.23
-Nodes (6): parse_stooq(), build_universe(), _get(), parse_bse(), parse_nse(), parse_stooq()
+### Community 62 - "AlertError"
+Cohesion: 0.17
+Nodes (10): AlertError, fetch(), fetch_yahoo(), _get(), get_quotes(), _offline_text(), parse_stooq(), parse_yahoo() (+2 more)
 
 ### Community 63 - "trader-alerts"
 Cohesion: 0.18
@@ -478,8 +485,8 @@ Cohesion: 0.07
 Nodes (86): abandonForeignSession(), abandonSupersededGo(), abortSvelteComponentInjection(), beginNewLiveConfiguration(), cancelEditing(), cancelEditingToPicking(), cancelInsertConfigure(), cleanup() (+78 more)
 
 ### Community 73 - "trader-alerts/market.py"
-Cohesion: 0.16
-Nodes (11): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), is_indian_stock(), ist_to_utc(), market_to_utc(), _nth_sunday() (+3 more)
+Cohesion: 0.14
+Nodes (12): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), is_indian_stock(), ist_to_utc(), market_to_utc(), _nth_sunday() (+4 more)
 
 ### Community 74 - "trader-analyst"
 Cohesion: 0.25
@@ -490,8 +497,8 @@ Cohesion: 0.25
 Nodes (7): Example: the reel, Safety, Steps, The rules, trader-news, What it never does, What it reads and writes
 
 ### Community 76 - "trader-entry/market.py"
-Cohesion: 0.15
-Nodes (11): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), ist_to_utc(), market_to_utc(), _nth_sunday(), to_eastern() (+3 more)
+Cohesion: 0.13
+Nodes (13): eastern_to_utc(), currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), is_indian_stock(), ist_to_utc(), market_to_utc() (+5 more)
 
 ### Community 77 - "trader-timemachine/market.py"
 Cohesion: 0.16
@@ -502,8 +509,8 @@ Cohesion: 0.33
 Nodes (5): CLI usage (direct Python), Day Trader Skills — MarketMind Pro, Setup, Skills (invoke with `/trader-*`), Workflow order
 
 ### Community 79 - "trader/market.py"
-Cohesion: 0.13
-Nodes (13): next_open(), session(), trading_day(), currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), is_indian_stock() (+5 more)
+Cohesion: 0.10
+Nodes (22): eastern_offset(), eastern_to_utc(), next_open(), _nth_sunday(), session(), trading_day(), currency_symbol(), eastern_offset() (+14 more)
 
 ### Community 80 - "trader-broker/market.py"
 Cohesion: 0.14
@@ -513,21 +520,21 @@ Nodes (12): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_ti
 Cohesion: 0.06
 Nodes (45): addManualContextText(), applyEditing(), buildLocatorForLeaf(), canRestoreManualEditElement(), collectEditableTextRows(), visit(), collectManualContextPieces(), walk() (+37 more)
 
-### Community 82 - "trader-exit/market.py"
-Cohesion: 0.16
-Nodes (11): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), is_indian_stock(), ist_to_utc(), market_to_utc(), _nth_sunday() (+3 more)
+### Community 82 - "surveillance.py"
+Cohesion: 0.12
+Nodes (14): apply_earnings_filter(), apply_surveillance_veto(), _calendar_dates(), earnings_in_window(), extract_symbols(), walk(), _fetch_calendar(), fetch_earnings_dates() (+6 more)
 
 ### Community 83 - "trader-scanner/market.py"
-Cohesion: 0.16
-Nodes (11): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), is_indian_stock(), ist_to_utc(), market_to_utc(), _nth_sunday() (+3 more)
+Cohesion: 0.14
+Nodes (12): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), is_indian_stock(), ist_to_utc(), market_to_utc(), _nth_sunday() (+4 more)
 
 ### Community 84 - "trader-news/market.py"
 Cohesion: 0.14
 Nodes (12): currency_symbol(), eastern_offset(), eastern_to_utc(), get_market_timings(), is_indian_stock(), ist_to_utc(), market_to_utc(), _nth_sunday() (+4 more)
 
 ### Community 85 - "trader/entry.py"
-Cohesion: 0.15
-Nodes (11): ampm(), bar_line(), describe(), early_cutoff(), evaluate(), hm(), r2(), setup_name() (+3 more)
+Cohesion: 0.08
+Nodes (41): ampm(), bar_line(), chart_path(), chart_range(), cmd_check(), cmd_watch(), emit(), on_trigger() (+33 more)
 
 ### Community 86 - "resumeSession"
 Cohesion: 0.06
@@ -541,13 +548,17 @@ Nodes (55): armPageChatForTyping(), attachSteerFocusDebug(), attachSteerFocusGua
 Cohesion: 0.25
 Nodes (5): cents_away(), history_replay(), opening_range(), resolve_rule(), rule_stop()
 
-### Community 89 - "get_chart"
-Cohesion: 0.16
-Nodes (9): chart_path(), chart_range(), get_chart(), offline_file(), _open_url(), parse_chart(), read_text(), yahoo_get() (+1 more)
+### Community 89 - "simulation.py"
+Cohesion: 0.18
+Nodes (6): check_orb_status(), resolve_yahoo_ticker(), simulate_daily_fallback(), simulate_pick(), _verdict_from_payoff(), enrich_latest()
+
+### Community 90 - "cmd_watch"
+Cohesion: 0.27
+Nodes (11): cmd_check(), cmd_watch(), cmd_watchlist(), EntryError, main(), _opts(), parse_hhmm(), parse_now() (+3 more)
 
 ### Community 91 - "pipeline.py"
 Cohesion: 0.09
-Nodes (10): finalize_with_news(), check_orb_status(), resolve_yahoo_ticker(), simulate_pick(), _verdict_from_payoff(), enrich_latest(), Bhavcopy Historical Data Pipeline, Stage 1 Market Screen (+2 more)
+Nodes (12): allocate(), _empty(), finalize_with_news(), test_allocate_no_budget(), test_allocate_whole_shares_within_budget(), Bhavcopy Historical Data Pipeline, Budget Position Sizing and Portfolio Allocator, Fundamentals Check and Red Flag Demotion (+4 more)
 
 ### Community 92 - "modern-screenshot.umd.js"
 Cohesion: 0.09
@@ -558,8 +569,8 @@ Cohesion: 0.18
 Nodes (9): compute(), eastern_to_utc(), load_plan(), normalize_plan(), _num(), parse_clock(), parse_now(), read_offline() (+1 more)
 
 ### Community 94 - "watch_loop"
-Cohesion: 0.22
-Nodes (8): emit(), provider(), eastern_offset(), eastern_to_utc(), _nth_sunday(), to_eastern(), watch_loop(), ist_to_utc()
+Cohesion: 0.21
+Nodes (8): bar_line(), emit(), provider(), describe(), setup_name(), short(), to_eastern(), watch_loop()
 
 ### Community 95 - "trader-scanner"
 Cohesion: 0.20
@@ -569,17 +580,21 @@ Nodes (9): Data and limits, Example: the reel, Rules, Safety, Steps, The daily s
 Cohesion: 0.17
 Nodes (9): cmd_chart(), cmd_run(), main(), pc(), pct(), render_chart(), report(), simulate() (+1 more)
 
+### Community 97 - "market_status"
+Cohesion: 0.20
+Nodes (7): eastern_offset(), market_status(), _nth_sunday(), _rang_today(), session(), to_eastern(), trading_day()
+
 ### Community 98 - "fetch_chart"
 Cohesion: 0.29
 Nodes (5): to_yahoo_symbol(), chart_url(), fetch_chart(), _get(), _sleep()
 
-### Community 99 - "trader-entry/entry.py"
-Cohesion: 0.09
-Nodes (24): ampm(), bar_line(), emit(), on_trigger(), describe(), early_cutoff(), eastern_offset(), eastern_to_utc() (+16 more)
+### Community 99 - "evaluate"
+Cohesion: 0.16
+Nodes (9): ampm(), early_cutoff(), evaluate(), hm(), next_open(), r2(), session(), trading_day() (+1 more)
 
-### Community 100 - "hashlib"
-Cohesion: 0.42
-Nodes (3): imported_plugin_names(), main(), sha256()
+### Community 100 - "to_eastern"
+Cohesion: 0.29
+Nodes (5): daily_closes(), eastern_offset(), _nth_sunday(), to_eastern(), ts_to_eastern()
 
 ### Community 101 - "el"
 Cohesion: 0.07
@@ -590,8 +605,8 @@ Cohesion: 0.07
 Nodes (48): agentHasWorkInFlight(), agentStatusText(), barPaletteForTheme(), brandMarkSvg(), buildDesignHeader(), cursorForInsertAxis(), designPanelCss(), detectPageTheme() (+40 more)
 
 ### Community 103 - "new-work.md"
-Cohesion: 0.06
-Nodes (29): Recommended Actions, Craft (deprecated alias), Apply, Live-mode signature params, Set the spatial thesis, Two isolated assessments, Verify, Visitor mode (+21 more)
+Cohesion: 0.08
+Nodes (21): Recommended Actions, Craft (deprecated alias), Apply, Live-mode signature params, Set the spatial thesis, Two isolated assessments, Verify, Visitor mode (+13 more)
 
 ### Community 104 - "parse_bars"
 Cohesion: 0.29
@@ -602,8 +617,8 @@ Cohesion: 0.18
 Nodes (26): C, chartCache, crores(), fetchSeries(), flagClass(), Fundamentals(), Holding, inr() (+18 more)
 
 ### Community 107 - "impeccable/SKILL.md"
-Cohesion: 0.10
-Nodes (15): Before you finish, Scope is sovereign, The amplification, The skeleton test, Why it reads flat, Craft floor, Refuse, Verify (+7 more)
+Cohesion: 0.09
+Nodes (19): Craft floor, Refuse, Verify, Color, Components, Layout, Motion, Operate mode depth (and Read notes) (+11 more)
 
 ### Community 108 - "updatePendingCounter"
 Cohesion: 0.17
@@ -628,6 +643,10 @@ Nodes (22): Assess Onboarding Needs, Context Over Ceremony, Contextual Help, Des
 ### Community 113 - "mountSvelteComponentVariant"
 Cohesion: 0.12
 Nodes (25): acceptedDomAlreadyClean(), applyOriginalAttrsToSvelteAnchor(), clearHandledWrapperReloadStamp(), commitAcceptedSvelteComponentToDom(), componentModuleCandidates(), deferredRecoverySuperseded(), describeMountFailure(), detectDevServerBase() (+17 more)
+
+### Community 114 - "bolder.md"
+Cohesion: 0.33
+Nodes (5): Before you finish, Scope is sovereign, The amplification, The skeleton test, Why it reads flat
 
 ### Community 115 - "The Toolkit"
 Cohesion: 0.10
@@ -666,8 +685,8 @@ Cohesion: 0.13
 Nodes (14): 1. Accessibility (A11y), 2. Performance, 3. Theming, 4. Responsive Design, 5. Implementation Integrity (CRITICAL), Audit Health Score, Detailed Findings by Severity, Diagnostic Scan (+6 more)
 
 ### Community 124 - "cmd_orb"
-Cohesion: 0.31
-Nodes (8): cmd_orb(), _p(), parse_hhmm(), parse_now(), read_config(), read_symbols(), ScanError, symbols_from_file()
+Cohesion: 0.27
+Nodes (9): cmd_orb(), eastern_to_utc(), _p(), parse_hhmm(), parse_now(), read_config(), read_symbols(), ScanError (+1 more)
 
 ### Community 125 - "New visual work"
 Cohesion: 0.14
@@ -693,9 +712,9 @@ Nodes (23): Component translation rules, Narrative mapping, Pitfalls, Scan mode 
 Cohesion: 0.15
 Nodes (11): Step 1: Parse the request, Step 2: Reuse the page, then start, Step 3: Generate, Step 4: Accept and close, append-arrays, append-string, Config drift, Consent prompt (use this phrasing) (+3 more)
 
-### Community 131 - "os"
-Cohesion: 0.25
-Nodes (4): load_offline(), _read_maybe_gz(), _stem(), write_json()
+### Community 131 - "Visualize: Direction Comps & Asset Production"
+Cohesion: 0.33
+Nodes (5): After approval: the comp becomes a spec, Generate three compositional options, One approval point, Plates and provenance, Visualize: Direction Comps & Asset Production
 
 ### Community 132 - "critique.md"
 Cohesion: 0.17
@@ -709,6 +728,10 @@ Nodes (11): Assess Current State, Code Simplification, Content Simplification, D
 Cohesion: 0.17
 Nodes (11): Accessibility Resilience, Assess Hardening Needs, Edge Cases & Boundary Conditions, Error Handling, Hardening Dimensions, Input Validation & Sanitization, Internationalization (i18n), Performance Resilience (+3 more)
 
+### Community 135 - "urllib_request"
+Cohesion: 0.20
+Nodes (4): analyse_headlines(), fetch_news(), get_news(), test_news_veto_and_sentiment()
+
 ### Community 136 - "clarify.md"
 Cohesion: 0.18
 Nodes (10): Actions and navigation, Audit the language, Errors and permissions, Forms, Help and instructional text, Loading, empty, and success states, Rewrite by function, Set the message hierarchy (+2 more)
@@ -720,6 +743,10 @@ Nodes (11): 10. Help and Documentation, 1. Visibility of System Status, 2. Match
 ### Community 138 - "Generate Combined Critique Report"
 Cohesion: 0.18
 Nodes (11): Design Health Score, Design Specificity Verdict, Generate Combined Critique Report, Minor Observations, Overall Impression, Persona Red Flags, Priority Issues, Questions to Consider (+3 more)
+
+### Community 139 - "entry_doc"
+Cohesion: 0.40
+Nodes (4): on_trigger(), entry_doc(), iso(), write_json()
 
 ### Community 140 - "polish.md"
 Cohesion: 0.18
@@ -733,9 +760,9 @@ Nodes (10): Assess Current State, Color Refinement, Composition Refinement, Moti
 Cohesion: 0.25
 Nodes (7): Monorepo notes, Opting out of the boot check, Step 1: Run the pass, Step 2: Act by severity, Step 3: Deprecated fields are binding, Step 4: Do not overclaim on truth drift, What this owns, and what it does not
 
-### Community 144 - "fetch_spark"
-Cohesion: 0.24
-Nodes (8): to_yahoo_symbol(), chart_path(), confirm(), fetch_spark(), progress(), spark_path(), to_yahoo(), yahoo_get()
+### Community 144 - "Read"
+Cohesion: 0.50
+Nodes (3): Comps, Directions, Read
 
 ### Community 145 - "Product"
 Cohesion: 0.18
@@ -753,17 +780,13 @@ Nodes (9): 1. The Wall of Options, 2. The Memory Bridge, 3. The Hidden Navigatio
 Cohesion: 0.22
 Nodes (9): Color & materials, Components & controls, iOS platform, Layout & structure, Motion, The iOS slop test, Touch targets, Typography (+1 more)
 
-### Community 149 - "Operate mode depth (and Read notes)"
-Cohesion: 0.22
-Nodes (9): Color, Components, Layout, Motion, Operate mode depth (and Read notes), Product constraints, Product permissions, The product slop test (+1 more)
-
 ### Community 150 - "Shape"
 Cohesion: 0.22
 Nodes (8): Cadence, Confirm and stop, Phase 1: Discovery interview, Phase 2: Resolve the design direction, Phase 3: Write the brief, Round 1: purpose, people, and outcome, Round 2: material, behavior, and boundaries, Shape
 
 ### Community 151 - "_absorb"
-Cohesion: 0.25
-Nodes (4): _absorb(), parse_chart(), parse_spark(), series_from_result()
+Cohesion: 0.22
+Nodes (5): _absorb(), confirm(), parse_chart(), parse_spark(), series_from_result()
 
 ### Community 152 - "orb_window"
 Cohesion: 0.12
@@ -814,8 +837,8 @@ Cohesion: 0.33
 Nodes (6): Constraints, Failure modes, Flow, $impeccable hooks, Routing, Triage findings
 
 ### Community 165 - "build_universe"
-Cohesion: 0.20
-Nodes (6): build_universe(), classify(), cmd_universe(), http_get(), main(), parse_symdir()
+Cohesion: 0.17
+Nodes (7): build_universe(), classify(), cmd_universe(), http_get(), main(), parse_symdir(), yahoo_get()
 
 ### Community 166 - "interface"
 Cohesion: 0.40
@@ -829,37 +852,29 @@ Nodes (4): Containment, Painted material, Region map, What varies independently
 Cohesion: 0.50
 Nodes (4): Heuristics Scoring Guide, Issue Severity (P0–P3), Reference Material, Score Summary
 
-### Community 169 - "re"
-Cohesion: 0.38
-Nodes (4): mention_patterns(), tag(), mention_patterns(), tag()
-
 ### Community 170 - "Impeccable Documenter"
 Cohesion: 0.40
 Nodes (4): Impeccable Documenter, Input Contract, Output Contract, Workflow
 
-### Community 172 - "entry_doc"
-Cohesion: 0.40
-Nodes (4): on_trigger(), entry_doc(), iso(), write_json()
-
 ## Knowledge Gaps
 - **5 isolated node(s):** `Frontend Single Page App Shell`, `Trader Score Rule Engine`, `Backend Dependencies`, `MarketMind Pro Overview`, `Weekly Automated Market Scanner`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1463 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1498 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `init()` connect `initGlobalBar` to `generate.md`, `connectSSE`, `impeccable/SKILL.md`, `updatePendingCounter`, `doctor.md`, `Init flow`, `onAnnotDown`, `resumeSession`, `initPageChat`, `live-browser.js`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **What connects `Frontend Single Page App Shell`, `Trader Score Rule Engine`, `Backend Dependencies` to the rest of the system?**
   _5 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Market Scan Lifecycle Control` be split into smaller, more focused modules?**
-  _Cohesion score 0.11494252873563218 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10967741935483871 - nodes in this community are weakly interconnected._
 - **Why does `Commands` connect `impeccable/SKILL.md` to `initGlobalBar`?**
-  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **Should `test_pro.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.10099573257467995 - nodes in this community are weakly interconnected._
-- **Why does `Reference Material` connect `Heuristics Scoring Guide` to `Persona-Based Design Testing`, `critique.md`, `Cognitive Load Assessment`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Should `Trader Score & Red Flag Rules` be split into smaller, more focused modules?**
-  _Cohesion score 0.13852813852813853 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11895161290322581 - nodes in this community are weakly interconnected._
+- **Why does `apply_red_flag_demotion()` connect `test_v2.py` to `Historical Market Datafeed`, `pipeline.py`?**
+  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+- **Should `test_v2.py` be split into smaller, more focused modules?**
+  _Cohesion score 0.10804597701149425 - nodes in this community are weakly interconnected._

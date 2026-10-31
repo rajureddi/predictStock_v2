@@ -69,7 +69,7 @@ def _yahoo_batch(tickers, period):
     if not tickers: return out
     try:
         raw = yf.download(tickers, period=period, interval="1d", group_by="ticker",
-                          auto_adjust=False, threads=True, progress=False, timeout=30)
+                          auto_adjust=False, threads=True, progress=False, timeout=3)
     except Exception:
         return out
     if raw is None or len(raw) == 0: return out
@@ -97,6 +97,11 @@ def download_batch(tickers, period="1y"):
     for t in tickers:
         loc = local_history(t)
         if loc is not None and len(loc) >= min_local:
+            out[t] = loc
+        elif loc is not None and t.endswith(".BO") and len(loc) >= 60:
+            # BSE numerical scrips have excellent local Bhavcopy coverage (~260 days);
+            # Yahoo Finance almost never carries reliable history for 6-digit .BO codes.
+            # Using local Bhavcopy directly avoids massive connection timeouts.
             out[t] = loc
         elif loc is not None and period != "2y" and len(loc) >= 30:
             # Thin local frame (mostly BSE scrips that trade sparsely):

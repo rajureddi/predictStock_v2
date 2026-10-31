@@ -12,6 +12,9 @@ from app import fundamentals as fundamentals_mod
 from app import news as news_mod
 from app.engine import trader_score, walk_forward_and_forecast
 from app.allocate import allocate
+from app import regime as regime_mod
+from app import surveillance as surv_mod
+from app import sectors as sectors_mod
 
 REPORTS = ROOT / "data" / "reports"; REPORTS.mkdir(parents=True, exist_ok=True)
 CONFIG = ROOT / "data" / "screen_config.json"
@@ -102,16 +105,24 @@ def stage2(candidates, log=print):
 
 def dedupe_by_isin(ranked):
     """The same company often lists on both exchanges (same ISIN). Keep
-    only the best-ranked listing — recommending one company twice is not
-    diversification. Returns (kept, dropped)."""
-    seen, kept, dropped = set(), [], []
+    only one listing, strictly prioritizing primary NSE listings (.NS)
+    over BSE numerical scrips (.BO) for cleaner data and fast downloads.
+    Returns (kept, dropped)."""
+    by_key = {}
     for p in ranked:
-        key = p.get("isin") or p.get("yahoo") or p.get("symbol")
-        if key in seen:
-            dropped.append(p)
+        key = p.get("isin") or p.get("symbol") or p.get("yahoo")
+        if key not in by_key:
+            by_key[key] = p
         else:
-            seen.add(key)
-            kept.append(p)
+            existing = by_key[key]
+            # Prioritize NSE listing over BSE
+            if p.get("exchange") == "NSE" and existing.get("exchange") != "NSE":
+                by_key[key] = p
+            elif p.get("exchange") == existing.get("exchange") and p.get("trader_score", 0) > existing.get("trader_score", 0):
+                by_key[key] = p
+    kept_ids = {id(v) for v in by_key.values()}
+    kept = [p for p in ranked if id(p) in kept_ids]
+    dropped = [p for p in ranked if id(p) not in kept_ids]
     return kept, dropped
 
 def rank_key(e):
@@ -178,13 +189,27 @@ def run_pipeline(log=print):
     s1 = stage1(uni, log=log)
     (REPORTS / "stage1_checkpoint.json").unlink(missing_ok=True)
     liquid = [r for r in s1 if r["liquid"]]
-    liquid.sort(key=lambda r: -r["trader_score"])
+    liquid.sort(key=lambda r: (-r["trader_score"], 0 if r.get("exchange") == "NSE" else 1, -r.get("traded_value", 0)))
     liquid, dup_s1 = dedupe_by_isin(liquid)
     if dup_s1: log(f"[stage1] dropped {len(dup_s1)} duplicate cross-listings before stage 2")
+    # Market regime gate (NIFTY vs 50/200-DMA) + India VIX sizing
+    regime = regime_mod.get_market_regime(log=log)
+    want = int(regime.get("max_picks") or 7)
+    # Surveillance hard veto (ASM / GSM / trade-to-trade) BEFORE the expensive stage 2
+    series_map = {(l["symbol"], l["exchange"]): l.get("series") for l in uni["listings"]}
+    liquid, surveillance_vetoed = surv_mod.apply_surveillance_veto(liquid, series_map=series_map, log=log)
+    if surveillance_vetoed: log(f"[surveillance] vetoed {len(surveillance_vetoed)} listings before stage 2")
     top = liquid[:150]
+    # For any remaining BSE candidates, check if universe has an equivalent primary NSE listing by ISIN
+    isin_to_nse = {l["isin"]: l["yahoo"] for l in uni.get("listings", []) if l.get("isin") and l.get("exchange") == "NSE" and l.get("yahoo")}
+    for c in top:
+        if c.get("exchange") == "BSE" and c.get("isin") in isin_to_nse:
+            c["yahoo"] = isin_to_nse[c["isin"]]
     log(f"[stage1] with-data={len(s1)} liquid={len(liquid)} -> stage2={len(top)}")
     evaluated = stage2(top, log=log)
     fundamentals_mod.attach_fundamentals(evaluated, log=log)
+    # VIX stop widening is applied before the simulation so the Monte Carlo tests the stop we will actually use
+    for e in evaluated: regime_mod.apply_stop_widen(e, regime.get("stop_widen", 1.0))
     good = [e for e in evaluated if e["quality_pass"] and e["predicted_return_pct"] > 0 and (e.get("rsi") or 50) <= 80.0 and (e.get("risk_reward") or 1.0) >= 1.15]
     if len(good) < 7:
         good = [e for e in evaluated if e["quality_pass"] and e["predicted_return_pct"] > 0]
@@ -213,18 +238,23 @@ def run_pipeline(log=print):
     good.sort(key=rank_key)
     good, dup_final = dedupe_by_isin(good)
     if dup_final: log(f"[ranking] dropped duplicate cross-listings: {[p['symbol'] for p in dup_final]}")
-    pool, demoted = apply_red_flag_demotion(good, keep=7)
+    pool, demoted = apply_red_flag_demotion(good, keep=want)
     if demoted: log(f"[fundamentals] red-flag demoted: {[p['symbol'] for p in demoted]}")
-    picks, vetoed = finalize_with_news(pool, log=log)
+    # Earnings inside the holding window: skip when enough clean picks exist, else flag
+    pool, earnings_skipped = surv_mod.apply_earnings_filter(pool, run_date.isoformat(), target_date_for(run_date), keep=want, log=log)
+    # Sector concentration cap: max 2 per sector, capped names fill only a short pool
+    sectors_mod.attach_sectors(pool, log=log)
+    pool, sector_capped = sectors_mod.apply_sector_cap(pool, want=want)
+    if sector_capped: log(f"[sectors] capped: {[p['symbol'] for p in sector_capped]}")
+    picks, vetoed = finalize_with_news(pool, log=log, want=want)
     # strip internal helpers
     for p in picks: p.pop("yahoo", None)
     budget = get_budget()
-    alloc = allocate(picks, budget) if budget else None
+    alloc = allocate(picks, budget, size_mult=regime.get("size_mult", 1.0), cash_pct=regime.get("cash_pct", 0.0)) if budget else None
     if alloc:
-        amap = {a["symbol"]+str(i): a for i, a in enumerate(alloc["allocations"])}
         for i, p in enumerate(picks):
             a = alloc["allocations"][i] if i < len(alloc["allocations"]) else None
-            if a: p.update(shares=a["shares"], invested=a["invested"], expected_value=a["expected_value"], expected_profit=a["expected_profit"])
+            if a: p.update(shares=a["shares"], invested=a["invested"], expected_value=a["expected_value"], expected_profit=a["expected_profit"], risk_inr=a.get("risk_inr"))
     _nf = datafeed.download_batch(["^NSEI"], period="5d").get("^NSEI")
     data_asof = str(_nf.index[-1].date()) if _nf is not None and len(_nf) else None
     if not data_asof:
@@ -241,7 +271,13 @@ def run_pipeline(log=print):
                                     bse_with_data=sum(1 for r in s1 if r["exchange"] == "BSE"),
                                     liquid=len(liquid), stage2=len(evaluated), quality_passed=len(good)),
                   picks=picks, allocation=alloc,
+                  market_regime=regime,
                   vetoed=vetoed,
+                  surveillance_vetoed=surveillance_vetoed,
+                  earnings_skipped=[dict(symbol=p["symbol"], name=p["name"], exchange=p["exchange"],
+                                         current_price=p.get("current_price"), earnings_date=p.get("earnings_date"),
+                                         predicted_return_pct=p.get("predicted_return_pct")) for p in earnings_skipped],
+                  sector_capped=sector_capped,
                   simulation_rejected=[dict(symbol=p["symbol"], name=p["name"], exchange=p["exchange"],
                                              risk=(p.get("simulation") or {}).get("loss_probability_pct", 0),
                                              win_odds=(p.get("simulation") or {}).get("win_probability_pct", 0)) for p in sim_rejected],
