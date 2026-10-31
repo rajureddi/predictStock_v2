@@ -8,6 +8,7 @@ sys.path.insert(0, str(ROOT / "backend"))
 from app import pipeline as pl
 from app import scan as scan_mod
 from app.allocate import allocate
+from app import backtest as backtest_mod
 
 app = FastAPI(title="MarketMind Pro", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -21,14 +22,17 @@ def _latest():
 def _with_allocation(report):
     if report is None: return None
     budget = pl.get_budget()
-    picks = report.get("picks", [])
-    alloc = allocate(picks, budget) if budget else None
+    picks = list(report.get("picks", []))
+    regime = report.get("market_regime") or {}
+    alloc = allocate(picks, budget, size_mult=regime.get("size_mult", 1.0) or 1.0,
+                     cash_pct=regime.get("cash_pct", 0.0) or 0.0) if budget else None
     report = dict(report); report["allocation"] = alloc
     if alloc:
         for i, p in enumerate(picks):
             if i < len(alloc["allocations"]):
                 a = alloc["allocations"][i]
-                p = dict(p); p.update(shares=a["shares"], invested=a["invested"], expected_value=a["expected_value"], expected_profit=a["expected_profit"])
+                p = dict(p); p.update(shares=a["shares"], invested=a["invested"], expected_value=a["expected_value"],
+                                      expected_profit=a["expected_profit"], risk_inr=a.get("risk_inr"))
                 picks[i] = p
         report["picks"] = picks
     return report
@@ -64,6 +68,18 @@ def get_simulation(symbol: str, exchange: str = "NSE", replays: int = 1000):
 
 @app.get("/api/picks/latest")
 def latest(): return _with_allocation(_latest()) or {"picks": [], "note": "No run yet — run scripts/weekly_run.py"}
+
+@app.get("/api/backtest")
+def backtest_summary():
+    """Latest offline portfolio backtest (scripts/backtest_portfolio.py) with
+    transaction costs and the NIFTY 200-DMA regime split."""
+    f = REPORTS / "backtest_summary.json"
+    if not f.exists():
+        return {"available": False, "note": "Run backend/scripts/backtest_portfolio.py to generate data/reports/backtest_summary.json"}
+    try:
+        d = json.loads(f.read_text(encoding="utf-8")); d["available"] = True; return d
+    except Exception as e:
+        return {"available": False, "error": str(e)}
 
 @app.get("/api/scanned")
 def scanned():
@@ -428,6 +444,11 @@ def history():
 
     quotes = get_live_quotes(list(all_symbols), ex_hints) if all_symbols else {}
     sym_to_yh = _resolve_yahoo_map(list(all_symbols), ex_hints) if all_symbols else {}
+    nifty_close = None
+    if reports_data:
+        try: nifty_close = datafeed.nifty_close(period="2y")
+        except Exception: nifty_close = None
+    settled_trades = []
 
     for r in reports_data:
         picks_out = []
@@ -450,6 +471,10 @@ def history():
                             act_ret = round(((act_price - cp) / cp) * 100, 2)
                 except Exception:
                     pass
+            if act_price is not None and cp:
+                reg = backtest_mod.regime_on(nifty_close, r.get("run_date")) if nifty_close is not None and r.get("run_date") else None
+                t = backtest_mod.trade_from_pick(p, act_price, regime=reg)
+                if t: t["run_date"] = r.get("run_date"); settled_trades.append(t)
             pick_full = dict(p)
             pick_full.update({
                 "symbol": sym,
@@ -469,9 +494,13 @@ def history():
         out.append({
             "run_date": r.get("run_date"),
             "target_date": target_dt,
-            "picks": picks_out
+            "picks": picks_out,
+            "market_regime": r.get("market_regime")
         })
-    return {"weeks": out}
+    track = backtest_mod.compute_trade_stats(settled_trades)
+    track["weeks_settled"] = len({t["run_date"] for t in settled_trades})
+    track["weeks_total"] = len(reports_data)
+    return {"weeks": out, "track_record": track}
 
 class BudgetIn(BaseModel):
     budget_inr: float | None = None

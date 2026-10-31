@@ -656,6 +656,35 @@ footer.disc{max-width:900px;font-size:11.5px;color:var(--mut);line-height:1.6;pa
 .banner.bad svg:first-child{color:var(--down)}
 .banner .iconbtn{width:26px;height:26px;margin-left:auto}
 .banner .btn{margin-left:auto}
+/* market regime banner (Picks tab) */
+.banner.regime{border-left:4px solid var(--mut);padding-left:12px}
+.banner.regime.bull{border-left-color:var(--up)}
+.banner.regime.bull svg:first-child{color:var(--up)}
+.banner.regime.bear{border-left-color:var(--down);background:var(--down-wash)}
+.banner.regime.bear svg:first-child{color:var(--down)}
+.banner.regime.neutral{border-left-color:var(--amber);background:var(--amber-wash)}
+.banner.regime.neutral svg:first-child{color:var(--amber)}
+.banner.regime .regime-name{font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+.banner.regime.bull .regime-name{color:var(--up)}
+.banner.regime.bear .regime-name{color:var(--down)}
+.banner.regime.neutral .regime-name{color:var(--amber)}
+.banner.regime .regime-txt{color:var(--ink2)}
+.banner.regime .regime-txt b{font-weight:600;color:var(--ink)}
+.banner.regime .regime-knobs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.banner.regime .regime-knobs span{font-size:11.5px;font-weight:500;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--ink2);white-space:nowrap}
+.tag.warn{background:var(--amber-wash);color:var(--amber)}
+.allocgrid .v .s{font-size:11px;color:var(--mut);font-weight:400}
+/* track record (Past Weeks) */
+.kpis.six{grid-template-columns:repeat(6,minmax(0,1fr))}
+.trackrec .panel-head h3{display:flex;align-items:center;gap:8px}
+.trackrec .panel-head h3 .mut{font-weight:400;font-size:12.5px}
+.trackrec .kpis dd.num.pos{color:var(--up)}
+.trackrec .kpis dd.num.neg{color:var(--down)}
+.regsplit{display:flex;flex-direction:column;gap:4px;margin-top:6px!important;font-size:12.5px!important;font-weight:500!important}
+.regchip{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--ink2);white-space:nowrap}
+.regchip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mut)}
+.regchip.bull::before{background:var(--up)}
+.regchip.bear::before{background:var(--down)}
 .loadpanel{display:flex;flex-direction:column;align-items:center;gap:14px;padding:44px 24px}
 .loadpanel.inline{padding:40px 20px}
 .loadtxt{font-size:13.5px;color:var(--mut);font-weight:500}
@@ -908,6 +937,9 @@ tbody tr:last-child td{border-bottom:0}
 [data-theme=dark] .bar,[data-theme=dark] .fscore .track,[data-theme=dark] .scorebar,[data-theme=dark] .pct-bar-track{background:rgba(255,255,255,.09)}
 [data-theme=dark] .budgetrow input::placeholder,[data-theme=dark] .search input::placeholder{color:#7A808A}
 [data-theme=dark] .vetocard .vr{color:#F2A7A7}
+[data-theme=dark] .banner.regime.bear{background:rgba(240,99,99,.10)}
+[data-theme=dark] .banner.regime.neutral{background:rgba(224,160,58,.10)}
+[data-theme=dark] .banner.regime .regime-knobs span,[data-theme=dark] .regchip{background:rgba(255,255,255,.08);color:var(--ink)}
 [data-theme=dark] .rangebar .track{background:linear-gradient(90deg,rgba(240,99,99,.5),rgba(255,255,255,.14) 45%,rgba(60,203,127,.55))}
 [data-theme=dark] .rangebar .mark{border-color:var(--surface)}
 [data-theme=dark] .pct-bar-fill.pos,[data-theme=dark] .live-pulse-dot{background:var(--up)}
@@ -925,7 +957,7 @@ tbody tr:last-child td{border-bottom:0}
   .navstate{display:none}
   .cols{grid-template-columns:1fr}
   .side{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpis,.kpis.six{grid-template-columns:repeat(3,minmax(0,1fr))}
   .kpis>div:nth-child(4){box-shadow:inset 0 1px 0 var(--line)}
   .kpis>div:nth-child(5){box-shadow:inset 1px 0 0 var(--line),inset 0 1px 0 var(--line)}
 }
@@ -945,7 +977,7 @@ tbody tr:last-child td{border-bottom:0}
   .hero-title h2{font-size:26px}
   .hero-title h2 .num{font-size:18px}
   .page{padding:0 12px 32px;margin-top:-40px}
-  .kpis,.kpis.four{grid-template-columns:1fr 1fr}
+  .kpis,.kpis.four,.kpis.six{grid-template-columns:1fr 1fr}
   .kpis>div{box-shadow:none!important;padding:12px 14px}
   .kpis dd.num{font-size:18px}
   .pl-head{display:none}

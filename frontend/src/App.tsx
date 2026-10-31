@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { ThinkingOrb } from 'thinking-orbs'
 import {
   ArrowRight, CaretLeft, CaretRight, CheckCircle, ClockCounterClockwise, CurrencyInr, DiceFive,
-  MagnifyingGlass, Moon, ShieldWarning, Sun, Warning, X, Briefcase,
+  MagnifyingGlass, Moon, ShieldWarning, Sun, Warning, X, Briefcase, TrendUp, TrendDown, Gauge, ChartLineUp,
 } from '@phosphor-icons/react'
 import { C, Holding, Theme, ThemeCtx, applyPalette, fetchSeries, holdingFromPick, inr, loadHoldings, num, pct, saveHoldings } from './lib'
 import StockDesk from './StockDesk'
@@ -161,6 +161,11 @@ export default function App() {
   const vetoed: any[] = report?.vetoed || []
   const demoted: any[] = report?.red_flag_demoted || []
   const simRejected: any[] = report?.simulation_rejected || []
+  const survVetoed: any[] = report?.surveillance_vetoed || []
+  const earningsSkipped: any[] = report?.earnings_skipped || []
+  const sectorCapped: any[] = report?.sector_capped || []
+  const regime = report?.market_regime
+  const track = history?.track_record
   const a = report?.allocation
   const sc = report?.stage_counts || {}
 
@@ -550,6 +555,21 @@ export default function App() {
           <div><dt>Quality-passed</dt><dd className="num">{sc.quality_passed ?? '—'}</dd><dd className="s">Beat the naive baseline</dd></div>
         </dl>
 
+        {regime && regime.regime !== 'unknown' && <div className={`banner regime ${regime.regime}`} role="status">
+          {regime.regime === 'bull' ? <TrendUp size={18} weight="bold" /> : regime.regime === 'bear' ? <TrendDown size={18} weight="bold" /> : <Gauge size={18} weight="bold" />}
+          <span className="regime-name">{regime.regime} regime</span>
+          <span className="regime-txt">
+            NIFTY <b className="num">{inr(regime.nifty_close)}</b> is <b className={`num ${(regime.nifty_vs_200dma_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>{pct(regime.nifty_vs_200dma_pct)}</b> vs its 200-DMA
+            {regime.nifty_vs_50dma_pct != null && <> and <b className={`num ${regime.nifty_vs_50dma_pct >= 0 ? 'pos' : 'neg'}`}>{pct(regime.nifty_vs_50dma_pct)}</b> vs the 50-DMA</>}
+            {regime.vix != null && <> · India VIX <b className="num">{regime.vix}</b>{regime.vix_change_5d_pct != null && <span className="num"> ({pct(regime.vix_change_5d_pct)} in 5d)</span>}</>}
+          </span>
+          <span className="regime-knobs num">
+            <span title="Maximum picks published in this regime">≤{regime.max_picks} picks</span>
+            <span title="Position size multiplier from India VIX">size ×{regime.size_mult}</span>
+            {regime.stop_widen > 1 && <span title="Stops widened by this factor for volatility">stops ×{regime.stop_widen}</span>}
+            {regime.cash_pct > 0 && <span title="Share of budget kept in cash">{Math.round(regime.cash_pct * 100)}% cash</span>}
+          </span>
+        </div>}
         {scanNote && <div className="banner ok"><CheckCircle size={18} weight="bold" /> <span>{scanNote}</span><button className="iconbtn" aria-label="Dismiss" onClick={() => setScanNote('')}><X size={14} weight="bold" /></button></div>}
         {scan && !scan.running && scan.stage === 'failed' && <div className="banner bad">
           <Warning size={18} weight="bold" />
@@ -590,6 +610,8 @@ export default function App() {
                         {p.quality_pass && <span className="tag pass"><CheckCircle size={12} weight="bold" /> Quality pass</span>}
                         {p.simulation && <span className="tag"><DiceFive size={12} weight="bold" /> {p.simulation.win_probability_pct}% win odds</span>}
                         {p.news?.veto && <span className="tag neg"><Warning size={12} weight="bold" /> News veto</span>}
+                        {p.earnings_in_window && <span className="tag warn" title={`Results on ${p.earnings_date}`}><Warning size={12} weight="bold" /> Results {p.earnings_date}</span>}
+                        {p.sector && <span className="tag">{p.sector}</span>}
                       </span>
                     </span>
                     <MiniSpark symbol={p.symbol} exchange={p.exchange} />
@@ -619,7 +641,10 @@ export default function App() {
                 <div className="ag"><div className="k">Leftover</div><div className="v num">{inr(a.leftover)}</div></div>
                 <div className="ag"><div className="k">Expected value</div><div className="v num">{inr(a.expected_value)}</div></div>
                 <div className="ag"><div className="k">Expected profit</div><div className="v num pos">{inr(a.expected_profit)}</div></div>
+                {a.risk_inr != null && <div className="ag"><div className="k">Risk per trade</div><div className="v num">{inr(a.risk_inr)}<span className="s"> · {a.risk_pct}% × {a.size_mult ?? 1}</span></div></div>}
+                {a.cash_reserve > 0 && <div className="ag"><div className="k">Cash reserve</div><div className="v num">{inr(a.cash_reserve)}</div></div>}
               </div> : <div className="note">No budget set. Picks are ranked only. Set a budget to see share counts.</div>}
+              {a && <p className="hint" style={{ marginTop: 10 }}>Shares are sized so each pick risks the same rupees between entry and stop (ATR risk sizing), capped at 30% per pick{a.cash_reserve > 0 ? ` with ${inr(a.cash_reserve)} held back for the regime` : ''}.</p>}
             </section>
 
             <section className="panel side-sec">
@@ -627,8 +652,21 @@ export default function App() {
               <p className="hint">Re-scans all ~7,987 NSE + BSE stocks on official exchange (Bhavcopy) data, deep-backtests the top 150, checks fundamentals &amp; news, then publishes a fresh set of 5-7 picks here automatically.</p>
             </section>
 
-            {(vetoed.length > 0 || demoted.length > 0 || simRejected.length > 0) && <section className="panel side-sec veto-sec">
+            {(vetoed.length > 0 || demoted.length > 0 || simRejected.length > 0 || survVetoed.length > 0 || earningsSkipped.length > 0 || sectorCapped.length > 0) && <section className="panel side-sec veto-sec">
               <h3><ShieldWarning size={17} weight="bold" /> Excluded by safety &amp; simulation checks</h3>
+              {survVetoed.slice(0, 8).map((s: any, i: number) => <div className="vetocard" key={'sv' + i}>
+                <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">SURVEILLANCE</span></div>
+                <div className="vr">Under exchange surveillance: <b>{s.reason}</b>. Never swing-traded — 100% margin, T2T settlement or tight circuits.</div>
+              </div>)}
+              {survVetoed.length > 8 && <div className="note">+{survVetoed.length - 8} more surveillance-listed stocks vetoed before deep analysis.</div>}
+              {earningsSkipped.map((s: any, i: number) => <div className="vetocard" key={'e' + i}>
+                <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">RESULTS IN WINDOW</span></div>
+                <div className="vr">Earnings on <b className="num">{s.earnings_date}</b> fall inside the holding window — a coin-flip gap event. Skipped because enough clean picks were available.</div>
+              </div>)}
+              {sectorCapped.map((s: any, i: number) => <div className="vetocard" key={'sc' + i}>
+                <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">SECTOR CAP</span></div>
+                <div className="vr">Third pick in <b>{s.sector}</b> — capped at 2 per sector so the portfolio is not one sector bet.</div>
+              </div>)}
               {simRejected.map((s: any, i: number) => <div className="vetocard" key={'sim' + i}>
                 <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">MONTE CARLO VETO</span></div>
                 <div className="vr">Blocked by Time Machine: <b>Stop-loss risk ({s.risk}%) exceeds win odds ({s.win_odds ?? 0}%)</b> across 1,000 historical replays. Excluded to protect capital from high stop-out rates.</div>
@@ -707,6 +745,27 @@ export default function App() {
 
       {!loading && tab === 'history' && !historyDesk && <>
         {history === null && <div className="panel loadpanel"><ThinkingOrb state="working" size={64} theme={orb} /><div className="loadtxt">Loading past weeks &amp; live prices…</div></div>}
+        {track && <section className="panel trackrec" aria-label="Live track record">
+          <div className="panel-head">
+            <h3><ChartLineUp size={16} weight="bold" /> Track record <span className="mut">· settled picks, after 0.3% round-trip costs</span></h3>
+            <span className="mut num" style={{ fontSize: 12 }}>{track.n ?? 0} trades · {track.weeks_settled ?? 0} of {track.weeks_total ?? 0} weeks settled</span>
+          </div>
+          {!track.n ? <div className="note" style={{ margin: '0 20px 18px' }}>No settled picks yet. The track record fills in once a week's target date has passed and official closes are in.</div>
+          : <dl className="kpis six">
+            <div><dt>Hit rate</dt><dd className={`num ${track.win_rate_pct >= 50 ? 'pos' : 'neg'}`}>{num(track.win_rate_pct)}%</dd><dd className="s">net positive after costs{track.direction_hit_rate_pct != null ? ` · direction ${num(track.direction_hit_rate_pct)}%` : ''}</dd></div>
+            <div><dt>Expectancy</dt><dd className={`num ${(track.expectancy_R ?? 0) >= 0 ? 'pos' : 'neg'}`}>{track.expectancy_R == null ? '—' : `${track.expectancy_R >= 0 ? '+' : ''}${track.expectancy_R.toFixed(2)}R`}</dd><dd className="s">per trade, in stop-distance units · target &gt; +0.15R</dd></div>
+            <div><dt>Profit factor</dt><dd className={`num ${(track.profit_factor ?? 0) >= 1.3 ? 'pos' : (track.profit_factor ?? 0) < 1 ? 'neg' : ''}`}>{track.profit_factor == null ? '∞' : num(track.profit_factor)}</dd><dd className="s">gross wins ÷ gross losses · target &gt; 1.4</dd></div>
+            <div><dt>Payoff ratio</dt><dd className={`num ${(track.payoff_ratio ?? 0) >= 1.3 ? 'pos' : ''}`}>{track.payoff_ratio == null ? '∞' : num(track.payoff_ratio)}</dd><dd className="s">avg win {pct(track.avg_win_pct)} ÷ avg loss {pct(-track.avg_loss_pct)}</dd></div>
+            <div><dt>Net avg return</dt><dd className={`num ${(track.avg_return_net_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>{pct(track.avg_return_net_pct)}</dd><dd className="s">gross {pct(track.avg_return_gross_pct)} · worst streak {track.max_consecutive_losses} losses</dd></div>
+            <div><dt>By regime</dt>
+              <dd className="num regsplit">
+                <span className="regchip bull" title="NIFTY above its 200-DMA on entry day">Bull {track.by_regime?.bull ? `${num(track.by_regime.bull.win_rate_pct)}% · ${pct(track.by_regime.bull.avg_return_net_pct)}` : '—'}</span>
+                <span className="regchip bear" title="NIFTY below its 200-DMA on entry day">Bear {track.by_regime?.bear ? `${num(track.by_regime.bear.win_rate_pct)}% · ${pct(track.by_regime.bear.avg_return_net_pct)}` : '—'}</span>
+              </dd>
+              <dd className="s">hit rate · net return{track.by_regime?.bull && track.by_regime?.bear ? ` (${track.by_regime.bull.n} / ${track.by_regime.bear.n} trades)` : ''}</dd>
+            </div>
+          </dl>}
+        </section>}
         {history !== null && (history?.weeks || []).length === 0 && <div className="panel emptystate">
           <ThinkingOrb state="breathing" size={64} theme={orb} />
           <h4>No past weeks yet</h4>
