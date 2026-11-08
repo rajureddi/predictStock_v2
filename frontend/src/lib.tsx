@@ -10,8 +10,8 @@ export const useOrb = (onInk = false): Theme => {
   return onInk ? (t === 'light' ? 'dark' : 'light') : t
 }
 const PALETTES = {
-  light: { ink: '#0A0A0C', mut: '#5E636C', faint: '#9A9EA6', up: '#1E9E5A', down: '#D64545', accent: '#FF5500', amber: '#C47C00', line: 'rgba(10,10,12,.09)', surface: '#FFFFFF', tip: '#0A0A0C', track: 'rgba(10,10,12,.08)' },
-  dark: { ink: '#ECEDEF', mut: '#9298A2', faint: '#6B7079', up: '#3CCB7F', down: '#F06363', accent: '#FF6A1F', amber: '#E0A03A', line: 'rgba(255,255,255,.08)', surface: '#141518', tip: '#2A2D33', track: 'rgba(255,255,255,.1)' },
+  light: { ink: '#0A1931', mut: '#48607E', faint: '#768CA8', up: '#10B981', down: '#EF4444', accent: '#FF5E1A', amber: '#F59E0B', line: 'rgba(10,25,49,.10)', surface: '#FFFFFF', tip: '#0A1931', track: 'rgba(10,25,49,.09)' },
+  dark: { ink: '#FFFFFF', mut: '#9CA3AF', faint: '#6B7280', up: '#10B981', down: '#EF4444', accent: '#FF5E1A', amber: '#F59E0B', line: 'rgba(255,255,255,.10)', surface: '#0E0F12', tip: '#FFFFFF', track: 'rgba(255,255,255,.10)' },
 }
 export const applyPalette = (t: Theme) => Object.assign(C, PALETTES[t])
 
@@ -37,7 +37,7 @@ export function fetchSeries(symbol: string, exchange: string): Promise<any[]> {
 /* ---------- trader-score radial ---------- */
 export function ScoreRing({ score, size = 66 }: { score: number; size?: number }) {
   const r = 26, c = 2 * Math.PI * r, frac = Math.max(0, Math.min(100, score)) / 100
-  const col = score >= 75 ? C.up : score >= 60 ? C.ink : '#B86E00'
+  const col = score >= 75 ? C.up : score >= 60 ? C.amber : C.down
   return (<svg width={size} height={size} viewBox="0 0 66 66" aria-hidden="true">
     <circle cx="33" cy="33" r={r} fill="none" stroke={C.track} strokeWidth="5" />
     <circle cx="33" cy="33" r={r} fill="none" stroke={col} strokeWidth="5" strokeLinecap="round"
@@ -50,11 +50,11 @@ export function ScoreRing({ score, size = 66 }: { score: number; size?: number }
 export function RangeBar({ p }: { p: any }) {
   const marks = [
     { v: p.stop_loss, lbl: 'Stop-loss', col: C.down },
-    { v: p.range_low, lbl: 'Range low', col: '#A3A7AF' },
+    { v: p.range_low, lbl: 'Range low', col: '#9AA5BC' },
     { v: p.current_price, lbl: 'Now', col: C.ink },
     { v: p.predicted_price, lbl: 'Predicted', col: C.accent },
     { v: p.target, lbl: 'Target', col: C.up },
-    { v: p.range_high, lbl: 'Range high', col: '#A3A7AF' },
+    { v: p.range_high, lbl: 'Range high', col: '#9AA5BC' },
   ].filter(m => m.v != null)
   if (marks.length < 3) return null
   const lo = Math.min(...marks.map(m => m.v)), hi = Math.max(...marks.map(m => m.v))

@@ -179,14 +179,66 @@ def get_status():
     return out
 
 
-def start_scan():
+def _kill_pid(pid):
+    """Best-effort terminate a stuck scan process."""
+    try:
+        pid = int(pid)
+        if os.name == "nt":
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(pid)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=5,
+            )
+        else:
+            import signal
+            os.kill(pid, signal.SIGTERM)
+    except Exception:
+        pass
+
+
+def reset_today_predictions():
+    """Removes today's saved predictions, stage-1 checkpoint, and stale scan state
+    so the user can run a 100% clean scratch scan."""
+    from datetime import date
+    from app import report_store
+
+    today_iso = date.today().isoformat()
+    removed = report_store.delete_report(today_iso)
+    CKPT.unlink(missing_ok=True)
+    STATE.unlink(missing_ok=True)
+    # Also check if latest.json still has today's run_date
+    lat = _read_json(LATEST)
+    if lat and lat.get("run_date") == today_iso:
+        LATEST.unlink(missing_ok=True)
+        newer = report_store.latest_report()
+        if newer:
+            LATEST.write_text(json.dumps(newer, indent=1, default=str), encoding="utf-8")
+    return {"removed_date": today_iso, "removed": removed}
+
+
+def start_scan(fresh: bool = False):
     running, pids = scan_running()
     if running:
-        return {"started": False, "reason": "already_running", "running": True, "pids": pids}
+        if not fresh:
+            return {"started": False, "reason": "already_running", "running": True, "pids": pids}
+        for p in pids:
+            _kill_pid(p)
+        PIDFILE.unlink(missing_ok=True)
+
     REPORTS.mkdir(parents=True, exist_ok=True)
+    if fresh:
+        reset_today_predictions()
+        for cache_f in (
+            ROOT / "data" / "sector_strength_cache.json",
+            ROOT / "data" / "earnings_cache.json",
+        ):
+            cache_f.unlink(missing_ok=True)
+
     started_at = datetime.now(timezone.utc).isoformat()
-    STATE.write_text(json.dumps({"started_at": started_at, "source": "web"}), encoding="utf-8")
-    log = open(RUNLOG, "ab")
+    STATE.write_text(json.dumps({"started_at": started_at, "source": "web", "fresh": bool(fresh)}), encoding="utf-8")
+    # Truncate run.log at the start of every scan so old [stage2] markers never confuse _log_stage()
+    log = open(RUNLOG, "wb")
     popen_kw = {}
     if os.name == "nt":
         # Fully detach the scan from the server's console on Windows so no
@@ -199,10 +251,13 @@ def start_scan():
         popen_kw["stdin"] = subprocess.DEVNULL
     else:
         popen_kw["start_new_session"] = True
+    cmd = [sys.executable, "scripts/weekly_run.py"]
+    if fresh:
+        cmd.append("--fresh")
     proc = subprocess.Popen(
-        [sys.executable, "scripts/weekly_run.py"],
+        cmd,
         cwd=str(ROOT), stdout=log, stderr=subprocess.STDOUT,
         **popen_kw,
     )
     PIDFILE.write_text(str(proc.pid), encoding="utf-8")
-    return {"started": True, "started_at": started_at, "pid": proc.pid}
+    return {"started": True, "fresh": bool(fresh), "started_at": started_at, "pid": proc.pid}

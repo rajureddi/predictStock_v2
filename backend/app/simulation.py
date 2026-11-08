@@ -66,7 +66,7 @@ def simulate_daily_fallback(pick, replays=1000, seed=42, df=None):
         if df is None or len(df) < 20:
             return None
 
-        tail = df.tail(252).copy()
+        tail = df.tail(120).copy()
         prev_c = tail["Close"].shift(1)
         valid = tail.dropna(subset=["Open", "High", "Low", "Close"]).iloc[1:]
         prev_c = prev_c.loc[valid.index]
@@ -80,16 +80,17 @@ def simulate_daily_fallback(pick, replays=1000, seed=42, df=None):
         rl = (valid["Low"] / prev_c - 1.0).to_numpy(dtype=float)
         rc = (valid["Close"] / prev_c - 1.0).to_numpy(dtype=float)
 
-        # Mildly shrink mean daily drift by 40% so past parabolic runs do not guarantee high win odds
+        # Only dampen extreme parabolic daily drift (> +0.35%/day = >140% annualized)
         mean_rc = float(np.mean(rc))
-        if mean_rc > 0.0015:
-            adj = mean_rc * 0.40
+        if mean_rc > 0.0035:
+            adj = (mean_rc - 0.0035) * 0.45
             ro = ro - adj
             rh = rh - adj
             rl = rl - adj
             rc = rc - adj
 
         n_bars = len(rc)
+        recent_start = max(0, n_bars - 45)
         current_price = float(pick.get("current_price") or 0)
         target = float(pick.get("target") or pick.get("predicted_price") or (current_price * 1.05))
         stop = float(pick.get("stop_loss") or (current_price * 0.95))
@@ -97,85 +98,108 @@ def simulate_daily_fallback(pick, replays=1000, seed=42, df=None):
             return None
 
         risk_unit = max(current_price - stop, 1e-6)
-        target_r = (target - current_price) / risk_unit
+        atr_val = float(pick.get("atr") or 0.0)
+        be_at = float(pick.get("breakeven_at") or (current_price + 0.55 * atr_val if atr_val > 0 else current_price + 0.42 * (target - current_price)))
+        be_stop = float(pick.get("breakeven_stop") or (current_price * 1.0048))
+        from app.backtest import tiered_round_trip_cost_pct
+        rt_cost_pct = tiered_round_trip_cost_pct(pick.get("traded_value"))
+        rt_cost_px = current_price * (rt_cost_pct / 100.0)
 
         # Deterministic, reproducible RNG per ticker + price configuration
         sym_hash = zlib.crc32(f"{ticker}:{current_price:.2f}:{target:.2f}:{stop:.2f}".encode("utf-8")) & 0xFFFFFFFF
         rng = random.Random((int(seed) ^ sym_hash) & 0xFFFFFFFF)
 
-        hits_target, hits_stop, neither = 0, 0, 0
+        hits_target, hits_stop, hits_be, neither, net_wins = 0, 0, 0, 0, 0
         final_prices = []
         r_multiples = []
 
         for _ in range(replays):
             p = current_price
+            active_stop = stop
+            be_armed = False
             hit = None
             for _ in range(5):  # 5 trading days horizon
-                idx = rng.randrange(n_bars)
+                if recent_start > 0 and rng.random() < 0.65:
+                    idx = rng.randrange(recent_start, n_bars)
+                else:
+                    idx = rng.randrange(n_bars)
                 day_open = p * (1.0 + ro[idx])
                 day_high = max(day_open, p * (1.0 + rh[idx]))
                 day_low = min(day_open, p * (1.0 + rl[idx]))
                 day_close = min(day_high, max(day_low, p * (1.0 + rc[idx])))
 
                 # Gap check at open first
-                if day_open <= stop:
-                    hit = "stop"
-                    p = stop
+                if day_open <= active_stop:
+                    hit = "breakeven" if be_armed else "stop"
+                    p = day_open
                     break
                 if day_open >= target:
                     hit = "target"
-                    p = target
+                    p = day_open
                     break
 
                 # Intrabar High/Low check (conservative on ambiguous both-hit days)
-                hit_low = day_low <= stop
+                hit_low = day_low <= active_stop
                 hit_high = day_high >= target
                 if hit_low and hit_high:
-                    # If bearish bar or open is closer to stop, count as stop-first
-                    if rc[idx] <= ro[idx] or (day_open - stop) <= (target - day_open):
-                        hit = "stop"
-                        p = stop
+                    if rc[idx] <= ro[idx] or (day_open - active_stop) <= (target - day_open):
+                        hit = "breakeven" if be_armed else "stop"
+                        p = active_stop
                     else:
                         hit = "target"
                         p = target
                     break
                 elif hit_low:
-                    hit = "stop"
-                    p = stop
+                    hit = "breakeven" if be_armed else "stop"
+                    p = active_stop
                     break
                 elif hit_high:
                     hit = "target"
                     p = target
                     break
 
+                # Activate Mooli Salamat breakeven stop strictly after surviving the day
+                if day_high >= be_at:
+                    active_stop = max(active_stop, be_stop)
+                    be_armed = True
+
                 p = day_close
 
             if hit == "target":
                 hits_target += 1
-                r_multiples.append(target_r)
             elif hit == "stop":
                 hits_stop += 1
-                r_multiples.append(-1.0)
+            elif hit == "breakeven":
+                hits_be += 1
             else:
                 neither += 1
-                r_multiples.append((p - current_price) / risk_unit)
+
+            net_pnl = (p - current_price) - rt_cost_px
+            if net_pnl > 0:
+                net_wins += 1
+            r_multiples.append(net_pnl / risk_unit)
             final_prices.append(p)
 
         final_prices.sort()
+        p_win = round(net_wins / replays * 100, 1)
         p_target = round(hits_target / replays * 100, 1)
         p_stop = round(hits_stop / replays * 100, 1)
+        p_be = round(hits_be / replays * 100, 1)
         p_neither = round(neither / replays * 100, 1)
         median_c = round(final_prices[len(final_prices) // 2], 2)
         p5 = round(final_prices[int(len(final_prices) * 0.05)], 2)
         p95 = round(final_prices[int(len(final_prices) * 0.95)], 2)
         avg_r = round(float(np.mean(r_multiples)), 3)
-        exp_ret_pct = round(float(np.mean([(fp - current_price) / current_price * 100.0 for fp in final_prices])), 2)
-        verdict = _verdict_from_payoff(avg_r, exp_ret_pct, p_target, p_stop)
+        exp_ret_pct = round(float(np.mean([(fp - current_price) / current_price * 100.0 - rt_cost_pct for fp in final_prices])), 2)
+        verdict = _verdict_from_payoff(avg_r, exp_ret_pct, p_win, p_stop)
 
         return {
-            "win_probability_pct": p_target,
+            "win_probability_pct": p_win,
+            "target_hit_probability_pct": p_target,
+            "breakeven_protected_pct": p_be,
             "loss_probability_pct": p_stop,
             "neither_probability_pct": p_neither,
+            "round_trip_cost_pct": rt_cost_pct,
             "median_close": median_c,
             "expected_p5": p5,
             "expected_p95": p95,
@@ -185,7 +209,7 @@ def simulate_daily_fallback(pick, replays=1000, seed=42, df=None):
             "replays": replays,
             "seed": seed,
             "sessions": int(n_bars),
-            "method": "5-Day High/Low Time Machine (OHLC bootstrap)"
+            "method": "5-Day High/Low Time Machine (OHLC bootstrap + Mooli Salamat trail)"
         }
     except Exception:
         return None

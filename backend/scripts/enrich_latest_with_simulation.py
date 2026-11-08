@@ -30,7 +30,10 @@ def enrich_latest():
 
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=1)
-    print("latest.json enriched successfully!")
+    from app import report_store
+    if data.get("run_date"):
+        report_store.save_report(data)
+    print("latest.json enriched and saved to reports.db")
 
 if __name__ == "__main__":
     enrich_latest()

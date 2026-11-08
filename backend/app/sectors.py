@@ -44,13 +44,24 @@ def fetch_sectors(yahoo_list, log=print):
         if c and c.get("fetched", "") >= cutoff: out[y] = c.get("data") or {}
         else: todo.append(y)
     if todo:
+        from concurrent.futures import wait as futures_wait
         log(f"[sectors] fetching {len(todo)} symbols ({len(out)} cached)")
-        with ThreadPoolExecutor(max_workers=8) as ex:
+        ex = ThreadPoolExecutor(max_workers=8)
+        try:
             futs = {ex.submit(_fetch_one, y): y for y in todo}
+            done, _ = futures_wait(list(futs.keys()), timeout=6.0)
             for fut, y in futs.items():
-                try: data = fut.result(timeout=4)
-                except Exception: data = {}
-                out[y] = data; cache[y] = dict(fetched=date.today().isoformat(), data=data)
+                data = {}
+                if fut in done:
+                    try:
+                        data = fut.result(timeout=0.1) or {}
+                    except Exception:
+                        data = {}
+                out[y] = data
+                if data:
+                    cache[y] = dict(fetched=date.today().isoformat(), data=data)
+        finally:
+            ex.shutdown(wait=False, cancel_futures=True)
         _save(cache)
     return out
 
@@ -87,4 +98,83 @@ def apply_sector_cap(ranked, want=7, max_per_sector=MAX_PER_SECTOR):
     capped_out = [dict(symbol=p["symbol"], name=p.get("name"), exchange=p.get("exchange"),
                        sector=p.get("sector"), current_price=p.get("current_price"),
                        predicted_return_pct=p.get("predicted_return_pct")) for p in capped]
+    return pool, capped_out
+
+
+def apply_correlation_cap(ranked, frames_by_key=None, want=7, max_corr=0.70, lookback=60, fill_if_short=False):
+    """60-day pairwise daily-return correlation gate (`corr <= 0.70`).
+    Prevents hidden thematic concentration (e.g. PSU / Defence / Adani / Tata clusters
+    that span multiple Yahoo sectors yet dump together on a single macro headline).
+    Returns (pool, corr_capped)."""
+    if len(ranked) <= 1:
+        return list(ranked), []
+    from app import datafeed
+    import numpy as np
+
+    ret_cache = {}
+    def _rets(p):
+        yh = p.get("yahoo") or f"{p.get('symbol')}.NS"
+        if yh in ret_cache:
+            return ret_cache[yh]
+        df = (frames_by_key or {}).get(yh)
+        if df is None:
+            try:
+                df = datafeed.local_history(yh)
+            except Exception:
+                df = None
+        if df is None or "Close" not in df.columns or len(df) < 25:
+            ret_cache[yh] = None
+            return None
+        s = df["Close"].dropna().tail(lookback + 1).pct_change().dropna()
+        ret_cache[yh] = s if len(s) >= 20 else None
+        return ret_cache[yh]
+
+    pool, corr_capped = [], []
+    for p in ranked:
+        r_cand = _rets(p)
+        too_corr_sym = None
+        too_corr_val = 0.0
+        if r_cand is not None:
+            for existing in pool:
+                r_ex = _rets(existing)
+                if r_ex is None:
+                    continue
+                common = r_cand.index.intersection(r_ex.index)
+                if len(common) < 20:
+                    continue
+                a = r_cand.loc[common].to_numpy(dtype=float)
+                b = r_ex.loc[common].to_numpy(dtype=float)
+                if np.std(a) > 1e-8 and np.std(b) > 1e-8:
+                    corr = float(np.corrcoef(a, b)[0, 1])
+                    if corr >= max_corr:
+                        too_corr_sym = existing.get("symbol")
+                        too_corr_val = round(corr, 2)
+                        break
+        if too_corr_sym:
+            p_copy = dict(p)
+            p_copy["correlated_with"] = too_corr_sym
+            p_copy["correlation"] = too_corr_val
+            corr_capped.append(p_copy)
+        else:
+            pool.append(p)
+
+    if fill_if_short:
+        while len(pool) < want and corr_capped:
+            p = corr_capped.pop(0)
+            p["correlation_cap_filled"] = True
+            pool.append(p)
+    pool.sort(key=lambda p: next((i for i, r in enumerate(ranked) if r.get("symbol") == p.get("symbol")), 999))
+    capped_out = [
+        dict(
+            symbol=p["symbol"],
+            name=p.get("name"),
+            exchange=p.get("exchange"),
+            sector=p.get("sector"),
+            correlated_with=p.get("correlated_with"),
+            correlation=p.get("correlation"),
+            current_price=p.get("current_price"),
+            predicted_return_pct=p.get("predicted_return_pct"),
+        )
+        for p in corr_capped
+    ]
     return pool, capped_out

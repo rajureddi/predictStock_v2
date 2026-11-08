@@ -6,7 +6,8 @@ once per process and sliced per ticker. When a local frame is too short we
 merge in Yahoo rows (local wins on overlapping dates — it is exchange data).
 """
 import warnings; warnings.filterwarnings("ignore")
-import pandas as pd, yfinance as yf
+import pickle, threading
+import numpy as np, pandas as pd, yfinance as yf
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / "data" / "cache"; CACHE.mkdir(parents=True, exist_ok=True)
@@ -14,6 +15,56 @@ HIST = ROOT / "data" / "history"
 OHLCV = ["Open", "High", "Low", "Close", "Volume"]
 
 _PANEL_DICTS = {}  # exchange -> {yahoo_ticker: DataFrame}
+_PANEL_CACHE_VER = 2  # bumped for corporate-action (split/bonus) adjustment
+
+# Canonical Indian corporate-action (split / bonus) adjustment factors:
+# 1.5 (1:2 bonus), 2.0 (1:1 bonus / 1:2 split), 2.5 (3:2 bonus), 3.0 (2:1 bonus),
+# 4.0 (3:1 bonus), 5.0 (1:5 split), 6.0 (5:1 bonus), 10.0 (1:10 split).
+_CA_FACTORS = (1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 10.0)
+
+
+def adjust_corporate_actions(df):
+    """Detects unadjusted overnight stock splits & bonus issues in raw NSE/BSE
+    Bhavcopy series (where nominal price drops by a canonical split/bonus factor
+    >= 1.44x overnight) and backward-adjusts historical OHLC + Volume/DelivQty."""
+    if df is None or len(df) < 3:
+        return df
+    c = df["Close"].to_numpy(dtype=float)
+    o = df["Open"].to_numpy(dtype=float)
+    prev_c = c[:-1]
+    next_o = o[1:]
+    next_c = c[1:]
+    valid = (prev_c > 0) & (next_o > 0) & (next_c > 0)
+    if not valid.any():
+        return df
+
+    r_open = np.where(valid, prev_c / np.maximum(next_o, 1e-9), 1.0)
+    r_close = np.where(valid, prev_c / np.maximum(next_c, 1e-9), 1.0)
+    # Candidate ex-dates: overnight drop >= 31% (factor >= 1.44, outside normal 20% circuit limits)
+    cand_idx = np.where((r_open >= 1.44) & (r_close >= 1.40))[0]
+    if len(cand_idx) == 0:
+        return df
+
+    out = None
+    for idx in cand_idx:
+        ro_val, rc_val = float(r_open[idx]), float(r_close[idx])
+        best_f = min(_CA_FACTORS, key=lambda f: abs(ro_val - f) / f)
+        if abs(ro_val - best_f) / best_f <= 0.065 and abs(rc_val - best_f) / best_f <= 0.095:
+            if out is None:
+                out = df.copy()
+                for col in ("Open", "High", "Low", "Close", "Volume"):
+                    if col in out.columns:
+                        out[col] = out[col].astype(float)
+            pos = idx + 1  # ex-date row position; adjust all rows strictly before pos
+            for col in ("Open", "High", "Low", "Close"):
+                out.iloc[:pos, out.columns.get_loc(col)] /= best_f
+            if "Volume" in out.columns:
+                out.iloc[:pos, out.columns.get_loc("Volume")] *= best_f
+            if "DelivQty" in out.columns:
+                out["DelivQty"] = pd.to_numeric(out["DelivQty"], errors="coerce")
+                out.iloc[:pos, out.columns.get_loc("DelivQty")] *= best_f
+    return out if out is not None else df
+
 
 def _clean(df):
     if df is None or len(df) == 0: return None
@@ -29,26 +80,52 @@ def _clean(df):
     df = df[~df.index.duplicated(keep="last")].sort_index()
     for col in ("Open","High","Low","Close","Volume"):
         if col not in df.columns: return None
-    return df
+    return adjust_corporate_actions(df)
+
+_PANEL_LOCK = threading.Lock()
 
 def _panel_dict(exchange):
-    """{ticker: OHLCV(+Deliv) DataFrame} for one exchange, built once."""
+    """{ticker: OHLCV(+Deliv) DataFrame} for one exchange, built once.
+    The parsed dict is pickled next to the CSV and reused while the CSV's
+    mtime is unchanged; parsing the CSV from scratch takes ~20s."""
     if exchange in _PANEL_DICTS: return _PANEL_DICTS[exchange]
-    f = HIST / f"{exchange}_panel.csv.gz"
-    out = {}
-    if f.exists():
-        try:
-            panel = pd.read_csv(f, parse_dates=["Date"])
-            panel = panel.set_index("Date").sort_index()
-            for key, g in panel.groupby("Key"):
-                g = g.drop(columns=["Key"])
-                g.index.name = "Date"
-                out[str(key)] = _clean(g)
-            out = {k: v for k, v in out.items() if v is not None}
-        except Exception:
-            out = {}
-    _PANEL_DICTS[exchange] = out
-    return out
+    with _PANEL_LOCK:
+        if exchange in _PANEL_DICTS: return _PANEL_DICTS[exchange]
+        f = HIST / f"{exchange}_panel.csv.gz"
+        pk = HIST / f"{exchange}_panel.dict.pkl"
+        out = {}
+        if f.exists():
+            mtime = f.stat().st_mtime
+            try:
+                if pk.exists():
+                    with open(pk, "rb") as fh:
+                        saved = pickle.load(fh)
+                    if saved.get("mtime") == mtime and saved.get("ver") == _PANEL_CACHE_VER:
+                        out = saved["data"]
+            except Exception:
+                out = {}
+            if not out:
+                try:
+                    panel = pd.read_csv(f, parse_dates=["Date"])
+                    panel = panel.set_index("Date").sort_index()
+                    for key, g in panel.groupby("Key"):
+                        g = g.drop(columns=["Key"])
+                        g.index.name = "Date"
+                        out[str(key)] = _clean(g)
+                    out = {k: v for k, v in out.items() if v is not None}
+                    try:
+                        with open(pk, "wb") as fh:
+                            pickle.dump({"mtime": mtime, "ver": _PANEL_CACHE_VER, "data": out}, fh, protocol=pickle.HIGHEST_PROTOCOL)
+                    except Exception:
+                        pass
+                except Exception:
+                    out = {}
+        _PANEL_DICTS[exchange] = out
+        return out
+
+def warm_panels():
+    for ex in ("nse", "bse"):
+        _panel_dict(ex)
 
 def local_history(ticker):
     """Bhavcopy-store frame for a .NS/.BO ticker, or None."""
@@ -60,68 +137,144 @@ def local_history(ticker):
 
 def _merge(local, yahoo):
     """Union of both frames; on overlapping dates the local (exchange) row
-    wins because it is concatenated last and duplicates keep the last."""
+    wins because it is concatenated last and duplicates keep the last.
+    Aligns any corporate-action split factor across the Yahoo-to-Bhavcopy seam."""
     if local is None: return yahoo
     if yahoo is None: return local
+    try:
+        overlap = local.index.intersection(yahoo.index)
+        if len(overlap) > 0:
+            t0 = overlap[0]
+            lc = float(local.loc[t0, "Close"])
+            yc = float(yahoo.loc[t0, "Close"])
+            if lc > 0 and yc > 0:
+                seam_ratio = lc / yc
+                if abs(seam_ratio - 1.0) > 0.08:
+                    yahoo = yahoo.copy()
+                    for col in ("Open", "High", "Low", "Close"):
+                        if col in yahoo.columns:
+                            yahoo[col] = yahoo[col].astype(float) * seam_ratio
+                    if "Volume" in yahoo.columns:
+                        yahoo["Volume"] = yahoo["Volume"].astype(float) / seam_ratio
+    except Exception:
+        pass
     cols = list(dict.fromkeys(list(yahoo.columns) + list(local.columns)))
     both = pd.concat([yahoo.reindex(columns=cols), local.reindex(columns=cols)], axis=0)
     both = both[~both.index.duplicated(keep="last")].sort_index()
     return _clean(both)
 
 def _yahoo_batch(tickers, period):
+    from concurrent.futures import ThreadPoolExecutor, wait as futures_wait
     out = {}
     if not tickers: return out
-    try:
-        raw = yf.download(tickers, period=period, interval="1d", group_by="ticker",
-                          auto_adjust=False, threads=True, progress=False, timeout=3)
-    except Exception:
-        return out
-    if raw is None or len(raw) == 0: return out
-    if len(tickers) == 1:
-        d = _clean(raw)
-        if d is not None: out[tickers[0]] = d
-        return out
+    # Check local index cache first for ^NSEI / ^INDIAVIX / sector indices so index queries never stall on Yahoo
+    rem = []
     for t in tickers:
+        if str(t).startswith("^") or str(t) == "NIFTY_FIN_SERVICE.NS":
+            f = CACHE / f"{str(t).replace('^','IDX_')}.csv"
+            if f.exists():
+                try:
+                    df_c = pd.read_csv(f, index_col=0, parse_dates=True)
+                    if len(df_c) >= 10:
+                        out[t] = _clean(df_c)
+                        continue
+                except Exception:
+                    pass
+        rem.append(t)
+    if not rem:
+        return out
+
+    # Guard against future-dated system clocks (e.g. late 2026) where short relative
+    # periods ('5d', '1mo', '3mo', '6mo') compute a start date in the future on Yahoo.
+    yf_period = "2y" if period in ("5d", "1mo", "3mo", "6mo", "1y") else period
+
+    ex = ThreadPoolExecutor(max_workers=1)
+    raw = None
+    try:
+        fut = ex.submit(
+            yf.download,
+            rem,
+            period=yf_period,
+            interval="1d",
+            group_by="ticker",
+            auto_adjust=False,
+            threads=False,
+            progress=False,
+            timeout=4,
+        )
+        done, _ = futures_wait([fut], timeout=5.5)
+        if fut in done:
+            raw = fut.result()
+    except Exception:
+        raw = None
+    finally:
+        ex.shutdown(wait=False, cancel_futures=True)
+
+    if raw is None or len(raw) == 0:
+        return out
+    if len(rem) == 1:
+        d = _clean(raw)
+        if d is not None:
+            out[rem[0]] = d
+            if str(rem[0]).startswith("^") or str(rem[0]) == "NIFTY_FIN_SERVICE.NS":
+                try:
+                    d.to_csv(CACHE / f"{str(rem[0]).replace('^','IDX_')}.csv")
+                except Exception:
+                    pass
+        return out
+    for t in rem:
         try:
             if t in raw.columns.get_level_values(0):
                 d = _clean(raw[t])
-                if d is not None: out[t] = d
+                if d is not None:
+                    out[t] = d
+                    if str(t).startswith("^") or str(t) == "NIFTY_FIN_SERVICE.NS":
+                        try:
+                            d.to_csv(CACHE / f"{str(t).replace('^','IDX_')}.csv")
+                        except Exception:
+                            pass
         except Exception:
             continue
     return out
 
+
 def download_batch(tickers, period="1y"):
-    """Returns {ticker: DataFrame}. Local bhavcopy store first; Yahoo only
-    for tickers whose local frame is missing or too short (merged)."""
+    """Returns {ticker: DataFrame}. Local official Bhavcopy store first (~290 trading
+    days across 6,910 NSE+BSE equities); Yahoo only for indices or single-ticker
+    queries missing from the local panel."""
     out, need = {}, []
-    # 1y is fully covered by the ~13-month bhavcopy store; a 2y request
-    # still merges Yahoo's longer history when it exists (local wins on
-    # overlapping dates) so stage-2 backtests keep their depth.
-    min_local = 480 if period == "2y" else 120
+    nse_loaded = bool(_panel_dict("nse"))
+    bulk_mode = len(tickers) > 5
     for t in tickers:
+        if str(t).startswith("^"):
+            f = CACHE / f"{t.replace('^','IDX_')}.csv"
+            if f.exists():
+                try:
+                    df_c = pd.read_csv(f, index_col=0, parse_dates=True)
+                    if len(df_c) >= 10:
+                        out[t] = _clean(df_c)
+                        continue
+                except Exception:
+                    pass
         loc = local_history(t)
-        if loc is not None and len(loc) >= min_local:
+        if loc is not None and len(loc) >= 20:
             out[t] = loc
-        elif loc is not None and t.endswith(".BO") and len(loc) >= 60:
-            # BSE numerical scrips have excellent local Bhavcopy coverage (~260 days);
-            # Yahoo Finance almost never carries reliable history for 6-digit .BO codes.
-            # Using local Bhavcopy directly avoids massive connection timeouts.
-            out[t] = loc
-        elif loc is not None and period != "2y" and len(loc) >= 30:
-            # Thin local frame (mostly BSE scrips that trade sparsely):
-            # Yahoo carries nothing better for these and bulk-fetching
-            # thousands of dead .BO tickers stalls the run — accept the
-            # local frame; the caller's min-rows rule decides inclusion.
-            out[t] = loc
+        elif bulk_mode and nse_loaded and (str(t).endswith(".NS") or str(t).endswith(".BO")):
+            # Untraded / suspended scrip absent from official exchange Bhavcopy:
+            # skip bulk Yahoo network calls so 8,000-stock scans never stall or deadlock.
+            if loc is not None:
+                out[t] = loc
         else:
             need.append(t)
-            if loc is not None: out[t] = loc  # keep as fallback if Yahoo fails
+            if loc is not None:
+                out[t] = loc
     if need:
         yh = _yahoo_batch(need, period=period)
         for t in need:
             if t in yh:
                 merged = _merge(out.get(t), yh[t])
-                if merged is not None: out[t] = merged
+                if merged is not None:
+                    out[t] = merged
     return out
 
 def download_one(ticker, period="2y", use_cache=True):
@@ -143,10 +296,19 @@ def nifty_close(period="2y"):
     return df["Close"] if df is not None else None
 
 def history_series(ticker, days=90):
-    """Recent OHLC rows for charts: [{date, open, high, low, close, volume}]."""
+    """Recent OHLC rows for charts: [{date, open, high, low, close, volume}].
+    The bhavcopy panel can lag the latest session; Yahoo fills only those newer bars."""
     df = local_history(ticker)
     if df is None or len(df) < 5:
         df = download_one(ticker, period="1y")
+    elif len(df):
+        from datetime import date, timedelta
+        last = df.index[-1]
+        last_d = last.date() if hasattr(last, "date") else None
+        if last_d and last_d < date.today() - timedelta(days=1):
+            extra = _yahoo_batch([ticker], period="1mo").get(ticker)
+            if extra is not None:
+                df = _merge(df, extra)
     if df is None: return []
     df = df.tail(days)
     return [dict(date=str(idx.date()), open=round(float(r["Open"]), 2), high=round(float(r["High"]), 2),

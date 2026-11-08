@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "falling-leaves": "^0.1.0",
+    "falling-snow": "^1.0.0",
+    "react-snowfall": "^2.4.0",
+    "snowfall": "^2.1.0"
+  }
+}

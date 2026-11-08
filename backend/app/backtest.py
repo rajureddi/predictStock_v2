@@ -12,6 +12,27 @@ import numpy as np
 COST_PER_SIDE_PCT = 0.15  # brokerage + STT + impact, per side (~0.3% round trip)
 
 
+def tiered_round_trip_cost_pct(traded_value_inr=None, default_per_side=COST_PER_SIDE_PCT):
+    """Liquidity-tiered NSE/BSE cash-delivery round-trip transaction cost (STT 0.1%x2 +
+    stamp duty + exchange/SEBI/GST + ADT-tiered market impact slippage).
+    Falls back to `2 * default_per_side` (0.30%) when traded_value_inr is omitted."""
+    if traded_value_inr is None:
+        return round(2.0 * default_per_side, 4)
+    try:
+        tv = float(traded_value_inr)
+    except Exception:
+        return round(2.0 * default_per_side, 4)
+    if tv <= 0 or math.isnan(tv):
+        return round(2.0 * default_per_side, 4)
+    if tv >= 500_000_000:   # >= ₹50 Cr/day (Nifty 100 institutional liquidity)
+        return 0.26
+    if tv >= 100_000_000:   # ₹10–50 Cr/day (liquid mid-cap)
+        return 0.30
+    if tv >= 30_000_000:    # ₹3–10 Cr/day (mid/small-cap)
+        return 0.36
+    return 0.44             # ₹50L–₹3 Cr/day (higher bid-ask impact cost)
+
+
 def _f(x, default=None):
     try:
         v = float(x)
@@ -156,22 +177,39 @@ def regime_on(nifty_close, when, window=200):
         return None
 
 
-def simulate_exit(bars, entry, stop, target, horizon=5):
+def simulate_exit(bars, entry, stop, target, horizon=5, breakeven_at=None, breakeven_stop=None):
     """Walk up to `horizon` OHLC bars after entry. Gap at open first, then
     intrabar; a bar touching both levels counts as a stop (conservative).
+    When `breakeven_at` is set ('Mooli Salamat' principal protection), any bar
+    that reaches `High >= breakeven_at` without stopping out arms `breakeven_stop`
+    for subsequent bars (zero intrabar lookahead).
     Returns dict(exit, reason, bars_held, mae_pct, mfe_pct) or None."""
     if bars is None or len(bars) == 0 or entry <= 0:
         return None
     lo_px, hi_px = entry, entry
+    active_stop = float(stop) if stop else None
+    be_armed = False
+    be_px = float(breakeven_stop) if breakeven_stop is not None else entry * 1.0042
     n = 0
+    last_close = entry
     for _, b in bars.head(horizon).iterrows():
         n += 1
         o, h, l, c = float(b["Open"]), float(b["High"]), float(b["Low"]), float(b["Close"])
         lo_px, hi_px = min(lo_px, l), max(hi_px, h)
-        if stop and o <= stop: return dict(exit=o, reason="stop_gap", bars_held=n, mae_pct=(lo_px/entry-1)*100, mfe_pct=(hi_px/entry-1)*100)
-        if target and o >= target: return dict(exit=o, reason="target_gap", bars_held=n, mae_pct=(lo_px/entry-1)*100, mfe_pct=(hi_px/entry-1)*100)
-        hit_stop = bool(stop) and l <= stop; hit_tgt = bool(target) and h >= target
-        if hit_stop: return dict(exit=stop, reason="stop", bars_held=n, mae_pct=(lo_px/entry-1)*100, mfe_pct=(hi_px/entry-1)*100)
-        if hit_tgt: return dict(exit=target, reason="target", bars_held=n, mae_pct=(lo_px/entry-1)*100, mfe_pct=(hi_px/entry-1)*100)
+        if active_stop and o <= active_stop:
+            rsn = "breakeven" if be_armed and (not stop or active_stop > stop) else "stop_gap"
+            return dict(exit=o, reason=rsn, bars_held=n, mae_pct=(lo_px / entry - 1) * 100, mfe_pct=(hi_px / entry - 1) * 100)
+        if target and o >= target:
+            return dict(exit=o, reason="target_gap", bars_held=n, mae_pct=(lo_px / entry - 1) * 100, mfe_pct=(hi_px / entry - 1) * 100)
+        hit_stop = bool(active_stop) and l <= active_stop
+        hit_tgt = bool(target) and h >= target
+        if hit_stop:
+            rsn = "breakeven" if be_armed and (not stop or active_stop > stop) else "stop"
+            return dict(exit=active_stop, reason=rsn, bars_held=n, mae_pct=(lo_px / entry - 1) * 100, mfe_pct=(hi_px / entry - 1) * 100)
+        if hit_tgt:
+            return dict(exit=target, reason="target", bars_held=n, mae_pct=(lo_px / entry - 1) * 100, mfe_pct=(hi_px / entry - 1) * 100)
+        if breakeven_at is not None and h >= float(breakeven_at):
+            active_stop = max(active_stop, be_px) if active_stop is not None else be_px
+            be_armed = True
         last_close = c
-    return dict(exit=last_close, reason="time", bars_held=n, mae_pct=(lo_px/entry-1)*100, mfe_pct=(hi_px/entry-1)*100)
+    return dict(exit=last_close, reason="time", bars_held=n, mae_pct=(lo_px / entry - 1) * 100, mfe_pct=(hi_px / entry - 1) * 100)

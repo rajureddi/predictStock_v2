@@ -17,16 +17,86 @@ def _empty(budget, cash_pct=0.0, risk_pct=1.0):
                 cash_reserve=round(b * (cash_pct or 0), 2), size_mult=1.0, investable=round(b * (1 - (cash_pct or 0)), 2))
 
 
-def allocate(picks, budget, risk_pct=1.0, size_mult=1.0, cash_pct=0.0):
+def allocate(picks, budget, risk_pct=1.0, size_mult=1.0, cash_pct=0.0, budget_mode=False):
     """Returns the allocation dict. Existing keys (budget_inr, allocations[
     symbol, shares, invested, expected_value, expected_profit], total_invested,
     leftover, expected_value, expected_profit) are unchanged; adds risk_inr,
-    risk_pct, cash_reserve, size_mult, investable and per-pick risk_inr."""
+    risk_pct, cash_reserve, size_mult, investable and per-pick risk_inr.
+    When budget_mode=True, sizes whole shares across all budget-matched picks
+    so retail budgets (e.g. ₹5,000 or ₹10,000) deploy across all 5 picks."""
     cash_pct = min(max(float(cash_pct or 0.0), 0.0), 0.95)
     size_mult = max(float(size_mult or 1.0), 0.0)
     risk_pct = max(float(risk_pct or 1.0), 0.0)
     if not budget or budget <= 0 or not picks:
         return _empty(budget, cash_pct, risk_pct)
+
+    if budget_mode:
+        investable = float(budget)
+        risk_inr = budget * (risk_pct / 100.0) * size_mult
+        per_cap = max(investable * 0.34, max((float(p.get("current_price") or 0) for p in picks), default=0.0))
+        shares = [0] * len(picks)
+        total = 0.0
+        # Pass 1: allocate at least 1 whole share to every pick in rank order that fits inside the budget
+        for i, p in enumerate(picks):
+            price = float(p.get("current_price") or 0)
+            if price > 0 and total + price <= investable:
+                shares[i] = 1
+                total += price
+        # Pass 2: top up additional whole shares balanced across picks by conviction × expected return
+        changed = True
+        while changed:
+            changed = False
+            # Prefer picks with fewer current invested rupees relative to equal weight, broken by expected return
+            order = sorted(
+                range(len(picks)),
+                key=lambda k: (
+                    shares[k] * float(picks[k].get("current_price") or 0) / max(investable / max(len(picks), 1), 1.0),
+                    -float(picks[k].get("predicted_return_pct") or 0.0),
+                ),
+            )
+            for i in order:
+                price = float(picks[i].get("current_price") or 0)
+                if price <= 0:
+                    continue
+                if (shares[i] + 1) * price <= per_cap and total + price <= investable:
+                    shares[i] += 1
+                    total += price
+                    changed = True
+                    break
+        allocs, exp_val, tot_risk = [], 0.0, 0.0
+        for i, p in enumerate(picks):
+            price = float(p.get("current_price") or 0)
+            pred = float(p.get("predicted_price") or price)
+            stop = float(p.get("stop_loss") or 0)
+            inv = round(shares[i] * price, 2)
+            ev = round(shares[i] * pred, 2)
+            exp_val += ev
+            psr = price - stop if 0 < stop < price else price * FALLBACK_STOP_PCT
+            r_inr = round(shares[i] * psr, 2)
+            tot_risk += r_inr
+            allocs.append(dict(
+                symbol=p.get("symbol"),
+                shares=shares[i],
+                invested=inv,
+                expected_value=ev,
+                expected_profit=round(ev - inv, 2),
+                risk_inr=r_inr,
+            ))
+        total = round(total, 2)
+        return dict(
+            budget_inr=budget,
+            allocations=allocs,
+            total_invested=total,
+            leftover=round(budget - total, 2),
+            expected_value=round(exp_val, 2),
+            expected_profit=round(exp_val - total, 2),
+            risk_inr=round(tot_risk / max(len(picks), 1), 2),
+            risk_pct=risk_pct,
+            size_mult=size_mult,
+            cash_reserve=0.0,
+            investable=round(investable, 2),
+        )
+
     investable = budget * (1.0 - cash_pct)
     risk_inr = budget * (risk_pct / 100.0) * size_mult
     per_cap = investable * MAX_PICK_PCT

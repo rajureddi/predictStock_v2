@@ -103,16 +103,24 @@ def fetch_fundamentals(yahoo_list, log=print):
         else:
             todo.append(y)
     if todo:
+        from concurrent.futures import wait as futures_wait
         log(f"[fundamentals] fetching {len(todo)} symbols ({len(out)} cached)")
-        with ThreadPoolExecutor(max_workers=8) as ex:
+        ex = ThreadPoolExecutor(max_workers=8)
+        try:
             futs = {ex.submit(_fetch_one, y): y for y in todo}
+            done, _ = futures_wait(list(futs.keys()), timeout=6.0)
             for fut, y in futs.items():
-                try:
-                    data = fut.result(timeout=FETCH_TIMEOUT)
-                except Exception:
-                    data = None
+                data = None
+                if fut in done:
+                    try:
+                        data = fut.result(timeout=0.1)
+                    except Exception:
+                        data = None
                 out[y] = data
-                cache[y] = {"fetched": date.today().isoformat(), "data": data}
+                if data is not None:
+                    cache[y] = {"fetched": date.today().isoformat(), "data": data}
+        finally:
+            ex.shutdown(wait=False, cancel_futures=True)
         _save_cache(cache)
     return out
 

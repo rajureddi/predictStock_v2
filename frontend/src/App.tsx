@@ -1,23 +1,32 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { ThinkingOrb } from 'thinking-orbs'
 import {
-  ArrowRight, CaretLeft, CaretRight, CheckCircle, ClockCounterClockwise, CurrencyInr, DiceFive,
-  MagnifyingGlass, Moon, ShieldWarning, Sun, Warning, X, Briefcase, TrendUp, TrendDown, Gauge, ChartLineUp,
+  ArrowRight, Brain, CaretLeft, CaretRight, CheckCircle, ClockCounterClockwise, CurrencyInr, DiceFive,
+  Lightning, MagnifyingGlass, Moon, Rocket, ShieldWarning, Sun, Warning, X, Briefcase, TrendUp, TrendDown, Gauge, ChartLineUp,
+  SlidersHorizontal, Gear,
 } from '@phosphor-icons/react'
 import { C, Holding, Theme, ThemeCtx, applyPalette, fetchSeries, holdingFromPick, inr, loadHoldings, num, pct, saveHoldings } from './lib'
 import StockDesk from './StockDesk'
 import Portfolio from './Portfolio'
+import ShortTerm, { ShortTermReport } from './ShortTerm'
+import TradeAnalyser from './TradeAnalyser'
+import { BacktestView } from './BacktestView'
+import SectorHeatmap from './SectorHeatmap'
+import BudgetSettingsModal from './BudgetSettingsModal'
+
+import { FallingLeaves } from "falling-leaves/react"
 
 const Backdrop = lazy(() => import('./scene/Backdrop'))
 
 /* ---------- percentage bar with positive/negative color variants ---------- */
-function PctBar({ val, max = 25 }: { val?: number | null; max?: number }) {
+function PctBar({ val, max = 25, up }: { val?: number | null; max?: number; up?: boolean }) {
   if (val == null) return <span className="mut">—</span>
-  const pos = val >= 0
+  const pos = up ?? val >= 0
   const abs = Math.abs(val)
   const widthPct = Math.min(100, Math.max(12, Math.round((abs / max) * 100)))
   return (
     <div className={`pct-bar-cell ${pos ? 'pos' : 'neg'}`} title={`${pos ? '+' : ''}${val.toFixed(2)}%`}>
+
       <span className="pct-bar-track">
         <span className={`pct-bar-fill ${pos ? 'pos' : 'neg'}`} style={{ width: `${widthPct}%` }} />
       </span>
@@ -45,6 +54,13 @@ function MiniSpark({ symbol, exchange }: { symbol: string; exchange: string }) {
   </svg>
 }
 
+function formatScanDate(iso?: string) {
+  if (!iso) return '—'
+  const [y, m, d] = iso.split('-').map(Number)
+  if (!y || !m || !d) return iso
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 function AccMeter({ v }: { v?: number | null }) {
   if (v == null) return <span className="mut">—</span>
   return <span className="accmeter"><span className="num">{v}%</span><i><b style={{ width: `${Math.max(0, Math.min(100, v))}%` }} /></i></span>
@@ -61,17 +77,22 @@ export default function App() {
   const orb = theme
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0B0C0E' : '#F2F3F5')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0A1931' : '#F5F8FC')
     localStorage.setItem('marketmind.theme', theme)
   }, [theme])
-  const [tab, setTab] = useState<'picks' | 'scanned' | 'history' | 'portfolio'>('picks')
+  const [tab, setTab] = useState<'picks' | 'analyser' | 'shortterm' | 'scanned' | 'sectors' | 'backtest' | 'history' | 'portfolio'>('picks')
+  const [shortTermReport, setShortTermReport] = useState<ShortTermReport | null>(null)
+  const [shortTermScan, setShortTermScan] = useState<any>(null)
   const [holdings, setHoldingsRaw] = useState<Holding[]>(loadHoldings)
   const setHoldings = (f: (h: Holding[]) => Holding[]) => setHoldingsRaw(h => { const n = f(h); saveHoldings(n); return n })
   const [report, setReport] = useState<any>(null)
   const [scanned, setScanned] = useState<any>(null)
   const [history, setHistory] = useState<any>(null)
+  const [histQuotes, setHistQuotes] = useState<Record<string, number>>({})
   const [budget, setBudget] = useState<string>('')
   const [savedBudget, setSavedBudget] = useState<number | null>(null)
+  const [showBudgetModal, setShowBudgetModal] = useState(false)
+  const [screenRules, setScreenRules] = useState<any>(null)
   const [scan, setScan] = useState<any>(null)
   const [scanNote, setScanNote] = useState<string>('')
   const [loading, setLoading] = useState(true)
@@ -88,11 +109,19 @@ export default function App() {
 
   useEffect(() => {
     const fetchIndices = () => {
-      fetch('/api/market-indices').then(r => r.json()).then(d => setIndices(d)).catch(() => {})
+      fetch('/api/market-indices').then(r => r.json()).then(d => setIndices(d)).catch(() => { })
+    }
+    const fetchPicks = () => {
+      fetch('/api/picks/latest').then(r => r.json()).then(d => {
+        if (d && d.picks && d.picks.length) {
+          setReport(prev => prev ? { ...prev, picks: d.picks } : d)
+        }
+      }).catch(() => { })
     }
     fetchIndices()
     const intv = setInterval(fetchIndices, 60000)
-    return () => clearInterval(intv)
+    const picksIntv = setInterval(fetchPicks, 30000)
+    return () => { clearInterval(intv); clearInterval(picksIntv) }
   }, [])
 
   useEffect(() => {
@@ -111,19 +140,84 @@ export default function App() {
     if (tab !== 'picks') setOpenIdx(null)
   }, [tab])
 
-  const load = async () => {
+  const loadShortTerm = async () => {
     try {
-      const r = await (await fetch('/api/picks/latest')).json(); setReport(r)
-      const b = await (await fetch('/api/screen/budget')).json()
-      setSavedBudget(b.budget_inr); if (b.budget_inr != null) setBudget(String(b.budget_inr))
-      setScanned(await (await fetch('/api/scanned')).json())
-      setHistory(await (await fetch('/api/history')).json())
+      const res = await fetch('/api/short-term/picks')
+      const data = await res.json()
+      if (data) setShortTermReport(data)
+    } catch { }
+  }
+
+  const checkShortTermScan = async () => {
+    try {
+      const s = await (await fetch('/api/short-term/status')).json()
+      setShortTermScan(s)
+      if (s && !s.running && s.stage === 'done') {
+        loadShortTerm()
+      }
+      return s
+    } catch { return null }
+  }
+
+  const startShortTermScan = async () => {
+    try {
+      await fetch('/api/short-term/start', { method: 'POST' })
+      checkShortTermScan()
+    } catch { }
+  }
+
+  useEffect(() => {
+    if (!shortTermScan?.running) return
+    const t = setInterval(checkShortTermScan, 2000)
+    return () => clearInterval(t)
+  }, [shortTermScan?.running])
+
+  const load = async () => {
+    const getJson = (u: string) => fetch(u).then(r => r.json())
+    getJson('/api/screen/budget').then(b => { setSavedBudget(b.budget_inr); if (b.budget_inr != null) setBudget(String(b.budget_inr)) }).catch(() => { })
+    getJson('/api/screen/rules').then(setScreenRules).catch(() => { })
+    getJson('/api/scanned').then(setScanned).catch(() => { })
+    getJson('/api/history').then(setHistory).catch(() => { })
+    loadShortTerm()
+    try {
+      const rep = await getJson('/api/picks/latest')
+      setReport(rep)
+      if (rep?.screen_rules) setScreenRules(rep.screen_rules)
     } finally { setLoading(false) }
   }
   useEffect(() => { load() }, [])
+  const historySymbols = useMemo(() => {
+    const set = new Set<string>()
+    for (const w of history?.weeks || []) for (const p of w.picks || []) if (p.symbol) set.add(p.symbol)
+    return [...set].sort()
+  }, [history])
+  useEffect(() => {
+    if (tab !== 'history' || historySymbols.length === 0) return
+    let alive = true
+    const pull = async () => {
+      const next: Record<string, number> = {}
+      for (let i = 0; i < historySymbols.length; i += 40) {
+        const batch = historySymbols.slice(i, i + 40)
+        try {
+          const data = await fetch(`/api/live-quotes?symbols=${encodeURIComponent(batch.join(','))}`).then(r => r.json())
+          for (const [s, price] of Object.entries(data?.quotes || {})) {
+            if (typeof price === 'number' && price > 0) next[s] = price
+          }
+        } catch { /* keep the last good quote */ }
+      }
+      if (alive && Object.keys(next).length) setHistQuotes(prev => ({ ...prev, ...next }))
+    }
+    pull()
+    const t = setInterval(pull, 30000)
+    return () => { alive = false; clearInterval(t) }
+  }, [tab, historySymbols])
   useEffect(() => {
     if (tab === 'history') {
-      fetch('/api/history').then(r => r.json()).then(h => setHistory(h)).catch(() => {})
+      fetch('/api/history').then(r => r.json()).then(h => setHistory(h)).catch(() => { })
+    }
+    if (tab === 'shortterm') {
+      loadShortTerm()
+      checkShortTermScan()
     }
   }, [tab])
   const checkScan = async () => {
@@ -143,12 +237,24 @@ export default function App() {
     const t = setInterval(tick, 4000)
     return () => { alive = false; clearInterval(t) }
   }, [])
-  const startScan = async () => {
+  const startScan = async (fresh = false) => {
     setScanNote('')
     try {
-      const r = await (await fetch('/api/scan/start', { method: 'POST' })).json()
+      const r = await (await fetch(`/api/scan/start?fresh=${fresh ? 'true' : 'false'}`, { method: 'POST' })).json()
+      if (fresh) {
+        await load()
+      }
       if (r.started || r.reason === 'already_running') { wasRunning.current = true; checkScan() }
     } catch { /* status polling will surface the state */ }
+  }
+  const clearTodayPicks = async () => {
+    setScanNote('')
+    try {
+      await fetch('/api/scan/reset-today', { method: 'POST' })
+      await load()
+      await checkScan()
+      setScanNote("Removed today's saved predictions & stage-1 checkpoint. Ready for a Fresh Scratch Scan.")
+    } catch { }
   }
   const saveBudget = async (v: number | null) => {
     setSavingBudget(true)
@@ -206,9 +312,24 @@ export default function App() {
     return [...h, ...add]
   })
   const editShares = (symbol: string, shares: number) => setHoldings(h => h.map(x => x.symbol === symbol ? { ...x, shares } : x))
+  const openStockChart = (symbol: string, exchange = 'NSE', name?: string, backLabel = 'TradeAnalyser', price?: number) => {
+    setGlobalSearch('')
+    setSearchFocused(false)
+    const pick = { symbol, name: name || symbol, exchange: exchange || 'NSE', current_price: price }
+    setCustomDesk({ pick, list: [pick], idx: 0, backLabel })
+  }
+
   const openFromPortfolio = (symbol: string) => {
     const i = picks.findIndex(p => p.symbol === symbol)
-    if (i >= 0) { setTab('picks'); setTimeout(() => setOpenIdx(i), 0) }
+    if (i >= 0) {
+      setTab('picks')
+      setTimeout(() => setOpenIdx(i), 0)
+    } else {
+      const h = holdings.find(x => x.symbol === symbol)
+      if (!h) return
+      const pick = { symbol: h.symbol, name: h.name || h.symbol, exchange: h.exchange || 'NSE', current_price: h.buy }
+      setCustomDesk({ pick, list: [pick], idx: 0, backLabel: 'Portfolio' })
+    }
   }
 
   const [searchResults, setSearchResults] = useState<any[]>([])
@@ -244,7 +365,7 @@ export default function App() {
     }
   }, [globalSearch])
 
-  const openStockPrediction = async (symbol: string, exchange = 'NSE', name?: string) => {
+  const openStockPrediction = async (symbol: string, exchange = 'NSE', name?: string, backLabel?: string) => {
     setGlobalSearch('')
     setSearchFocused(false)
     const existingIdx = picks.findIndex(p => p.symbol === symbol)
@@ -260,11 +381,12 @@ export default function App() {
       if (res.pick) {
         const p = res.pick
         if (name && !p.name) p.name = name
+        const label = backLabel || (tab === 'scanned' ? 'All Scanned Stocks' : tab === 'portfolio' ? 'Portfolio' : "This Week's Picks")
         setCustomDesk({
           pick: p,
-          list: [p, ...picks],
+          list: label === 'Portfolio' ? [p] : [p, ...picks],
           idx: 0,
-          backLabel: tab === 'scanned' ? 'All Scanned Stocks' : "This Week's Picks"
+          backLabel: label
         })
       } else {
         alert(res.error || `Could not generate 5-day prediction for ${symbol}`)
@@ -291,10 +413,18 @@ export default function App() {
         ? <span>Stage 1 complete. A model is now trained and walk-forward backtested for each top stock. This stage takes a while. Leave this page open; the new picks appear here automatically.</span>
         : scan.stage1 && <div className="bar"><div className="barfill" style={{ width: `${Math.min(100, Math.round(100 * scan.stage1.done_batches / scan.stage1.total_batches))}%` }} /></div>}
     </div>
+    <button className="btn ghost sm" onClick={() => startScan(true)} title="Force restart from Batch 0 (clears checkpoint & today's cache)">
+      <Lightning size={14} weight="bold" /> Fresh Restart
+    </button>
   </div>
 
   return (<ThemeCtx.Provider value={theme}>
     <div className="app-shell">
+
+      <FallingLeaves
+        fullScreen
+        shapes={["maple"]}
+      />
       {predictLoading && (
         <div className="predict-loading-modal" role="status">
           <div className="predict-loading-card">
@@ -333,12 +463,59 @@ export default function App() {
           </button>
           <button
             role="tab"
+            aria-selected={tab === 'analyser'}
+            className={`sidebar-tab-btn ${tab === 'analyser' ? 'on' : ''}`}
+            onClick={() => { setCustomDesk(null); setTab('analyser') }}
+          >
+            <Brain size={18} weight={tab === 'analyser' ? 'bold' : 'regular'} />
+            <span>TradeAnalyser</span>
+            <span className="tabcount num" style={{ background: 'rgba(255,94,26,0.30)', color: '#FFFFFF', border: '1px solid rgba(255,94,26,0.5)', fontWeight: 700, padding: '2px 7px' }}>
+              AI Top 10
+            </span>
+          </button>
+          <button
+            role="tab"
+            aria-selected={tab === 'shortterm'}
+            className={`sidebar-tab-btn ${tab === 'shortterm' ? 'on' : ''}`}
+            onClick={() => { setCustomDesk(null); setTab('shortterm') }}
+          >
+            <Rocket size={18} weight={tab === 'shortterm' ? 'bold' : 'regular'} />
+            <span>Multibaggers</span>
+            {shortTermReport?.picks?.length ? (
+              <span className="tabcount num" style={{ background: 'var(--accent)', color: '#fff' }}>
+                {shortTermReport.picks.length}
+              </span>
+            ) : null}
+          </button>
+          <button
+            role="tab"
             aria-selected={tab === 'scanned'}
             className={`sidebar-tab-btn ${tab === 'scanned' ? 'on' : ''}`}
             onClick={() => { setCustomDesk(null); setTab('scanned') }}
           >
             <MagnifyingGlass size={18} weight={tab === 'scanned' ? 'bold' : 'regular'} />
             <span>All Scanned Stocks</span>
+          </button>
+          <button
+            role="tab"
+            aria-selected={tab === 'sectors'}
+            className={`sidebar-tab-btn ${tab === 'sectors' ? 'on' : ''}`}
+            onClick={() => { setCustomDesk(null); setTab('sectors') }}
+          >
+            <Gauge size={18} weight={tab === 'sectors' ? 'bold' : 'regular'} />
+            <span>Sector Heatmap</span>
+          </button>
+          <button
+            role="tab"
+            aria-selected={tab === 'backtest'}
+            className={`sidebar-tab-btn ${tab === 'backtest' ? 'on' : ''}`}
+            onClick={() => { setCustomDesk(null); setTab('backtest') }}
+          >
+            <ChartLineUp size={18} weight={tab === 'backtest' ? 'bold' : 'regular'} />
+            <span>Backtest Engine</span>
+            <span className="tabcount num" style={{ background: 'rgba(16,185,129,0.25)', color: '#FFFFFF', border: '1px solid rgba(16,185,129,0.45)', fontWeight: 700, padding: '2px 7px' }}>
+              1Y Proof
+            </span>
           </button>
           <button
             role="tab"
@@ -362,6 +539,28 @@ export default function App() {
         </nav>
 
         <div className="sidebar-footer">
+          <button
+            type="button"
+            className="sidebar-rules-btn"
+            onClick={() => setShowBudgetModal(true)}
+            title="Open Budget Settings: Configure budget rules, stock price ceilings (No Heavy), and min profit"
+          >
+            <span className="srb-left">
+              <SlidersHorizontal size={15} weight="bold" />
+              <span>Budget &amp; Rules</span>
+            </span>
+            <span className="srb-tag">
+              {screenRules?.price_cap_mode === 'no_heavy'
+                ? '≤ ₹2.5k'
+                : screenRules?.price_cap_mode === 'moderate'
+                ? '≤ ₹4.5k'
+                : screenRules?.price_cap_mode === 'allow_heavy'
+                ? '≤ ₹9.5k'
+                : screenRules?.price_cap_mode === 'ultra_heavy'
+                ? 'Uncapped'
+                : 'Settings ⚙'}
+            </span>
+          </button>
           <div className="sidebar-status-pill">
             <span className={`market-dot ${indices?.market_open ? 'live' : 'closed'}`} />
             <span className="market-text">{indices?.market_open ? 'NSE: OPEN' : 'NSE: CLOSED'}</span>
@@ -389,16 +588,16 @@ export default function App() {
             <div className="indices-strip">
               <div className="index-pill">
                 <span className="idx-name">NIFTY 50</span>
-                <span className="idx-price num">{indices?.nifty?.price ? inr(indices.nifty.price) : '24,340.50'}</span>
+                <span className="idx-price num">{indices?.nifty?.price ? inr(indices.nifty.price) : '—'}</span>
                 <span className={`idx-change num ${(indices?.nifty?.change_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>
-                  {pct(indices?.nifty?.change_pct ?? 0.42)}
+                  {indices?.nifty?.change_pct == null ? '' : pct(indices.nifty.change_pct)}
                 </span>
               </div>
               <div className="index-pill">
                 <span className="idx-name">INDIA VIX</span>
-                <span className="idx-price num">{indices?.vix?.price ?? '14.85'}</span>
+                <span className="idx-price num">{indices?.vix?.price ?? '—'}</span>
                 <span className={`idx-change num ${(indices?.vix?.change_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>
-                  {pct(indices?.vix?.change_pct ?? -1.20)}
+                  {indices?.vix?.change_pct == null ? '' : pct(indices.vix.change_pct)}
                 </span>
               </div>
               <div className="index-pill cutoff-pill">
@@ -423,7 +622,7 @@ export default function App() {
                 onKeyDown={e => {
                   if (e.key === 'Enter' && searchResults.length > 0) {
                     const top = searchResults[0]
-                    openStockPrediction(top.symbol, top.exchange, top.name)
+                    openStockChart(top.symbol, top.exchange, top.name, 'Search', top.current_price)
                   }
                 }}
                 aria-label="Search Equities"
@@ -446,7 +645,7 @@ export default function App() {
                     <div
                       key={idx}
                       className="search-result-row"
-                      onMouseDown={() => openStockPrediction(item.symbol, item.exchange, item.name)}
+                      onMouseDown={() => openStockChart(item.symbol, item.exchange, item.name, 'Search', item.current_price)}
                     >
                       <div className="sr-left">
                         <b>{item.symbol}</b>
@@ -473,12 +672,20 @@ export default function App() {
               )}
             </div>
 
-            <button className="topbar-scan-btn" disabled={!!scan?.running} onClick={startScan}>
+            <button className="topbar-scan-btn" disabled={!!scan?.running} onClick={() => startScan(false)}>
               {scan?.running ? (
                 <span className="orbinline"><ThinkingOrb state="working" size={20} theme={orb === 'light' ? 'dark' : 'light'} /> Scanning…</span>
               ) : (
                 <><MagnifyingGlass size={15} weight="bold" /> Scan Market</>
               )}
+            </button>
+            <button
+              className="topbar-scan-btn"
+              style={{ background: 'transparent', border: '1px solid var(--line)', color: 'var(--fg)' }}
+              onClick={() => startScan(true)}
+              title="Wipe today's predictions & checkpoints and run a 100% fresh scratch scan from Batch 0"
+            >
+              <Lightning size={15} weight="bold" /> Fresh Scan
             </button>
 
             <button
@@ -493,343 +700,514 @@ export default function App() {
         </header>
 
         <section className={`hero${opened || historyDesk || customDesk ? ' compact' : ''}`}>
-      <Suspense fallback={null}><Backdrop energy={scan?.running ? 1 : 0} theme={theme} /></Suspense>
-      <div className="hero-in">
-        {tab === 'portfolio' && <div className="hero-title">
-          <h2>Portfolio</h2>
-          <p>Your holdings from MarketMind picks, valued at the latest official close.</p>
-        </div>}
-        {tab === 'picks' && !opened && !customDesk && <>
-          <div className="hero-title">
-            <h2>Prediction week <span className="num">{report?.run_date || '—'} <ArrowRight size={20} weight="bold" aria-hidden="true" /> {report?.target_date || '—'}</span></h2>
-            <p>7-day horizon · prices as of {report?.data_as_of || '—'} · {picks.length} {picks.length === 1 ? 'pick' : 'picks'} published</p>
-          </div>
-          <div className="hero-actions">
-            <button className="scanbtn" disabled={!!scan?.running} onClick={startScan}>{scan?.running
-              ? <span className="orbinline"><ThinkingOrb state="working" size={20} theme={orb === 'light' ? 'dark' : 'light'} />Scanning…</span>
-              : <><MagnifyingGlass size={17} weight="bold" /> Scan Market</>}</button>
-          </div>
-        </>}
-        {tab === 'scanned' && !customDesk && <div className="hero-title">
-          <h2>All scanned stocks</h2>
-          <p className="num">Run {scanned?.run_date || '—'} · target {scanned?.target_date || '—'}</p>
-        </div>}
-        {tab === 'history' && !historyDesk && <div className="hero-title">
-          <h2>Past weeks</h2>
-          <p>Every published pick, tracked against live and actual prices.</p>
-        </div>}
-      </div>
-    </section>
-
-    <main className="page">
-      {loading && <div className="panel loadpanel"><ThinkingOrb state="connecting" size={64} theme={orb} /><div className="loadtxt">Connecting to market data…</div></div>}
-
-      {!loading && customDesk && (
-        <StockDesk
-          list={customDesk.list}
-          idx={customDesk.idx}
-          targetDate={report?.target_date}
-          holding={holdings.find(h => h.symbol === customDesk.pick.symbol)}
-          onSelect={i => setCustomDesk(c => c ? { ...c, idx: i, pick: c.list[i] } : null)}
-          onBack={() => setCustomDesk(null)}
-          onSaveHolding={saveHolding}
-          onRemoveHolding={removeHolding}
-          backLabel={customDesk.backLabel || "All Stocks"}
-        />
-      )}
-
-      {!loading && !customDesk && tab === 'picks' && opened && <StockDesk list={picks} idx={openIdx!} targetDate={report?.target_date}
-        holding={holdings.find(h => h.symbol === opened.symbol)}
-        onSelect={setOpenIdx} onBack={() => setOpenIdx(null)}
-        onSaveHolding={saveHolding} onRemoveHolding={removeHolding} />}
-
-      {!loading && !customDesk && tab === 'portfolio' && <Portfolio holdings={holdings} picks={picks}
-        onOpen={openFromPortfolio} onRemove={removeHolding} onAddAll={addAllPicks} onEditShares={editShares} />}
-
-      {!loading && !customDesk && tab === 'picks' && !opened && <>
-        <dl className="kpis panel">
-          <div><dt>Universe</dt><dd className="num">{sc.universe?.toLocaleString('en-IN') ?? '—'}</dd><dd className="s">NSE {report?.universe_counts?.nse?.toLocaleString('en-IN') ?? '—'} · BSE {report?.universe_counts?.bse?.toLocaleString('en-IN') ?? '—'}</dd></div>
-          <div><dt>With official data</dt><dd className="num">{sc.with_data?.toLocaleString('en-IN') ?? '—'}</dd><dd className="s">NSE {sc.nse_with_data?.toLocaleString('en-IN') ?? '—'} · BSE {sc.bse_with_data?.toLocaleString('en-IN') ?? '—'}</dd></div>
-          <div><dt>Liquid stocks</dt><dd className="num">{sc.liquid?.toLocaleString('en-IN') ?? '—'}</dd><dd className="s">Passed ₹50L/day traded value</dd></div>
-          <div><dt>Deep-backtested</dt><dd className="num">{sc.stage2 ?? '—'}</dd><dd className="s">ML + walk-forward tested</dd></div>
-          <div><dt>Quality-passed</dt><dd className="num">{sc.quality_passed ?? '—'}</dd><dd className="s">Beat the naive baseline</dd></div>
-        </dl>
-
-        {regime && regime.regime !== 'unknown' && <div className={`banner regime ${regime.regime}`} role="status">
-          {regime.regime === 'bull' ? <TrendUp size={18} weight="bold" /> : regime.regime === 'bear' ? <TrendDown size={18} weight="bold" /> : <Gauge size={18} weight="bold" />}
-          <span className="regime-name">{regime.regime} regime</span>
-          <span className="regime-txt">
-            NIFTY <b className="num">{inr(regime.nifty_close)}</b> is <b className={`num ${(regime.nifty_vs_200dma_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>{pct(regime.nifty_vs_200dma_pct)}</b> vs its 200-DMA
-            {regime.nifty_vs_50dma_pct != null && <> and <b className={`num ${regime.nifty_vs_50dma_pct >= 0 ? 'pos' : 'neg'}`}>{pct(regime.nifty_vs_50dma_pct)}</b> vs the 50-DMA</>}
-            {regime.vix != null && <> · India VIX <b className="num">{regime.vix}</b>{regime.vix_change_5d_pct != null && <span className="num"> ({pct(regime.vix_change_5d_pct)} in 5d)</span>}</>}
-          </span>
-          <span className="regime-knobs num">
-            <span title="Maximum picks published in this regime">≤{regime.max_picks} picks</span>
-            <span title="Position size multiplier from India VIX">size ×{regime.size_mult}</span>
-            {regime.stop_widen > 1 && <span title="Stops widened by this factor for volatility">stops ×{regime.stop_widen}</span>}
-            {regime.cash_pct > 0 && <span title="Share of budget kept in cash">{Math.round(regime.cash_pct * 100)}% cash</span>}
-          </span>
-        </div>}
-        {scanNote && <div className="banner ok"><CheckCircle size={18} weight="bold" /> <span>{scanNote}</span><button className="iconbtn" aria-label="Dismiss" onClick={() => setScanNote('')}><X size={14} weight="bold" /></button></div>}
-        {scan && !scan.running && scan.stage === 'failed' && <div className="banner bad">
-          <Warning size={18} weight="bold" />
-          <span>The last scan finished without producing a new report.</span>
-          <button className="btn dark" onClick={startScan}><MagnifyingGlass size={15} weight="bold" /> Retry: Scan Market</button>
-        </div>}
-        {scanState}
-
-        <div className="cols">
-          <section className="panel picklist" aria-label="This week's picks">
-            <div className="panel-head">
-              <h3>This week's picks</h3>
-              {picks.length > 0 && <div className="summary num">
-                <span>Avg predicted <b className={(avgRet ?? 0) >= 0 ? 'pos' : 'neg'}>{pct(avgRet)}</b></span>
-                <span>Avg backtest accuracy <b>{avgAcc == null ? '—' : num(avgAcc) + '%'}</b></span>
-              </div>}
-            </div>
-            <div className="pl-head" aria-hidden="true">
-              <span>#</span><span>Stock</span><span>90-day</span><span className="r">Now → Predicted</span><span className="r">Return</span><span className="r">Score</span><span>Backtest acc.</span><span />
-            </div>
-            {picks.length === 0 ? <div className="emptystate">
-              <ThinkingOrb state={scan?.running ? 'searching' : 'breathing'} size={64} theme={orb} />
-              <h4>{scan?.running ? 'Picks are being computed' : 'No picks yet'}</h4>
-              <p>{scan?.running
-                ? 'A scan is running now. The new set of 5-7 picks is published here automatically when it finishes.'
-                : <>The weekly pipeline writes the first report here after its run, or press <b>Scan Market</b>.</>}</p>
-              {!scan?.running && <button className="btn dark" onClick={startScan}><MagnifyingGlass size={15} weight="bold" /> Scan Market</button>}
-            </div> : <ol className="pl-rows">
-              {picks.map((p, i) => {
-                const up = (p.predicted_return_pct ?? 0) >= 0
-                return <li key={p.symbol + i}>
-                  <button className="pl-row" onClick={() => setOpenIdx(i)} aria-label={`Open analysis for ${p.name}`}>
-                    <span className="rk num">{i + 1}</span>
-                    <span className="id">
-                      <b>{p.name}</b>
-                      <span className="meta">
-                        <span className="num">{p.symbol} · {p.exchange}</span>
-                        {p.quality_pass && <span className="tag pass"><CheckCircle size={12} weight="bold" /> Quality pass</span>}
-                        {p.simulation && <span className="tag"><DiceFive size={12} weight="bold" /> {p.simulation.win_probability_pct}% win odds</span>}
-                        {p.news?.veto && <span className="tag neg"><Warning size={12} weight="bold" /> News veto</span>}
-                        {p.earnings_in_window && <span className="tag warn" title={`Results on ${p.earnings_date}`}><Warning size={12} weight="bold" /> Results {p.earnings_date}</span>}
-                        {p.sector && <span className="tag">{p.sector}</span>}
-                      </span>
-                    </span>
-                    <MiniSpark symbol={p.symbol} exchange={p.exchange} />
-                    <span className="px num r">{inr(p.current_price)}<span className="to">{inr(p.predicted_price)}</span></span>
-                    <span className="ret r"><span className={`retpill sm num ${up ? 'up' : 'dn'}`}>{pct(p.predicted_return_pct)}</span></span>
-                    <span className="score num r">{p.trader_score == null ? '—' : Math.round(p.trader_score)}</span>
-                    <AccMeter v={p.backtest?.best_dir_acc} />
-                    <CaretRight className="chev" size={16} weight="bold" aria-hidden="true" />
-                  </button>
-                </li>
-              })}
-            </ol>}
-          </section>
-
-          <aside className="side">
-            <section className="panel side-sec">
-              <h3><CurrencyInr size={16} weight="bold" /> Your budget</h3>
-              <p className="hint">Set a budget and every pick gets whole-share counts that fit it.</p>
-              <label className="fieldlbl" htmlFor="budget">Budget in rupees</label>
-              <div className="budgetrow">
-                <input id="budget" type="number" min="0" placeholder="e.g. 50000" value={budget} onChange={e => setBudget(e.target.value)} />
-                <button className="btn" disabled={savingBudget} onClick={() => saveBudget(budget === '' ? null : Number(budget))}>{savingBudget ? <span className="orbinline"><ThinkingOrb state="working" size={20} theme={orb} />Saving…</span> : 'Save budget'}</button>
-                {savedBudget != null && <button className="btn ghost" disabled={savingBudget} onClick={() => { setBudget(''); saveBudget(null) }}>Clear</button>}
+          <Suspense fallback={null}><Backdrop energy={scan?.running ? 1 : 0} theme={theme} /></Suspense>
+          <div className="hero-in">
+            {tab === 'portfolio' && <div className="hero-title">
+              <h2>Portfolio</h2>
+              <p>Your holdings from MarketMind picks, valued at the latest official close.</p>
+            </div>}
+            {tab === 'analyser' && !customDesk && <div className="hero-title">
+              <h2>TradeAnalyser · Institutional Committee</h2>
+              <p>Tauric Research TradingAgents framework: 5-department multi-agent debate, risk audit, and CIO decree for top predicted stocks.</p>
+            </div>}
+            {tab === 'shortterm' && !customDesk && <div className="hero-title">
+              <h2>Multibagger Compounders</h2>
+              <p>The Divi's Lab discovery engine: ₹500 Cr – ₹30,000 Cr companies with 10Y compounding &amp; 5x–50x expansion runway.</p>
+            </div>}
+            {tab === 'picks' && !opened && !customDesk && <>
+              <div className="hero-title">
+                <h2>Prediction week <span className="num">{report?.run_date || '—'} <ArrowRight size={20} weight="bold" aria-hidden="true" /> {report?.target_date || '—'}</span></h2>
+                <p>7-day horizon · prices as of {report?.data_as_of || '—'} · {picks.length} {picks.length === 1 ? 'pick' : 'picks'} published</p>
               </div>
-              {a ? <div className="allocgrid">
-                <div className="ag"><div className="k">Invested</div><div className="v num">{inr(a.total_invested)}</div></div>
-                <div className="ag"><div className="k">Leftover</div><div className="v num">{inr(a.leftover)}</div></div>
-                <div className="ag"><div className="k">Expected value</div><div className="v num">{inr(a.expected_value)}</div></div>
-                <div className="ag"><div className="k">Expected profit</div><div className="v num pos">{inr(a.expected_profit)}</div></div>
-                {a.risk_inr != null && <div className="ag"><div className="k">Risk per trade</div><div className="v num">{inr(a.risk_inr)}<span className="s"> · {a.risk_pct}% × {a.size_mult ?? 1}</span></div></div>}
-                {a.cash_reserve > 0 && <div className="ag"><div className="k">Cash reserve</div><div className="v num">{inr(a.cash_reserve)}</div></div>}
-              </div> : <div className="note">No budget set. Picks are ranked only. Set a budget to see share counts.</div>}
-              {a && <p className="hint" style={{ marginTop: 10 }}>Shares are sized so each pick risks the same rupees between entry and stop (ATR risk sizing), capped at 30% per pick{a.cash_reserve > 0 ? ` with ${inr(a.cash_reserve)} held back for the regime` : ''}.</p>}
-            </section>
-
-            <section className="panel side-sec">
-              <h3><MagnifyingGlass size={16} weight="bold" /> Scan the market</h3>
-              <p className="hint">Re-scans all ~7,987 NSE + BSE stocks on official exchange (Bhavcopy) data, deep-backtests the top 150, checks fundamentals &amp; news, then publishes a fresh set of 5-7 picks here automatically.</p>
-            </section>
-
-            {(vetoed.length > 0 || demoted.length > 0 || simRejected.length > 0 || survVetoed.length > 0 || earningsSkipped.length > 0 || sectorCapped.length > 0) && <section className="panel side-sec veto-sec">
-              <h3><ShieldWarning size={17} weight="bold" /> Excluded by safety &amp; simulation checks</h3>
-              {survVetoed.slice(0, 8).map((s: any, i: number) => <div className="vetocard" key={'sv' + i}>
-                <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">SURVEILLANCE</span></div>
-                <div className="vr">Under exchange surveillance: <b>{s.reason}</b>. Never swing-traded — 100% margin, T2T settlement or tight circuits.</div>
-              </div>)}
-              {survVetoed.length > 8 && <div className="note">+{survVetoed.length - 8} more surveillance-listed stocks vetoed before deep analysis.</div>}
-              {earningsSkipped.map((s: any, i: number) => <div className="vetocard" key={'e' + i}>
-                <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">RESULTS IN WINDOW</span></div>
-                <div className="vr">Earnings on <b className="num">{s.earnings_date}</b> fall inside the holding window — a coin-flip gap event. Skipped because enough clean picks were available.</div>
-              </div>)}
-              {sectorCapped.map((s: any, i: number) => <div className="vetocard" key={'sc' + i}>
-                <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">SECTOR CAP</span></div>
-                <div className="vr">Third pick in <b>{s.sector}</b> — capped at 2 per sector so the portfolio is not one sector bet.</div>
-              </div>)}
-              {simRejected.map((s: any, i: number) => <div className="vetocard" key={'sim' + i}>
-                <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">MONTE CARLO VETO</span></div>
-                <div className="vr">Blocked by Time Machine: <b>Stop-loss risk ({s.risk}%) exceeds win odds ({s.win_odds ?? 0}%)</b> across 1,000 historical replays. Excluded to protect capital from high stop-out rates.</div>
-              </div>)}
-              {vetoed.map((v, i) => <div className="vetocard" key={'v' + i}>
-                <div className="vt">{v.name} <span className="chip exch">{v.symbol} · {v.exchange}</span> <span className="chip neg">NEWS VETO</span></div>
-                <div className="vr">Blocked headline: <b>“{v.reason}”</b>. This stock passed the technical screen (predicted {pct(v.predicted_return_pct)}) but was excluded because of severe negative news.</div>
-              </div>)}
-              {demoted.map((v, i) => <div className="vetocard" key={'d' + i}>
-                <div className="vt">{v.name} <span className="chip exch">{v.symbol} · {v.exchange}</span> <span className="chip neg">RED-FLAG DEMOTED</span></div>
-                <div className="vr">Excluded on fundamentals: {(v.flags || []).join(' · ') || 'Severe debt + shrinking earnings.'}</div>
-              </div>)}
-            </section>}
-          </aside>
-        </div>
-
-        <footer className="disc">How to read this: every pick first had to beat the naive baseline in a walk-forward backtest on its own history; the accuracy shown is measured, not promised. Prices come from official NSE/BSE Bhavcopy data; fundamentals and news are checked before a stock can be picked, and severe news (fraud, default, SEBI action) vetoes it openly above. Predictions are for the target date's close, not guarantees. This is analysis software, not investment advice.</footer>
-      </>}
-
-      {!loading && !customDesk && tab === 'scanned' && <>
-        <dl className="kpis panel four">
-          <div><dt>Universe</dt><dd className="num">{scanned?.stage_counts?.universe?.toLocaleString('en-IN') ?? '—'}</dd></div>
-          <div><dt>With data</dt><dd className="num">{scanned?.stage_counts?.with_data?.toLocaleString('en-IN') ?? '—'}</dd><dd className="s">NSE {scanned?.stage_counts?.nse_with_data?.toLocaleString('en-IN') ?? '—'} · BSE {scanned?.stage_counts?.bse_with_data?.toLocaleString('en-IN') ?? '—'}</dd></div>
-          <div><dt>Liquid</dt><dd className="num">{scanned?.stage_counts?.liquid?.toLocaleString('en-IN') ?? '—'}</dd></div>
-          <div><dt>Deep-evaluated</dt><dd className="num">{scanned?.stage_counts?.stage2 ?? '—'}</dd></div>
-        </dl>
-        <section className="panel">
-          {scanned === null && <div className="loadpanel inline"><ThinkingOrb state="working" size={64} theme={orb} /><div className="loadtxt">Loading scanned stocks…</div></div>}
-          <div className="tabletools">
-            <label className="search">
-              <MagnifyingGlass size={16} weight="bold" aria-hidden="true" />
-              <input placeholder="Search symbol or company…" aria-label="Search symbol or company" value={query} onChange={e => setQuery(e.target.value)} />
-            </label>
-            <span className="mut">Top {scannedRows.length} liquid stocks by trader score · click any row to generate 5-day prediction</span>
+              <div className="hero-actions" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                <button className="scanbtn" disabled={!!scan?.running} onClick={() => startScan(false)}>{scan?.running
+                  ? <span className="orbinline"><ThinkingOrb state="working" size={20} theme={orb === 'light' ? 'dark' : 'light'} />Scanning…</span>
+                  : <><MagnifyingGlass size={17} weight="bold" /> Scan Market</>}</button>
+                <button
+                  className="btn"
+                  onClick={() => startScan(true)}
+                  title="Clear today's saved picks & stage-1 checkpoint and run a fresh scratch scan from Batch 0"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 16px', fontWeight: 600 }}
+                >
+                  <Lightning size={16} weight="bold" /> Fresh Scratch Scan
+                </button>
+              </div>
+            </>}
+            {tab === 'scanned' && !customDesk && <div className="hero-title">
+              <h2>All scanned stocks</h2>
+              <p className="num">Run {scanned?.run_date || '—'} · target {scanned?.target_date || '—'}</p>
+            </div>}
+            {tab === 'backtest' && !customDesk && <div className="hero-title">
+              <h2>Backtest Engine · Model Validation</h2>
+              <p>1-Year historical weekly replay of the machine learning prediction engine. 100% quantitative proof with hit rates and max drawdown.</p>
+            </div>}
+            {tab === 'history' && !historyDesk && <div className="hero-title">
+              <h2>Past weeks</h2>
+              <p>Every scan date is kept, tracked against live and actual prices.</p>
+            </div>}
           </div>
-          <div className="tablewrap"><table><thead><tr>
-            <th>#</th>
-            <th className="sortable" onClick={() => sortBy('symbol')}>Stock{arrow('symbol')}</th>
-            <th>Exchange</th>
-            <th className="sortable" onClick={() => sortBy('current_price')}>Price{arrow('current_price')}</th>
-            <th className="sortable" onClick={() => sortBy('trader_score')}>Trader score{arrow('trader_score')}</th>
-            <th className="sortable" onClick={() => sortBy('delivery_pct')}>Delivery %{arrow('delivery_pct')}</th>
-            <th className="sortable" onClick={() => sortBy('rsi')}>RSI{arrow('rsi')}</th>
-            <th className="sortable" onClick={() => sortBy('ret21_pct')}>21-day return{arrow('ret21_pct')}</th>
-            <th>Top reasons</th>
-            <th>5D Forecast</th>
-          </tr></thead>
-            <tbody>{scannedRows.map((s: any, i: number) => <tr key={i} className="clickable-row" onClick={() => openStockPrediction(s.symbol, s.exchange, s.name)} title={`Click to generate 5-day ML prediction & chart for ${s.symbol}`}>
-              <td className="num">{i + 1}</td>
-              <td><b>{s.symbol}</b><div className="rowname">{s.name}</div></td>
-              <td>{s.exchange}</td><td className="num">{inr(s.current_price)}</td>
-              <td className="num"><span className="scorebar"><i style={{ width: `${s.trader_score}%` }} /></span>{s.trader_score}</td>
-              <td className="num">{s.delivery_pct == null ? '—' : num(s.delivery_pct) + '%'}</td>
-              <td className="num">{s.rsi}</td>
-              <td className={`num ${s.ret21_pct >= 0 ? 'pos' : 'neg'}`}>{pct(s.ret21_pct)}</td>
-              <td className="reasonscell">{(s.reasons || []).join(' · ')}</td>
-              <td><span className="view-chart-btn sm">Predict 5D ↗</span></td>
-            </tr>)}</tbody></table></div>
-          {scanned !== null && scannedRows.length === 0 && <div className="emptystate sm"><p>{query || globalSearch ? 'No stocks match this search.' : 'No scan results yet. Run a market scan to populate this table.'}</p></div>}
         </section>
-      </>}
 
-      {!loading && tab === 'history' && historyDesk && (
-        <StockDesk
-          list={historyDesk.list}
-          idx={historyDesk.idx}
-          targetDate={historyDesk.targetDate}
-          holding={holdings.find(h => h.symbol === historyDesk.list[historyDesk.idx]?.symbol)}
-          onSelect={i => setHistoryDesk(h => h ? { ...h, idx: i } : null)}
-          onBack={() => setHistoryDesk(null)}
-          onSaveHolding={saveHolding}
-          onRemoveHolding={removeHolding}
-          backLabel="Past Weeks"
-        />
-      )}
+        <main className="page">
+          {loading && <div className="panel loadpanel"><ThinkingOrb state="connecting" size={64} theme={orb} /><div className="loadtxt">Connecting to market data…</div></div>}
 
-      {!loading && tab === 'history' && !historyDesk && <>
-        {history === null && <div className="panel loadpanel"><ThinkingOrb state="working" size={64} theme={orb} /><div className="loadtxt">Loading past weeks &amp; live prices…</div></div>}
-        {track && <section className="panel trackrec" aria-label="Live track record">
-          <div className="panel-head">
-            <h3><ChartLineUp size={16} weight="bold" /> Track record <span className="mut">· settled picks, after 0.3% round-trip costs</span></h3>
-            <span className="mut num" style={{ fontSize: 12 }}>{track.n ?? 0} trades · {track.weeks_settled ?? 0} of {track.weeks_total ?? 0} weeks settled</span>
-          </div>
-          {!track.n ? <div className="note" style={{ margin: '0 20px 18px' }}>No settled picks yet. The track record fills in once a week's target date has passed and official closes are in.</div>
-          : <dl className="kpis six">
-            <div><dt>Hit rate</dt><dd className={`num ${track.win_rate_pct >= 50 ? 'pos' : 'neg'}`}>{num(track.win_rate_pct)}%</dd><dd className="s">net positive after costs{track.direction_hit_rate_pct != null ? ` · direction ${num(track.direction_hit_rate_pct)}%` : ''}</dd></div>
-            <div><dt>Expectancy</dt><dd className={`num ${(track.expectancy_R ?? 0) >= 0 ? 'pos' : 'neg'}`}>{track.expectancy_R == null ? '—' : `${track.expectancy_R >= 0 ? '+' : ''}${track.expectancy_R.toFixed(2)}R`}</dd><dd className="s">per trade, in stop-distance units · target &gt; +0.15R</dd></div>
-            <div><dt>Profit factor</dt><dd className={`num ${(track.profit_factor ?? 0) >= 1.3 ? 'pos' : (track.profit_factor ?? 0) < 1 ? 'neg' : ''}`}>{track.profit_factor == null ? '∞' : num(track.profit_factor)}</dd><dd className="s">gross wins ÷ gross losses · target &gt; 1.4</dd></div>
-            <div><dt>Payoff ratio</dt><dd className={`num ${(track.payoff_ratio ?? 0) >= 1.3 ? 'pos' : ''}`}>{track.payoff_ratio == null ? '∞' : num(track.payoff_ratio)}</dd><dd className="s">avg win {pct(track.avg_win_pct)} ÷ avg loss {pct(-track.avg_loss_pct)}</dd></div>
-            <div><dt>Net avg return</dt><dd className={`num ${(track.avg_return_net_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>{pct(track.avg_return_net_pct)}</dd><dd className="s">gross {pct(track.avg_return_gross_pct)} · worst streak {track.max_consecutive_losses} losses</dd></div>
-            <div><dt>By regime</dt>
-              <dd className="num regsplit">
-                <span className="regchip bull" title="NIFTY above its 200-DMA on entry day">Bull {track.by_regime?.bull ? `${num(track.by_regime.bull.win_rate_pct)}% · ${pct(track.by_regime.bull.avg_return_net_pct)}` : '—'}</span>
-                <span className="regchip bear" title="NIFTY below its 200-DMA on entry day">Bear {track.by_regime?.bear ? `${num(track.by_regime.bear.win_rate_pct)}% · ${pct(track.by_regime.bear.avg_return_net_pct)}` : '—'}</span>
-              </dd>
-              <dd className="s">hit rate · net return{track.by_regime?.bull && track.by_regime?.bear ? ` (${track.by_regime.bull.n} / ${track.by_regime.bear.n} trades)` : ''}</dd>
-            </div>
-          </dl>}
-        </section>}
-        {history !== null && (history?.weeks || []).length === 0 && <div className="panel emptystate">
-          <ThinkingOrb state="breathing" size={64} theme={orb} />
-          <h4>No past weeks yet</h4>
-          <p>History builds up as each Monday run completes and target dates pass.</p>
-        </div>}
-        {(history?.weeks || []).map((w: any, i: number) => <section className="panel weekcard" key={i}>
-          <div className="panel-head">
-            <h3>
-              <span className="num">Week of {w.run_date} <ArrowRight size={13} weight="bold" aria-hidden="true" /> target {w.target_date}</span>
-              <span className="live-badge-indicator"><span className="live-pulse-dot" /> Live Market Tracking</span>
-            </h3>
-            <span className="mut" style={{ fontSize: 12 }}>Click any stock row to open full price chart &amp; 5-day performance breakdown</span>
-          </div>
-          <div className="tablewrap"><table><thead><tr>
-            <th>Stock</th>
-            <th>Was</th>
-            <th style={{ textAlign: 'right' }}>Live Price</th>
-            <th>Predicted</th>
-            <th>Predicted %</th>
-            <th>Actual</th>
-            <th>Actual %</th>
-            <th>Result</th>
-            <th>5D Chart</th>
-          </tr></thead>
-            <tbody>{w.picks.map((p: any, j: number) => {
-              const done = p.actual_price != null || p.actual_return_pct != null
-              const hit = done && Math.sign(p.actual_return_pct) === Math.sign(p.predicted_return_pct)
-              const livePrice = p.live_price ?? p.current_price
-              const liveReturn = p.live_return_pct ?? (p.current_price && livePrice ? ((livePrice - p.current_price) / p.current_price) * 100 : null)
-              return <tr
-                key={j}
-                className="hist-row clickable"
-                onClick={() => setHistoryDesk({ list: w.picks, idx: j, targetDate: w.target_date })}
-                title={`Click to view chart and 5-day price breakdown for ${p.symbol}`}
-              >
-                <td>
-                  <b>{p.symbol}</b>
-                  {p.exchange && <span className="chip exch sm">{p.exchange}</span>}
-                  {p.name && <div className="rowname">{p.name}</div>}
-                </td>
-                <td className="num">{inr(p.current_price)}</td>
-                <td className="num">
-                  <div className="live-price-cell">
-                    <span className="live-price-val num">{inr(done ? p.actual_price : livePrice)}</span>
-                    {(done ? p.actual_return_pct : liveReturn) != null && (
-                      <span className={`live-ret-pill ${(done ? p.actual_return_pct : liveReturn) >= 0 ? 'pos' : 'neg'}`}>
-                        {pct(done ? p.actual_return_pct : liveReturn)}
-                      </span>
-                    )}
+          {!loading && customDesk && (
+            <StockDesk
+              list={customDesk.list}
+              idx={customDesk.idx}
+              targetDate={report?.target_date}
+              holding={holdings.find(h => h.symbol === customDesk.pick.symbol)}
+              onSelect={i => setCustomDesk(c => c ? { ...c, idx: i, pick: c.list[i] } : null)}
+              onBack={() => setCustomDesk(null)}
+              onSaveHolding={saveHolding}
+              onRemoveHolding={removeHolding}
+              onPredict={customDesk.pick?.predicted_price == null
+                ? () => openStockPrediction(customDesk.pick.symbol, customDesk.pick.exchange, customDesk.pick.name, customDesk.backLabel)
+                : undefined}
+              backLabel={customDesk.backLabel || "All Stocks"}
+            />
+          )}
+
+          {!loading && !customDesk && tab === 'picks' && opened && <StockDesk list={picks} idx={openIdx!} targetDate={report?.target_date}
+            holding={holdings.find(h => h.symbol === opened.symbol)}
+            onSelect={setOpenIdx} onBack={() => setOpenIdx(null)}
+            onSaveHolding={saveHolding} onRemoveHolding={removeHolding} />}
+
+          {!loading && !customDesk && tab === 'portfolio' && <Portfolio holdings={holdings} picks={picks}
+            onOpen={openFromPortfolio} onRemove={removeHolding} onAddAll={addAllPicks} onEditShares={editShares} />}
+
+          {!loading && !customDesk && tab === 'shortterm' && (
+            <ShortTerm
+              report={shortTermReport}
+              scanState={shortTermScan}
+              onStartScan={startShortTermScan}
+              onOpenStock={(sym, exch, name) => openStockPrediction(sym, exch, name)}
+              onSaveHolding={saveHolding}
+              holdings={holdings}
+            />
+          )}
+
+          {!loading && !customDesk && tab === 'analyser' && (
+            <TradeAnalyser
+              onOpenStock={(sym, exch, name) => openStockPrediction(sym, exch, name)}
+              onOpenChart={(sym, exch, name, price) => openStockChart(sym, exch, name, 'Offline Screen', price)}
+              onSaveHolding={saveHolding}
+              holdings={holdings}
+            />
+          )}
+
+          {!loading && !customDesk && tab === 'backtest' && (
+            <BacktestView />
+          )}
+
+          {!loading && !customDesk && tab === 'sectors' && (
+            <SectorHeatmap />
+          )}
+
+          {!loading && !customDesk && tab === 'picks' && !opened && <>
+            <dl className="kpis panel">
+              <div><dt>Universe</dt><dd className="num">{sc.universe?.toLocaleString('en-IN') ?? '—'}</dd><dd className="s">NSE {report?.universe_counts?.nse?.toLocaleString('en-IN') ?? '—'} · BSE {report?.universe_counts?.bse?.toLocaleString('en-IN') ?? '—'}</dd></div>
+              <div><dt>With official data</dt><dd className="num">{sc.with_data?.toLocaleString('en-IN') ?? '—'}</dd><dd className="s">NSE {sc.nse_with_data?.toLocaleString('en-IN') ?? '—'} · BSE {sc.bse_with_data?.toLocaleString('en-IN') ?? '—'}</dd></div>
+              <div><dt>Liquid stocks</dt><dd className="num">{sc.liquid?.toLocaleString('en-IN') ?? '—'}</dd><dd className="s">Passed ₹50L/day traded value</dd></div>
+              <div><dt>Deep-backtested</dt><dd className="num">{sc.stage2 ?? '—'}</dd><dd className="s">ML + walk-forward tested</dd></div>
+              <div><dt>Quality-passed</dt><dd className="num">{sc.quality_passed ?? '—'}</dd><dd className="s">Beat the naive baseline</dd></div>
+            </dl>
+
+            {regime && regime.regime !== 'unknown' && <div className={`banner regime ${regime.regime}`} role="status">
+              {regime.regime === 'bull' ? <TrendUp size={18} weight="bold" /> : regime.regime === 'bear' ? <TrendDown size={18} weight="bold" /> : <Gauge size={18} weight="bold" />}
+              <span className="regime-name">{regime.regime} regime</span>
+              <span className="regime-txt">
+                NIFTY <b className="num">{inr(regime.nifty_close)}</b> is <b className={`num ${(regime.nifty_vs_200dma_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>{pct(regime.nifty_vs_200dma_pct)}</b> vs its 200-DMA
+                {regime.nifty_vs_50dma_pct != null && <> and <b className={`num ${regime.nifty_vs_50dma_pct >= 0 ? 'pos' : 'neg'}`}>{pct(regime.nifty_vs_50dma_pct)}</b> vs the 50-DMA</>}
+                {regime.vix != null && <> · India VIX <b className="num">{regime.vix}</b>{regime.vix_change_5d_pct != null && <span className="num"> ({pct(regime.vix_change_5d_pct)} in 5d)</span>}</>}
+              </span>
+              <span className="regime-knobs num">
+                <span title="Maximum picks published in this regime">≤{regime.max_picks} picks</span>
+                <span title="Position size multiplier from India VIX">size ×{regime.size_mult}</span>
+                {regime.stop_widen > 1 && <span title="Stops widened by this factor for volatility">stops ×{regime.stop_widen}</span>}
+                {regime.cash_pct > 0 && <span title="Share of budget kept in cash">{Math.round(regime.cash_pct * 100)}% cash</span>}
+              </span>
+            </div>}
+            {scanNote && <div className="banner ok">
+              <CheckCircle size={18} weight="bold" />
+              <span>{scanNote}</span>
+              <button className="btn sm" onClick={() => startScan(true)} style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <Lightning size={13} weight="bold" /> Fresh Scratch Scan
+              </button>
+              <button className="iconbtn" aria-label="Dismiss" onClick={() => setScanNote('')}><X size={14} weight="bold" /></button>
+            </div>}
+            {scan && !scan.running && scan.stage === 'failed' && <div className="banner bad">
+              <Warning size={18} weight="bold" />
+              <span>The last scan finished without producing a new report.</span>
+              <button className="btn dark" onClick={() => startScan(true)}><Lightning size={15} weight="bold" /> Retry: Fresh Scratch Scan</button>
+            </div>}
+            {scanState}
+
+            <div className="cols">
+              <section className="panel picklist" aria-label="This week's picks">
+                <div className="panel-head">
+                  <h3>This week's picks</h3>
+                  {picks.length > 0 && <div className="summary num">
+                    <span>Avg predicted <b className={(avgRet ?? 0) >= 0 ? 'pos' : 'neg'}>{pct(avgRet)}</b></span>
+                    <span>Avg backtest accuracy <b>{avgAcc == null ? '—' : num(avgAcc) + '%'}</b></span>
+                    {report?.market_breadth_pct != null && <span>Breadth <b>{report.market_breadth_pct}%</b></span>}
+                  </div>}
+                </div>
+                <div className="pl-head" aria-hidden="true">
+                  <span>#</span><span>Stock</span><span>90-day</span><span className="r">Now → Predicted</span><span className="r">Return</span><span className="r">Score</span><span>Backtest acc.</span><span />
+                </div>
+                {picks.length === 0 ? <div className="emptystate">
+                  <ThinkingOrb state={scan?.running ? 'searching' : 'breathing'} size={64} theme={orb} />
+                  <h4>{scan?.running ? 'Picks are being computed' : report?.no_trade ? 'No trade this week' : 'No picks yet'}</h4>
+                  <p>{scan?.running
+                    ? 'A scan is running now. Picks that pass every trade rule are published here automatically when it finishes.'
+                    : report?.no_trade
+                      ? <>{report.no_trade_reason} Staying in cash is a valid position.{report.market_breadth_pct != null && <> Market breadth: <b className="num">{report.market_breadth_pct}%</b> of liquid stocks above their 50-DMA.</>}</>
+                      : <>The weekly pipeline writes the first report here after its run, or press <b>Scan Market</b>.</>}</p>
+                  {!scan?.running && !report?.no_trade && <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <button className="btn dark" onClick={() => startScan(false)}><MagnifyingGlass size={15} weight="bold" /> Scan Market</button>
+                    <button className="btn" onClick={() => startScan(true)}><Lightning size={15} weight="bold" /> Fresh Scratch Scan</button>
+                  </div>}
+                  {!scan?.running && report?.no_trade && <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 12 }}>
+                    <button className="btn dark" onClick={() => startScan(true)}><Lightning size={15} weight="bold" /> Fresh Scratch Scan</button>
+                  </div>}
+                </div> : <ol className="pl-rows">
+                  {picks.map((p, i) => {
+                    const up = (p.predicted_return_pct ?? 0) >= 0
+                    const gainPerShare = (p.predicted_price != null && p.current_price != null) ? Math.round((p.predicted_price - p.current_price) * 100) / 100 : null
+                    return <li key={p.symbol + i}>
+                      <button className="pl-row" onClick={() => setOpenIdx(i)} aria-label={`Open analysis for ${p.name}`}>
+                        <span className="rk num">{i + 1}</span>
+                        <span className="id">
+                          <b>{p.name}</b>
+                          <span className="meta">
+                            <span className="num">{p.symbol} · {p.exchange}</span>
+                            {p.quality_pass && <span className="tag pass"><CheckCircle size={12} weight="bold" /> Quality pass</span>}
+                            {gainPerShare != null && gainPerShare > 0 && <span className="tag pass num" title="Predicted 5-day gain per share">+{inr(gainPerShare)}/sh</span>}
+                            {p.shares != null && p.shares > 0 && <span className="tag num" style={{ background: 'rgba(255, 94, 26, 0.14)', color: 'var(--accent)', borderColor: 'rgba(255, 94, 26, 0.35)', fontWeight: 700 }} title="Budget whole-share allocation">{p.shares} sh · {inr(p.invested)}{p.expected_profit != null ? ` (+${inr(p.expected_profit)})` : ''}</span>}
+                            {p.simulation && <span className="tag" title="Chance of hitting Target 1 within 5 days; most other trades end at the time exit"><DiceFive size={12} weight="bold" /> {p.simulation.win_probability_pct}% target odds</span>}
+                            {p.rs21_pct != null && <span className={`tag ${p.rs21_pct >= 0 ? 'pass' : 'neg'}`} title="21-day return minus NIFTY">RS {p.rs21_pct >= 0 ? '+' : ''}{p.rs21_pct}%</span>}
+                            {p.news?.veto && <span className="tag neg"><Warning size={12} weight="bold" /> News veto</span>}
+                            {p.earnings_in_window && <span className="tag warn" title={`Results on ${p.earnings_date}`}><Warning size={12} weight="bold" /> Results {p.earnings_date}</span>}
+                            {p.sector && <span className="tag">{p.sector}</span>}
+                          </span>
+                        </span>
+                        <MiniSpark symbol={p.symbol} exchange={p.exchange} />
+                        <span className="px num r">{inr(p.live_price ?? p.current_price)}<span className="to">{p.quality_pass === false ? 'No edge' : inr(p.predicted_price)}</span></span>
+                        <span className="ret r">{p.quality_pass === false ? <span className="mut">No edge</span> : <span className={`retpill sm num ${up ? 'up' : 'dn'}`}>{pct(p.predicted_return_pct)}</span>}</span>
+                        <span className="score num r">{p.trader_score == null ? '—' : Math.round(p.trader_score)}</span>
+                        <AccMeter v={p.backtest?.best_dir_acc} />
+                        <CaretRight className="chev" size={16} weight="bold" aria-hidden="true" />
+                      </button>
+                    </li>
+                  })}
+                </ol>}
+              </section>
+
+              <aside className="side">
+                <section className="panel side-sec">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <h3 style={{ margin: 0 }}><CurrencyInr size={16} weight="bold" /> Your budget</h3>
+                    <button
+                      type="button"
+                      className="btn sm ghost"
+                      onClick={() => setShowBudgetModal(true)}
+                      style={{ padding: '3px 8px', fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 700 }}
+                      title="Click to open Budget Settings Page (stock price limits & min profit)"
+                    >
+                      <Gear size={13} weight="bold" />
+                      <span>Rules ⚙</span>
+                    </button>
                   </div>
-                </td>
-                <td className="num">{inr(p.predicted_price)}</td>
-                <td><PctBar val={p.predicted_return_pct} /></td>
-                <td className="num">{done ? inr(p.actual_price) : <span className="mut">Pending</span>}</td>
-                <td>{done ? <PctBar val={p.actual_return_pct} /> : <span className="mut">—</span>}</td>
-                <td><span className={`hitmiss ${done ? (hit ? 'hit' : 'miss') : 'pend'}`}>{done ? (hit ? 'HIT' : 'MISS') : 'PENDING'}</span></td>
-                <td>
-                  <span className="view-chart-btn">Graph &amp; 5D ↗</span>
-                </td>
-              </tr>
-            })}</tbody></table></div>
-        </section>)}
-      </>}
-    </main>
-  </div>
-</div></ThemeCtx.Provider>)
+                  <p className="hint">Set your budget (e.g. ₹5,000 or ₹10,000) to automatically select the top 5 quality-passed stocks in that price range and size whole shares.</p>
+
+                  <button
+                    type="button"
+                    className="btn sm"
+                    onClick={() => setShowBudgetModal(true)}
+                    style={{ width: '100%', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'var(--navy)', color: '#fff', padding: '7px 10px', fontWeight: 700 }}
+                    title="Open settings to configure stock ceilings (No Heavy) and min profit"
+                  >
+                    <SlidersHorizontal size={14} weight="bold" />
+                    <span>Open Budget &amp; Stock Rules Page</span>
+                  </button>
+
+                  <div className="note" style={{ marginBottom: 10, fontSize: 11.5, background: 'rgba(10, 25, 49, 0.04)', borderColor: 'rgba(10, 25, 49, 0.12)' }}>
+                    <b>Active Rules:</b> {screenRules?.price_cap_mode === 'no_heavy' ? 'No Heavy (≤ ₹2,500)' : screenRules?.price_cap_mode === 'moderate' ? 'Moderate (≤ ₹4,500 - No Ultra-Heavy)' : 'Uncapped'} · Min Profit ≥ ₹{screenRules?.min_profit_inr ?? 100}
+                    <button
+                      type="button"
+                      onClick={() => setShowBudgetModal(true)}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent)', textDecoration: 'underline', cursor: 'pointer', padding: '0 4px', fontWeight: 700 }}
+                    >
+                      Change ↗
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+                    {[5000, 10000, 25000, 50000, 100000].map(preset => (
+                      <button
+                        key={preset}
+                        type="button"
+                        className={`btn sm ${savedBudget === preset ? 'dark' : 'ghost'}`}
+                        disabled={savingBudget}
+                        onClick={() => { setBudget(String(preset)); saveBudget(preset) }}
+                        style={{ padding: '4px 9px', fontSize: 12, fontWeight: 700 }}
+                      >
+                        ₹{preset >= 100000 ? '1L' : `${preset / 1000}k`}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="fieldlbl" htmlFor="budget">Budget in rupees</label>
+                  <div className="budgetrow">
+                    <input id="budget" type="number" min="0" placeholder="e.g. 10000" value={budget} onChange={e => setBudget(e.target.value)} />
+                    <button className="btn" disabled={savingBudget} onClick={() => saveBudget(budget === '' ? null : Number(budget))}>{savingBudget ? <span className="orbinline"><ThinkingOrb state="working" size={20} theme={orb} />Saving…</span> : 'Save budget'}</button>
+                    {savedBudget != null && <button className="btn ghost" disabled={savingBudget} onClick={() => { setBudget(''); saveBudget(null) }}>Clear</button>}
+                  </div>
+                  {a && a.price_band_max != null && (
+                    <div className="note" style={{ marginTop: 8, marginBottom: 4, fontWeight: 600 }}>
+                      Active Range: Top 5 stocks priced <b>{inr(a.price_band_min || 100)} – {inr(a.price_band_max)}</b> for your <b>{inr(a.budget_inr)}</b> budget.
+                    </div>
+                  )}
+                  {a ? <div className="allocgrid">
+                    <div className="ag"><div className="k">Invested</div><div className="v num">{inr(a.total_invested)}</div></div>
+                    <div className="ag"><div className="k">Leftover</div><div className="v num">{inr(a.leftover)}</div></div>
+                    <div className="ag"><div className="k">Expected value</div><div className="v num">{inr(a.expected_value)}</div></div>
+                    <div className="ag"><div className="k">Expected profit</div><div className="v num pos">{inr(a.expected_profit)}</div></div>
+                    {a.risk_inr != null && <div className="ag"><div className="k">Avg stop risk / pick</div><div className="v num">{inr(a.risk_inr)}</div></div>}
+                    {a.cash_reserve > 0 && <div className="ag"><div className="k">Cash reserve</div><div className="v num">{inr(a.cash_reserve)}</div></div>}
+                  </div> : <div className="note">No budget set — showing High-Ticket Institutional Movers (₹100–₹1,000+ per share). Set a budget (e.g. ₹5k or ₹10k) to switch to stocks in that range.</div>}
+                  {a && <p className="hint" style={{ marginTop: 10 }}>All 5 picks are selected inside your budget's price range and allocated in whole shares so total invested stays within {inr(a.budget_inr)}.</p>}
+                </section>
+
+                <section className="panel side-sec">
+                  <h3><MagnifyingGlass size={16} weight="bold" /> Scan the market</h3>
+                  <p className="hint">Re-scans all ~7,987 NSE + BSE stocks on official exchange (Bhavcopy) data, deep-backtests the top 150, checks fundamentals, news, relative strength and market breadth, then publishes only the stocks that pass every trade rule. Some weeks that is zero.</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+                    <button className="btn dark sm" disabled={!!scan?.running} onClick={() => startScan(true)}>
+                      <Lightning size={14} weight="bold" /> Fresh Scratch Scan
+                    </button>
+                    <button className="btn ghost sm" disabled={!!scan?.running} onClick={clearTodayPicks}>
+                      Remove Today's Picks
+                    </button>
+                  </div>
+                </section>
+
+                {(vetoed.length > 0 || demoted.length > 0 || simRejected.length > 0 || survVetoed.length > 0 || earningsSkipped.length > 0 || sectorCapped.length > 0) && <section className="panel side-sec veto-sec">
+                  <h3><ShieldWarning size={17} weight="bold" /> Excluded by safety &amp; simulation checks</h3>
+                  {survVetoed.slice(0, 8).map((s: any, i: number) => <div className="vetocard" key={'sv' + i}>
+                    <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">SURVEILLANCE</span></div>
+                    <div className="vr">Under exchange surveillance: <b>{s.reason}</b>. Never swing-traded — 100% margin, T2T settlement or tight circuits.</div>
+                  </div>)}
+                  {survVetoed.length > 8 && <div className="note">+{survVetoed.length - 8} more surveillance-listed stocks vetoed before deep analysis.</div>}
+                  {earningsSkipped.map((s: any, i: number) => <div className="vetocard" key={'e' + i}>
+                    <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">RESULTS IN WINDOW</span></div>
+                    <div className="vr">Earnings on <b className="num">{s.earnings_date}</b> fall inside the holding window — a coin-flip gap event. Skipped because enough clean picks were available.</div>
+                  </div>)}
+                  {sectorCapped.map((s: any, i: number) => <div className="vetocard" key={'sc' + i}>
+                    <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">SECTOR CAP</span></div>
+                    <div className="vr">Third pick in <b>{s.sector}</b> — capped at 2 per sector so the portfolio is not one sector bet.</div>
+                  </div>)}
+                  {simRejected.map((s: any, i: number) => <div className="vetocard" key={'sim' + i}>
+                    <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">MONTE CARLO VETO</span></div>
+                    <div className="vr">Blocked by Time Machine: <b>Stop-loss risk ({s.risk}%) exceeds win odds ({s.win_odds ?? 0}%)</b> across 1,000 historical replays. Excluded to protect capital from high stop-out rates.</div>
+                  </div>)}
+                  {vetoed.map((v, i) => <div className="vetocard" key={'v' + i}>
+                    <div className="vt">{v.name} <span className="chip exch">{v.symbol} · {v.exchange}</span> <span className="chip neg">NEWS VETO</span></div>
+                    <div className="vr">Blocked headline: <b>“{v.reason}”</b>. This stock passed the technical screen (predicted {pct(v.predicted_return_pct)}) but was excluded because of severe negative news.</div>
+                  </div>)}
+                  {demoted.map((v, i) => <div className="vetocard" key={'d' + i}>
+                    <div className="vt">{v.name} <span className="chip exch">{v.symbol} · {v.exchange}</span> <span className="chip neg">RED-FLAG DEMOTED</span></div>
+                    <div className="vr">Excluded on fundamentals: {(v.flags || []).join(' · ') || 'Severe debt + shrinking earnings.'}</div>
+                  </div>)}
+                </section>}
+              </aside>
+            </div>
+
+            <footer className="disc">How to read this: every pick first had to beat the naive baseline in a walk-forward backtest on its own history; the accuracy shown is measured, not promised. Prices come from official NSE/BSE Bhavcopy data; fundamentals and news are checked before a stock can be picked, and severe news (fraud, default, SEBI action) vetoes it openly above. Predictions are for the target date's close, not guarantees. This is analysis software, not investment advice.</footer>
+          </>}
+
+          {!loading && !customDesk && tab === 'scanned' && <>
+            <dl className="kpis panel four">
+              <div><dt>Universe</dt><dd className="num">{scanned?.stage_counts?.universe?.toLocaleString('en-IN') ?? '—'}</dd></div>
+              <div><dt>With data</dt><dd className="num">{scanned?.stage_counts?.with_data?.toLocaleString('en-IN') ?? '—'}</dd><dd className="s">NSE {scanned?.stage_counts?.nse_with_data?.toLocaleString('en-IN') ?? '—'} · BSE {scanned?.stage_counts?.bse_with_data?.toLocaleString('en-IN') ?? '—'}</dd></div>
+              <div><dt>Liquid</dt><dd className="num">{scanned?.stage_counts?.liquid?.toLocaleString('en-IN') ?? '—'}</dd></div>
+              <div><dt>Deep-evaluated</dt><dd className="num">{scanned?.stage_counts?.stage2 ?? '—'}</dd></div>
+            </dl>
+            <section className="panel">
+              {scanned === null && <div className="loadpanel inline"><ThinkingOrb state="working" size={64} theme={orb} /><div className="loadtxt">Loading scanned stocks…</div></div>}
+              <div className="tabletools">
+                <label className="search">
+                  <MagnifyingGlass size={16} weight="bold" aria-hidden="true" />
+                  <input placeholder="Search symbol or company…" aria-label="Search symbol or company" value={query} onChange={e => setQuery(e.target.value)} />
+                </label>
+                <span className="mut">Top {scannedRows.length} liquid stocks by trader score · click any row to generate 5-day prediction</span>
+              </div>
+              <div className="tablewrap"><table><thead><tr>
+                <th>#</th>
+                <th className="sortable" onClick={() => sortBy('symbol')}>Stock{arrow('symbol')}</th>
+                <th>Exchange</th>
+                <th className="sortable" onClick={() => sortBy('current_price')}>Price{arrow('current_price')}</th>
+                <th className="sortable" onClick={() => sortBy('trader_score')}>Trader score{arrow('trader_score')}</th>
+                <th className="sortable" onClick={() => sortBy('delivery_pct')}>Delivery %{arrow('delivery_pct')}</th>
+                <th className="sortable" onClick={() => sortBy('rsi')}>RSI{arrow('rsi')}</th>
+                <th className="sortable" onClick={() => sortBy('ret21_pct')}>21-day return{arrow('ret21_pct')}</th>
+                <th>Top reasons</th>
+                <th>5D Forecast</th>
+              </tr></thead>
+                <tbody>{scannedRows.map((s: any, i: number) => <tr key={i} className="clickable-row" onClick={() => openStockPrediction(s.symbol, s.exchange, s.name)} title={`Click to generate 5-day ML prediction & chart for ${s.symbol}`}>
+                  <td className="num">{i + 1}</td>
+                  <td><b>{s.symbol}</b><div className="rowname">{s.name}</div></td>
+                  <td>{s.exchange}</td><td className="num">{inr(s.current_price)}</td>
+                  <td className="num"><span className="scorebar"><i style={{ width: `${s.trader_score}%` }} /></span>{s.trader_score}</td>
+                  <td className="num">{s.delivery_pct == null ? '—' : num(s.delivery_pct) + '%'}</td>
+                  <td className="num">{s.rsi}</td>
+                  <td className={`num ${s.ret21_pct >= 0 ? 'pos' : 'neg'}`}>{pct(s.ret21_pct)}</td>
+                  <td className="reasonscell">{(s.reasons || []).join(' · ')}</td>
+                  <td><span className="view-chart-btn sm">Predict 5D ↗</span></td>
+                </tr>)}</tbody></table></div>
+              {scanned !== null && scannedRows.length === 0 && <div className="emptystate sm"><p>{query || globalSearch ? 'No stocks match this search.' : 'No scan results yet. Run a market scan to populate this table.'}</p></div>}
+            </section>
+          </>}
+
+          {!loading && tab === 'history' && historyDesk && (
+            <StockDesk
+              list={historyDesk.list}
+              idx={historyDesk.idx}
+              targetDate={historyDesk.targetDate}
+              holding={holdings.find(h => h.symbol === historyDesk.list[historyDesk.idx]?.symbol)}
+              onSelect={i => setHistoryDesk(h => h ? { ...h, idx: i } : null)}
+              onBack={() => setHistoryDesk(null)}
+              onSaveHolding={saveHolding}
+              onRemoveHolding={removeHolding}
+              backLabel="Past Weeks"
+            />
+          )}
+
+          {!loading && tab === 'history' && !historyDesk && <>
+            {history === null && <div className="panel loadpanel"><ThinkingOrb state="working" size={64} theme={orb} /><div className="loadtxt">Loading past weeks &amp; live prices…</div></div>}
+            {track && <section className="panel trackrec" aria-label="Live track record">
+              <div className="panel-head">
+                <h3><ChartLineUp size={16} weight="bold" /> Track record <span className="mut">· settled picks, after 0.3% round-trip costs</span></h3>
+                <span className="mut num" style={{ fontSize: 12 }}>{track.n ?? 0} trades · {track.scans_settled ?? track.weeks_settled ?? 0} of {track.scans_total ?? track.weeks_total ?? 0} scans settled</span>
+              </div>
+              {!track.n ? <div className="note" style={{ margin: '0 20px 18px' }}>No settled picks yet. The track record fills in once a week's target date has passed and official closes are in.</div>
+                : <dl className="kpis six">
+                  <div><dt>Hit rate</dt><dd className={`num ${track.win_rate_pct >= 50 ? 'pos' : 'neg'}`}>{num(track.win_rate_pct)}%</dd><dd className="s">net positive after costs{track.direction_hit_rate_pct != null ? ` · direction ${num(track.direction_hit_rate_pct)}%` : ''}</dd></div>
+                  <div><dt>Expectancy</dt><dd className={`num ${(track.expectancy_R ?? 0) >= 0 ? 'pos' : 'neg'}`}>{track.expectancy_R == null ? '—' : `${track.expectancy_R >= 0 ? '+' : ''}${track.expectancy_R.toFixed(2)}R`}</dd><dd className="s">per trade, in stop-distance units · target &gt; +0.15R</dd></div>
+                  <div><dt>Profit factor</dt><dd className={`num ${(track.profit_factor ?? 0) >= 1.3 ? 'pos' : (track.profit_factor ?? 0) < 1 ? 'neg' : ''}`}>{track.profit_factor == null ? '∞' : num(track.profit_factor)}</dd><dd className="s">gross wins ÷ gross losses · target &gt; 1.4</dd></div>
+                  <div><dt>Payoff ratio</dt><dd className={`num ${(track.payoff_ratio ?? 0) >= 1.3 ? 'pos' : ''}`}>{track.payoff_ratio == null ? '∞' : num(track.payoff_ratio)}</dd><dd className="s">avg win {pct(track.avg_win_pct)} ÷ avg loss {pct(-track.avg_loss_pct)}</dd></div>
+                  <div><dt>Net avg return</dt><dd className={`num ${(track.avg_return_net_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>{pct(track.avg_return_net_pct)}</dd><dd className="s">gross {pct(track.avg_return_gross_pct)} · worst streak {track.max_consecutive_losses} losses</dd></div>
+                  <div><dt>By regime</dt>
+                    <dd className="num regsplit">
+                      <span className="regchip bull" title="NIFTY above its 200-DMA on entry day">Bull {track.by_regime?.bull ? `${num(track.by_regime.bull.win_rate_pct)}% · ${pct(track.by_regime.bull.avg_return_net_pct)}` : '—'}</span>
+                      <span className="regchip bear" title="NIFTY below its 200-DMA on entry day">Bear {track.by_regime?.bear ? `${num(track.by_regime.bear.win_rate_pct)}% · ${pct(track.by_regime.bear.avg_return_net_pct)}` : '—'}</span>
+                    </dd>
+                    <dd className="s">hit rate · net return{track.by_regime?.bull && track.by_regime?.bear ? ` (${track.by_regime.bull.n} / ${track.by_regime.bear.n} trades)` : ''}</dd>
+                  </div>
+                </dl>}
+            </section>}
+            {history !== null && (history?.weeks || []).length === 0 && <div className="panel emptystate">
+              <ThinkingOrb state="breathing" size={64} theme={orb} />
+              <h4>No past scans yet</h4>
+              <p>Each completed scan is stored by date and shows up here.</p>
+            </div>}
+            {history !== null && (history?.weeks || []).length > 0 && <section className="panel scan-dates" aria-label="Recent scanned dates">
+              <div className="panel-head">
+                <h3>Recent scanned dates</h3>
+                <span className="mut" style={{ fontSize: 12 }}>{history.weeks.length} saved scans</span>
+              </div>
+              <div className="scan-date-row">
+                {history.weeks.map((w: any) => <button
+                  key={w.run_date}
+                  type="button"
+                  className="scan-date-chip"
+                  onClick={() => document.getElementById(`scan-${w.run_date}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                >
+                  <span className="num">{formatScanDate(w.run_date)}</span>
+                  <span className="mut">{w.picks?.length || 0} picks · target {formatScanDate(w.target_date)}</span>
+                </button>)}
+              </div>
+            </section>}
+            {(history?.weeks || []).map((w: any) => <section className="panel weekcard" id={`scan-${w.run_date}`} key={w.run_date}>
+              <div className="panel-head">
+                <h3>
+                  <span className="num">Scanned {formatScanDate(w.run_date)} <ArrowRight size={13} weight="bold" aria-hidden="true" /> target {formatScanDate(w.target_date)}</span>
+                  <span className="live-badge-indicator"><span className="live-pulse-dot" /> Live Market Tracking</span>
+                </h3>
+                <span className="mut" style={{ fontSize: 12 }}>Click any stock row to open full price chart &amp; 5-day performance breakdown</span>
+              </div>
+              <div className="tablewrap"><table><thead><tr>
+                <th>Stock</th>
+                <th>Was</th>
+                <th style={{ textAlign: 'right' }}>Live Price</th>
+                <th>Predicted</th>
+                <th>Predicted %</th>
+                <th>Close on target date</th>
+                <th>Trade exit</th>
+                <th>Exit %</th>
+                <th>Result</th>
+                <th>5D Chart</th>
+              </tr></thead>
+                <tbody>{w.picks.map((p: any, j: number) => {
+                  const done = p.actual_price != null || p.actual_return_pct != null
+                  const hit = done && Math.sign(p.actual_return_pct) === Math.sign(p.predicted_return_pct)
+                  const quoted = histQuotes[p.symbol]
+                  const livePrice = quoted ?? p.live_price ?? p.current_price
+                  const liveReturn = p.current_price && livePrice != null
+                    ? ((livePrice - p.current_price) / p.current_price) * 100
+                    : p.live_return_pct
+                  const deskList = w.picks.map((row: any) => {
+                    const q = histQuotes[row.symbol]
+                    if (q == null || !row.current_price) return row
+                    return { ...row, live_price: q, live_return_pct: ((q - row.current_price) / row.current_price) * 100 }
+                  })
+                  return <tr
+                    key={j}
+                    className="hist-row clickable"
+                    onClick={() => setHistoryDesk({ list: deskList, idx: j, targetDate: w.target_date })}
+                    title={`Click to view chart and 5-day price breakdown for ${p.symbol}`}
+                  >
+                    <td>
+                      <b>{p.symbol}</b>
+                      {p.exchange && <span className="chip exch sm">{p.exchange}</span>}
+                      {p.name && <div className="rowname">{p.name}</div>}
+                    </td>
+                    <td className="num">{inr(p.current_price)}</td>
+                    <td className="num">
+                      <div className="live-price-cell">
+                        <span className="live-price-val num">{inr(livePrice)}</span>
+                        {liveReturn != null && (
+                          <span className={`live-ret-pill ${liveReturn >= 0 ? 'pos' : 'neg'}`}>
+                            {pct(liveReturn)}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="num">{inr(p.predicted_price)}</td>
+                    <td title={liveReturn != null && liveReturn < 0 ? 'Forecast was up, but the live price is below the scan price' : 'Forecast return from the scan price'}>
+                      <PctBar val={p.predicted_return_pct} up={liveReturn == null ? undefined : liveReturn >= 0} />
+                    </td>
+                    <td className="num">{p.end_close_price != null
+                      ? <>{inr(p.end_close_price)} <span className={p.end_close_return_pct >= 0 ? 'pos' : 'neg'} style={{ fontSize: 11 }}>{pct(p.end_close_return_pct)}</span></>
+                      : <span className="mut" style={{ fontSize: 11 }}>{w.target_date && new Date(w.target_date) < new Date() ? 'Awaiting data' : `Settles ${formatScanDate(w.target_date)}`}</span>}</td>
+                    <td className="num">{done ? <>{inr(p.actual_price)}{p.exit_reason && <div className="mut" style={{ fontSize: 10.5 }}>{({ stop: 'Stop-loss hit', stop_gap: 'Gapped below stop', target: 'Target hit', target_gap: 'Gapped above target', time: 'Time exit' } as Record<string, string>)[p.exit_reason] || p.exit_reason}</div>}</> : <span className="mut" style={{ fontSize: 11 }}>Pending</span>}</td>
+                    <td>{done ? <PctBar val={p.actual_return_pct} /> : <span className="mut" style={{ fontSize: 11.5, color: 'var(--mut)' }}>Live Tracking</span>}</td>
+                    <td><span className={`hitmiss ${done ? (hit ? 'hit' : 'miss') : 'pend'}`}>{done ? (hit ? 'HIT' : 'MISS') : 'LIVE'}</span></td>
+                    <td>
+                      <span className="view-chart-btn">Graph &amp; 5D ↗</span>
+                    </td>
+                  </tr>
+                })}</tbody></table></div>
+            </section>)}
+          </>}
+        </main>
+      </div>
+
+      <BudgetSettingsModal
+        open={showBudgetModal}
+        onClose={() => setShowBudgetModal(false)}
+        onRulesSaved={load}
+        initialRules={screenRules}
+      />
+    </div></ThemeCtx.Provider >)
 }

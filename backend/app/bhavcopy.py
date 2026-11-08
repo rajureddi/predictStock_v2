@@ -34,11 +34,11 @@ def raw_path(exchange, d):
 
 def _fetch(url):
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/csv,*/*"})
-    with urllib.request.urlopen(req, timeout=45) as r:
+    with urllib.request.urlopen(req, timeout=6) as r:
         return r.read().decode("utf-8-sig", "ignore")
 
 
-def download_day(exchange, d, retries=1):
+def download_day(exchange, d, retries=0):
     """Fetch one day's bhavcopy. Returns 'ok' | 'missing' | 'exists'."""
     p = raw_path(exchange, d)
     if p.exists():
@@ -226,6 +226,16 @@ def build_panels(universe, log=print):
 def top_up(months_back=14, log=print):
     """Fetch any missing recent daily files for both exchanges and rebuild
     the panels if anything new arrived. Never raises."""
+    meta_f = HIST / "panel_meta.json"
+    stamp_f = HIST / "last_top_up.txt"
+    today_iso = date.today().isoformat()
+    if meta_f.exists() and stamp_f.exists():
+        try:
+            if stamp_f.read_text(encoding="utf-8").strip() == today_iso:
+                log(f"[bhavcopy] already checked today ({today_iso})")
+                return None
+        except Exception:
+            pass
     try:
         from app import universe as univ_mod
         uni = univ_mod.load_universe()
@@ -240,7 +250,11 @@ def top_up(months_back=14, log=print):
             new_total += got
         except Exception as e:
             log(f"[bhavcopy] top-up {ex} failed: {e}")
-    meta_f = HIST / "panel_meta.json"
+    try:
+        HIST.mkdir(parents=True, exist_ok=True)
+        stamp_f.write_text(today_iso, encoding="utf-8")
+    except Exception:
+        pass
     if new_total or not meta_f.exists():
         try:
             return build_panels(uni, log=log)

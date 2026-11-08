@@ -17,7 +17,8 @@ sys.path.insert(0, str(ROOT / "backend"))
 from app.pipeline import run_pipeline
 
 if __name__ == "__main__":
-    r = run_pipeline()
+    fresh_flag = "--fresh" in sys.argv
+    r = run_pipeline(log=lambda *a, **k: print(*a, **k, flush=True), fresh=fresh_flag)
     print(f"\n=== MarketMind Pro — week of {r['run_date']} -> target {r['target_date']} ===")
     print(f"Universe {r['universe_counts']} | stages {r['stage_counts']}")
     for p in r["picks"]:

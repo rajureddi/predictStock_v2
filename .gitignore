@@ -19,3 +19,12 @@ data/reports/*.log
 data/reports/stage1_checkpoint.json
 data/reports/scan_state.json
 data/reports/scan.pid
+# Daily scans live in SQLite, not one JSON file per day.
+data/reports/report-*.json
+data/reports/reports.db
+data/reports/reports.db-wal
+data/reports/reports.db-shm
+
+# Local AI and private configs
+data/ai_config.json
+data/*_cache.json

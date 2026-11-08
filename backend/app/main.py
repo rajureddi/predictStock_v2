@@ -2,6 +2,7 @@ import json, sys
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
@@ -14,19 +15,41 @@ app = FastAPI(title="MarketMind Pro", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 REPORTS = ROOT / "data" / "reports"
 
+@app.on_event("startup")
+def _warm_price_panels():
+    import threading
+    from app import datafeed
+    threading.Thread(target=datafeed.warm_panels, daemon=True).start()
+
 def _latest():
+    from app import report_store
+    report = report_store.latest_report()
+    if report:
+        return report
     f = REPORTS / "latest.json"
     if not f.exists(): return None
     return json.loads(f.read_text(encoding="utf-8"))
 
 def _with_allocation(report):
     if report is None: return None
-    budget = pl.get_budget()
-    picks = list(report.get("picks", []))
+    rules = pl.get_screen_rules()
+    budget = rules.get("budget_inr")
     regime = report.get("market_regime") or {}
+    want = int(regime.get("max_picks") or 5)
+    pool = report.get("candidate_pool")
+    if pool:
+        picks = pl.select_picks_for_budget(pool, budget_inr=budget, want=max(want, 5), rules=rules)
+    else:
+        picks = [dict(p) for p in report.get("picks", [])]
     alloc = allocate(picks, budget, size_mult=regime.get("size_mult", 1.0) or 1.0,
-                     cash_pct=regime.get("cash_pct", 0.0) or 0.0) if budget else None
-    report = dict(report); report["allocation"] = alloc
+                     cash_pct=regime.get("cash_pct", 0.0) or 0.0, budget_mode=True) if budget else None
+    if alloc and budget:
+        s_min, s_max = pl.budget_price_band(budget, want=max(want, 5))
+        alloc["price_band_min"] = s_min
+        alloc["price_band_max"] = s_max
+    report = dict(report)
+    report["allocation"] = alloc
+    report["screen_rules"] = rules
     if alloc:
         for i, p in enumerate(picks):
             if i < len(alloc["allocations"]):
@@ -34,7 +57,33 @@ def _with_allocation(report):
                 p = dict(p); p.update(shares=a["shares"], invested=a["invested"], expected_value=a["expected_value"],
                                       expected_profit=a["expected_profit"], risk_inr=a.get("risk_inr"))
                 picks[i] = p
-        report["picks"] = picks
+    else:
+        for i, p in enumerate(picks):
+            p = dict(p)
+            for k in ("shares", "invested", "expected_value", "expected_profit", "risk_inr"):
+                p.pop(k, None)
+            picks[i] = p
+
+    # Attach live market quotes to every pick
+    symbols = [p["symbol"] for p in picks if p.get("symbol")]
+    ex_hints = {p["symbol"]: p.get("exchange", "NSE") for p in picks if p.get("symbol")}
+    try:
+        quotes = get_live_quotes(symbols, ex_hints)
+    except Exception:
+        quotes = {}
+
+    updated_picks = []
+    for p in picks:
+        p = dict(p)
+        sym = p.get("symbol")
+        cp = p.get("current_price")
+        live = quotes.get(sym) or cp
+        if live:
+            p["live_price"] = live
+            p["live_return_pct"] = round(((live - cp) / cp) * 100, 2) if cp else 0.0
+        updated_picks.append(p)
+
+    report["picks"] = updated_picks
     return report
 
 @app.get("/api/health")
@@ -46,7 +95,15 @@ def universe():
     d = u.load_universe(); return {"counts": d["counts"], "source_nse": d["source_nse"], "source_bse": d["source_bse"]}
 
 @app.post("/api/scan/start")
-def scan_start(): return scan_mod.start_scan()
+def scan_start(fresh: bool = False):
+    if fresh:
+        _PREDICT_CACHE.clear()
+    return scan_mod.start_scan(fresh=fresh)
+
+@app.post("/api/scan/reset-today")
+def scan_reset_today():
+    _PREDICT_CACHE.clear()
+    return scan_mod.reset_today_predictions()
 
 @app.get("/api/scan/status")
 def scan_status(): return scan_mod.get_status()
@@ -69,17 +126,50 @@ def get_simulation(symbol: str, exchange: str = "NSE", replays: int = 1000):
 @app.get("/api/picks/latest")
 def latest(): return _with_allocation(_latest()) or {"picks": [], "note": "No run yet — run scripts/weekly_run.py"}
 
+@app.get("/api/sectors/heatmap")
+def sectors_heatmap(refresh: bool = False):
+    from app import sector_strength, sectors as sectors_mod
+    data = dict(sector_strength.get_sector_strength(force=refresh))
+    rep = _latest() or {}
+    picks = rep.get("picks", [])
+    cache = sectors_mod._load()
+    out = []
+    for p in picks:
+        idx = p.get("sector_index")
+        if not idx:
+            from app.simulation import resolve_yahoo_ticker
+            info = (cache.get(resolve_yahoo_ticker(p)) or {}).get("data") or {}
+            idx = sector_strength.map_sector(p.get("sector") or info.get("sector"), p.get("industry") or info.get("industry"))
+        out.append(dict(symbol=p.get("symbol"), name=p.get("name"), sector=p.get("sector"), sector_index=idx))
+    data["picks"] = out
+    return data
+
+class BacktestRunIn(BaseModel):
+    from_date: Optional[str] = None
+    to_date: Optional[str] = None
+    weeks: Optional[int] = 52
+    top_picks: Optional[int] = 5
+
 @app.get("/api/backtest")
 def backtest_summary():
-    """Latest offline portfolio backtest (scripts/backtest_portfolio.py) with
-    transaction costs and the NIFTY 200-DMA regime split."""
-    f = REPORTS / "backtest_summary.json"
-    if not f.exists():
-        return {"available": False, "note": "Run backend/scripts/backtest_portfolio.py to generate data/reports/backtest_summary.json"}
-    try:
-        d = json.loads(f.read_text(encoding="utf-8")); d["available"] = True; return d
-    except Exception as e:
-        return {"available": False, "error": str(e)}
+    from app import backtest_engine
+    return backtest_engine.get_backtest_results()
+
+@app.post("/api/backtest/start")
+def backtest_start(body: BacktestRunIn):
+    from app import backtest_engine
+    started = backtest_engine.start_background_backtest(
+        from_date=body.from_date,
+        to_date=body.to_date,
+        weeks=body.weeks or 52,
+        top_picks=body.top_picks or 5
+    )
+    return {"started": started, "message": "Backtest started" if started else "Already running"}
+
+@app.get("/api/backtest/status")
+def backtest_status():
+    from app import backtest_engine
+    return backtest_engine.get_backtest_status()
 
 @app.get("/api/scanned")
 def scanned():
@@ -225,6 +315,7 @@ def predict_stock(symbol: str, exchange: str = "NSE"):
     if not ts or not fc:
         return {"error": f"Could not compute forecast model for {symbol}"}
 
+    from app import trade_rules
     m = ts["metrics"]
     pick = dict(
         symbol=match["symbol"],
@@ -234,19 +325,27 @@ def predict_stock(symbol: str, exchange: str = "NSE"):
         isin=match.get("isin"),
         current_price=round(m["price"], 2),
         trader_score=ts["score"],
+        setup_type=m.get("setup_type"),
         reasons=ts["reasons"],
         patterns=m["patterns"],
         support=m["support"],
         resistance=m["resistance"],
         high52=m["high52"],
+        atr=round(m["atr"], 2),
         stop_loss=m["stop_loss"],
+        breakeven_at=m.get("breakeven_at"),
+        breakeven_stop=m.get("breakeven_stop"),
         target=m["target1"],
         target2=m["target2"],
         risk_reward=m["risk_reward"],
         rsi=round(m["rsi"], 1),
         adx=round(m["adx"], 1),
+        vcp_ratio=m.get("vcp_ratio"),
+        clv=m.get("clv"),
         delivery_pct=m.get("delivery_pct"),
+        dvr=m.get("dvr"),
         volume_ratio=round(m["vol_ratio"], 2),
+        **trade_rules.relative_strength(df["Close"], nc),
         **fc
     )
     try:
@@ -262,26 +361,60 @@ _LIVE_CACHE = {}
 
 def _resolve_yahoo_map(symbols: list[str], exchange_hints: dict[str, str] | None = None) -> dict[str, str]:
     exchange_hints = exchange_hints or {}
-    uni_by_pair = {}
+    out = {}
     uni_by_sym = {}
+    yahoo_by_sym_ex = {}
     try:
         from app import universe as u
         for l in u.load_universe().get("listings", []):
-            sym, ex, yh = l.get("symbol"), l.get("exchange"), l.get("yahoo")
-            if sym and yh:
-                uni_by_pair[(sym, ex)] = yh
-                if sym not in uni_by_sym:
-                    uni_by_sym[sym] = yh
+            sym, ex = l.get("symbol"), l.get("exchange")
+            if sym and sym not in uni_by_sym:
+                uni_by_sym[sym] = "BSE" if ex == "BSE" else "NSE"
+            if sym and l.get("yahoo"):
+                yahoo_by_sym_ex.setdefault((sym, "BSE" if ex == "BSE" else "NSE"), l["yahoo"])
     except Exception:
         pass
-    out = {}
+
     for s in symbols:
-        ex = exchange_hints.get(s)
-        yh = (uni_by_pair.get((s, ex)) if ex else None) or uni_by_pair.get((s, "NSE")) or uni_by_pair.get((s, "BSE")) or uni_by_sym.get(s)
-        if not yh:
-            yh = f"{s}.BO" if ex == "BSE" else f"{s}.NS"
-        out[s] = yh
+        ex = exchange_hints.get(s) or uni_by_sym.get(s) or "NSE"
+        # BSE listings are stored under their numeric scrip code (e.g. 513262.BO), not the symbol
+        out[s] = (yahoo_by_sym_ex.get((s, ex))
+                  or yahoo_by_sym_ex.get((s, "NSE" if ex == "BSE" else "BSE"))
+                  or (f"{s}.BO" if ex == "BSE" else f"{s}.NS"))
     return out
+
+
+def _expected_session_date():
+    """Last NSE session whose official close should already exist (capped at latest local panel date)."""
+    import datetime
+    from app import datafeed
+    ist = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=5, minutes=30)
+    d = ist.date()
+    if ist.time() < datetime.time(16, 0):
+        d -= datetime.timedelta(days=1)
+    while d.weekday() >= 5:
+        d -= datetime.timedelta(days=1)
+    try:
+        meta_f = datafeed.HIST / "panel_meta.json"
+        if meta_f.exists():
+            meta = json.loads(meta_f.read_text(encoding="utf-8"))
+            lasts = [datetime.date.fromisoformat(v["last"]) for v in meta.values() if v.get("last")]
+            if lasts and d > max(lasts):
+                return max(lasts)
+    except Exception:
+        pass
+    return d
+
+
+def _frame_last_close(df):
+    if df is None or len(df) == 0 or "Close" not in getattr(df, "columns", []):
+        return None, None
+    c = df["Close"].dropna()
+    if not len(c):
+        return None, None
+    idx = c.index[-1]
+    d = idx.date() if hasattr(idx, "date") else None
+    return round(float(c.iloc[-1]), 2), d
 
 
 def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = None) -> dict[str, float]:
@@ -291,7 +424,7 @@ def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = 
     res = {}
     missing = []
     for s in symbols:
-        if s in _LIVE_CACHE and (now - _LIVE_CACHE[s]["ts"] < 120):
+        if s in _LIVE_CACHE and (now - _LIVE_CACHE[s]["ts"] < 60):
             res[s] = _LIVE_CACHE[s]["price"]
         else:
             missing.append(s)
@@ -300,8 +433,10 @@ def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = 
         return res
 
     sym_to_yh = _resolve_yahoo_map(missing, exchange_hints)
+    expected = _expected_session_date()
 
-    # 1. Official Bhavcopy local panel + local cache fallback (covers BSE & NSE reliably)
+    # 1. Official Bhavcopy local panel. Its last row can be a session or two
+    # behind, so the date is kept and a newer Yahoo close replaces it.
     local_latest = {}
     for s in missing:
         yh = sym_to_yh.get(s)
@@ -316,59 +451,45 @@ def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = 
                     df = pd.read_csv(f, index_col=0, parse_dates=True)
                 except Exception:
                     df = None
-        if df is not None and len(df) and "Close" in df:
-            c_ser = df["Close"].dropna()
-            if len(c_ser):
-                local_latest[s] = round(float(c_ser.iloc[-1]), 2)
+        price, asof = _frame_last_close(df)
+        if price:
+            local_latest[s] = (price, asof)
 
-    # 2. Also check latest report prices as secondary fallback
+    # 2. Report prices only when the symbol has no history at all
     r = _latest()
     if r:
         for p in r.get("picks", []) + r.get("stage1_top50", []):
-            sym = p.get("symbol")
-            cp = p.get("current_price")
+            sym, cp = p.get("symbol"), p.get("current_price")
             if sym and cp and sym not in local_latest:
-                local_latest[sym] = round(float(cp), 2)
+                local_latest[sym] = (round(float(cp), 2), None)
 
-    # 3. Try live Yahoo Finance quotes for .NS tickers (or .BO not covered by Bhavcopy)
-    yh_to_sym = {yh: s for s, yh in sym_to_yh.items() if yh and (not yh.endswith(".BO") or s not in local_latest)}
+    # 3. Yahoo for anything missing or older than the last session
+    stale = [s for s in missing if local_latest.get(s, (None, None))[1] is None or local_latest[s][1] < expected]
+    yh_to_sym = {sym_to_yh[s]: s for s in stale if sym_to_yh.get(s)}
+    yahoo_latest = {}
     tickers = list(yh_to_sym.keys())
     if tickers:
         try:
-            import yfinance as yf
-            import pandas as pd
-            df = yf.download(tickers, period="5d", progress=False, timeout=10, threads=True)
-            if df is not None and len(df) and "Close" in df:
-                close_obj = df["Close"]
-                if isinstance(close_obj, pd.Series):
-                    s_clean = close_obj.dropna()
-                    if len(s_clean) and float(s_clean.iloc[-1]) > 0:
-                        sym = yh_to_sym.get(tickers[0])
-                        if sym:
-                            p = round(float(s_clean.iloc[-1]), 2)
-                            _LIVE_CACHE[sym] = {"price": p, "ts": now}
-                            res[sym] = p
-                else:
-                    closes = close_obj.tail(1).to_dict()
-                    for yh, row in closes.items():
-                        sym = yh_to_sym.get(yh)
-                        if not sym:
-                            continue
-                        for _ts, v in row.items():
-                            if v == v and v > 0:
-                                p = round(float(v), 2)
-                                _LIVE_CACHE[sym] = {"price": p, "ts": now}
-                                res[sym] = p
+            yh_frames = datafeed.download_batch(tickers, period="1mo")
+            for yh, df in yh_frames.items():
+                sym = yh_to_sym.get(yh)
+                price, asof = _frame_last_close(df)
+                if sym and price:
+                    yahoo_latest[sym] = (price, asof)
         except Exception:
             pass
 
-    # 4. Fill any symbol not returned by Yahoo from official local Bhavcopy / report fallback
     for s in missing:
-        if s not in res or res[s] is None:
-            fallback = local_latest.get(s)
-            if fallback:
-                _LIVE_CACHE[s] = {"price": fallback, "ts": now}
-                res[s] = fallback
+        local = local_latest.get(s)
+        yahoo = yahoo_latest.get(s)
+        chosen = None
+        if yahoo and (not local or local[1] is None or (yahoo[1] and yahoo[1] >= local[1])):
+            chosen = yahoo[0]
+        elif local:
+            chosen = local[0]
+        if chosen:
+            _LIVE_CACHE[s] = {"price": chosen, "ts": now}
+            res[s] = chosen
     return res
 
 @app.get("/api/live-quotes")
@@ -393,66 +514,81 @@ def market_indices():
     market_open = is_weekday and (datetime.time(9, 15) <= now_time <= datetime.time(15, 30))
 
     data = {
-        "nifty": {"price": 24340.50, "change_pct": 0.42, "name": "NIFTY 50"},
-        "vix": {"price": 14.85, "change_pct": -1.20, "name": "INDIA VIX"},
+        "nifty": {"price": None, "change_pct": None, "name": "NIFTY 50"},
+        "vix": {"price": None, "change_pct": None, "name": "INDIA VIX"},
         "market_open": market_open,
         "cutoff": "15:30 IST",
         "ist_time": ist_now.strftime("%H:%M IST")
     }
 
     try:
-        import yfinance as yf
-        df = yf.download(["^NSEI", "^INDIAVIX"], period="5d", progress=False, timeout=4)
-        if df is not None and "Close" in df and len(df) >= 2:
-            closes = df["Close"]
-            if "^NSEI" in closes:
-                s = closes["^NSEI"].dropna()
-                if len(s) >= 2:
-                    p1, p0 = float(s.iloc[-1]), float(s.iloc[-2])
-                    data["nifty"] = {"price": round(p1, 2), "change_pct": round(((p1 - p0) / p0) * 100, 2), "name": "NIFTY 50"}
-            if "^INDIAVIX" in closes:
-                s = closes["^INDIAVIX"].dropna()
-                if len(s) >= 2:
-                    p1, p0 = float(s.iloc[-1]), float(s.iloc[-2])
-                    data["vix"] = {"price": round(p1, 2), "change_pct": round(((p1 - p0) / p0) * 100, 2), "name": "INDIA VIX"}
+        from app import datafeed
+        idx_frames = datafeed.download_batch(["^NSEI", "^INDIAVIX"], period="1y")
+        nf_df = idx_frames.get("^NSEI")
+        if nf_df is not None and "Close" in nf_df:
+            s = nf_df["Close"].dropna()
+            if len(s) >= 2:
+                p1, p0 = float(s.iloc[-1]), float(s.iloc[-2])
+                data["nifty"] = {"price": round(p1, 2), "change_pct": round(((p1 - p0) / p0) * 100, 2), "name": "NIFTY 50"}
+        vx_df = idx_frames.get("^INDIAVIX")
+        if vx_df is not None and "Close" in vx_df:
+            s = vx_df["Close"].dropna()
+            if len(s) >= 2:
+                p1, p0 = float(s.iloc[-1]), float(s.iloc[-2])
+                data["vix"] = {"price": round(p1, 2), "change_pct": round(((p1 - p0) / p0) * 100, 2), "name": "INDIA VIX"}
     except Exception:
         pass
 
-    _INDICES_CACHE["ts"] = now
-    _INDICES_CACHE["data"] = data
+    if data["nifty"]["price"] is None and _INDICES_CACHE["data"] and _INDICES_CACHE["data"]["nifty"]["price"]:
+        return _INDICES_CACHE["data"]
+    if data["nifty"]["price"] is not None:
+        _INDICES_CACHE["ts"] = now
+        _INDICES_CACHE["data"] = data
     return data
 
 @app.get("/api/history")
 def history():
     import pandas as pd
-    from app import datafeed
+    from app import datafeed, report_store
     out = []
-    reports_data = []
     all_symbols = set()
     ex_hints = {}
-    for f in sorted(REPORTS.glob("report-*.json"), reverse=True):
-        try:
-            r = json.loads(f.read_text(encoding="utf-8"))
-            reports_data.append(r)
-            for p in r.get("picks", []):
-                if p.get("symbol"):
-                    all_symbols.add(p["symbol"])
-                    if p.get("exchange") and p["symbol"] not in ex_hints:
-                        ex_hints[p["symbol"]] = p["exchange"]
-        except Exception:
-            continue
+    # Every scan date is its own row. Collapsing to one ISO week hid later
+    # scans in the same week (2 Nov was dropped once 3 Nov existed).
+    reports_data = report_store.list_reports()
+    for r in reports_data:
+        for p in r.get("picks", []):
+            if p.get("symbol"):
+                all_symbols.add(p["symbol"])
+                if p.get("exchange") and p["symbol"] not in ex_hints:
+                    ex_hints[p["symbol"]] = p["exchange"]
 
-    quotes = get_live_quotes(list(all_symbols), ex_hints) if all_symbols else {}
     sym_to_yh = _resolve_yahoo_map(list(all_symbols), ex_hints) if all_symbols else {}
+    # Official local closes, not a live download. Yahoo can stall this route
+    # long enough that the scanned-date list never renders.
+    quotes = {}
+    for sym, yh in sym_to_yh.items():
+        try:
+            df_h = datafeed.local_history(yh)
+            if df_h is not None and len(df_h):
+                closes = df_h["Close"].dropna()
+                if len(closes):
+                    quotes[sym] = round(float(closes.iloc[-1]), 2)
+        except Exception:
+            pass
     nifty_close = None
     if reports_data:
-        try: nifty_close = datafeed.nifty_close(period="2y")
-        except Exception: nifty_close = None
-    settled_trades = []
+        try:
+            if (datafeed.CACHE / "IDX_NSEI.csv").exists():
+                nifty_close = datafeed.nifty_close(period="2y")
+        except Exception:
+            nifty_close = None
+    settled_by_key = {}
 
     for r in reports_data:
         picks_out = []
         target_dt = r.get("target_date")
+        run_dt_str = r.get("run_date")
         for p in r.get("picks", []):
             sym = p.get("symbol")
             cp = p.get("current_price")
@@ -460,21 +596,57 @@ def history():
             live_ret = round(((live - cp) / cp) * 100, 2) if cp and live else None
             act_price = p.get("actual_price")
             act_ret = p.get("actual_return_pct")
-            # Auto-resolve actual outcome if target_date has been reached in official history
-            if act_price is None and target_dt and sym in sym_to_yh and cp:
+            exit_reason = p.get("exit_reason")
+            nifty_ret = None
+            end_close = end_close_date = end_close_ret = None
+            if target_dt and sym in sym_to_yh and cp:
                 try:
-                    df_h = datafeed.local_history(sym_to_yh[sym])
-                    if df_h is not None and len(df_h):
-                        after = df_h[df_h.index >= pd.Timestamp(target_dt)]
-                        if len(after):
-                            act_price = round(float(after["Close"].iloc[0]), 2)
-                            act_ret = round(((act_price - cp) / cp) * 100, 2)
+                    df_e = datafeed.local_history(sym_to_yh[sym])
+                    if df_e is not None and len(df_e) and df_e.index[-1] >= pd.Timestamp(target_dt):
+                        upto = df_e[df_e.index <= pd.Timestamp(target_dt)]
+                        if len(upto):
+                            end_close = round(float(upto["Close"].iloc[-1]), 2)
+                            end_close_date = str(upto.index[-1].date())
+                            end_close_ret = round((end_close - cp) / cp * 100, 2)
+                        # Always settle by the full trade plan (stop / target / Mooli Salamat breakeven / time exit)
+                        # whenever official OHLC bars cover the holding window, overriding legacy raw-close snapshots.
+                        window = df_e[(df_e.index > pd.Timestamp(run_dt_str)) & (df_e.index <= pd.Timestamp(target_dt))]
+                        if len(window):
+                            atr_est = float(p.get("atr") or (cp * 0.02))
+                            be_at = p.get("breakeven_at") or round(cp + 0.75 * atr_est, 2)
+                            be_stop = p.get("breakeven_stop") or round(cp * 1.0042, 2)
+                            ex = backtest_mod.simulate_exit(
+                                window, cp, p.get("stop_loss"), p.get("target"), len(window),
+                                breakeven_at=be_at, breakeven_stop=be_stop
+                            )
+                            if ex:
+                                act_price = round(float(ex["exit"]), 2)
+                                act_ret = round(((act_price - cp) / cp) * 100, 2)
+                                exit_reason = ex["reason"]
+                except Exception:
+                    pass
+            if act_price is not None and nifty_close is not None and run_dt_str and target_dt:
+                try:
+                    n0 = nifty_close[nifty_close.index <= pd.Timestamp(run_dt_str)]
+                    n1 = nifty_close[nifty_close.index <= pd.Timestamp(target_dt)]
+                    if len(n0) and len(n1):
+                        nifty_ret = round((float(n1.iloc[-1]) / float(n0.iloc[-1]) - 1) * 100, 2)
                 except Exception:
                     pass
             if act_price is not None and cp:
-                reg = backtest_mod.regime_on(nifty_close, r.get("run_date")) if nifty_close is not None and r.get("run_date") else None
+                reg = backtest_mod.regime_on(nifty_close, run_dt_str) if nifty_close is not None and run_dt_str else None
                 t = backtest_mod.trade_from_pick(p, act_price, regime=reg)
-                if t: t["run_date"] = r.get("run_date"); settled_trades.append(t)
+                if t:
+                    t["run_date"] = run_dt_str
+                    # Deduplicate identical symbol within the same ISO week for aggregate track_record
+                    # (keeps the earliest scan of that week while preserving every scan row in `weeks`)
+                    try:
+                        iso = pd.Timestamp(run_dt_str).isocalendar()
+                        dedup_key = (sym, int(iso.year), int(iso.week))
+                    except Exception:
+                        dedup_key = (sym, run_dt_str)
+                    if dedup_key not in settled_by_key or str(run_dt_str) < str(settled_by_key[dedup_key].get("run_date", "")):
+                        settled_by_key[dedup_key] = t
             pick_full = dict(p)
             pick_full.update({
                 "symbol": sym,
@@ -487,6 +659,12 @@ def history():
                 "live_return_pct": live_ret,
                 "actual_price": act_price,
                 "actual_return_pct": act_ret,
+                "exit_reason": exit_reason,
+                "end_close_price": end_close,
+                "end_close_date": end_close_date,
+                "end_close_return_pct": end_close_ret,
+                "nifty_return_pct": nifty_ret,
+                "alpha_pct": round(act_ret - nifty_ret, 2) if act_ret is not None and nifty_ret is not None else None,
                 "run_date": r.get("run_date"),
                 "target_date": target_dt
             })
@@ -495,15 +673,57 @@ def history():
             "run_date": r.get("run_date"),
             "target_date": target_dt,
             "picks": picks_out,
-            "market_regime": r.get("market_regime")
+            "market_regime": r.get("market_regime"),
+            "no_trade": r.get("no_trade", False),
+            "no_trade_reason": r.get("no_trade_reason"),
         })
+    settled_trades = list(settled_by_key.values())
     track = backtest_mod.compute_trade_stats(settled_trades)
+    alphas = [p["alpha_pct"] for w in out for p in w["picks"] if p.get("alpha_pct") is not None]
+    track["avg_alpha_vs_nifty_pct"] = round(sum(alphas) / len(alphas), 2) if alphas else None
+    track["no_trade_weeks"] = sum(1 for w in out if w.get("no_trade"))
     track["weeks_settled"] = len({t["run_date"] for t in settled_trades})
     track["weeks_total"] = len(reports_data)
-    return {"weeks": out, "track_record": track}
+    track["scans_settled"] = track["weeks_settled"]
+    track["scans_total"] = track["weeks_total"]
+    return {
+        "weeks": out,
+        "scanned_dates": [r.get("run_date") for r in reports_data if r.get("run_date")],
+        "track_record": track,
+    }
 
 class BudgetIn(BaseModel):
     budget_inr: float | None = None
+
+class ScreenRulesIn(BaseModel):
+    budget_inr: Optional[float] = None
+    price_cap_mode: Optional[str] = "moderate"
+    min_stock_price: Optional[float] = None
+    max_stock_price: Optional[float] = None
+    min_profit_inr: Optional[float] = 100.0
+    profit_basis: Optional[str] = "auto"
+
+@app.get("/api/screen/rules")
+def get_screen_rules_endpoint():
+    return pl.get_screen_rules()
+
+@app.post("/api/screen/rules")
+def post_screen_rules_endpoint(body: ScreenRulesIn):
+    updates = body.dict(exclude_unset=True)
+    if "budget_inr" in updates and updates["budget_inr"] is not None and updates["budget_inr"] <= 0:
+        updates["budget_inr"] = None
+    cfg = pl.set_screen_rules(updates)
+    try:
+        from app import report_store
+        rep = _latest()
+        if rep and rep.get("candidate_pool"):
+            updated = _with_allocation(rep)
+            if updated:
+                report_store.save_report(updated)
+                (REPORTS / "latest.json").write_text(json.dumps(updated, indent=1, default=str), encoding="utf-8")
+    except Exception:
+        pass
+    return cfg
 
 @app.get("/api/screen/budget")
 def get_budget(): return {"budget_inr": pl.get_budget()}
@@ -511,5 +731,165 @@ def get_budget(): return {"budget_inr": pl.get_budget()}
 @app.post("/api/screen/budget")
 def post_budget(body: BudgetIn):
     v = body.budget_inr
-    if v is not None and v < 0: v = None
-    pl.set_budget(v); return {"budget_inr": pl.get_budget()}
+    if v is not None and v <= 0: v = None
+    pl.set_budget(v)
+    try:
+        from app import report_store
+        rep = _latest()
+        if rep and rep.get("candidate_pool"):
+            updated = _with_allocation(rep)
+            if updated:
+                report_store.save_report(updated)
+                (REPORTS / "latest.json").write_text(json.dumps(updated, indent=1, default=str), encoding="utf-8")
+    except Exception:
+        pass
+    return {"budget_inr": pl.get_budget()}
+
+# ---------- Short-Term Quality Compounders Screener (On-Demand) ----------
+@app.get("/api/short-term/picks")
+def short_term_picks():
+    from app import short_term_screener as sts
+    return sts.get_latest_picks()
+
+@app.post("/api/short-term/start")
+def short_term_start():
+    from app import short_term_screener as sts
+    return sts.trigger_scan()
+
+@app.get("/api/short-term/status")
+def short_term_status():
+    from app import short_term_screener as sts
+    return sts.get_status()
+
+# ---------- TradeAnalyser (TauricResearch/TradingAgents Multi-Agent Committee) ----------
+class TradeAnalyserRunIn(BaseModel):
+    symbol: str
+    exchange: Optional[str] = "NSE"
+    name: Optional[str] = None
+
+@app.get("/api/trade-analyser/candidates")
+def trade_analyser_candidates():
+    from app import trade_analyser as ta
+    candidates = ta.get_top10_candidates()
+    cached = ta.load_cached_reports()
+    for c in candidates:
+        sym = c["symbol"]
+        if sym in cached:
+            c["has_report"] = True
+            c["final_decision"] = cached[sym].get("final_decision")
+            c["conviction_score"] = cached[sym].get("conviction_score")
+            c["target1"] = cached[sym].get("target1")
+            c["stop_loss"] = cached[sym].get("stop_loss")
+        else:
+            c["has_report"] = False
+    return {"candidates": candidates}
+
+@app.post("/api/trade-analyser/analyze")
+def trade_analyser_analyze(body: TradeAnalyserRunIn):
+    from app import trade_analyser as ta
+    try:
+        rep = ta.run_trading_agents_analysis(body.symbol, body.exchange or "NSE", body.name)
+        return ta.sanitize_for_json(rep)
+    except Exception as e:
+        from fastapi.responses import JSONResponse
+        status_code = 400 if "AI Engine Required" in str(e) else 500
+        return JSONResponse(status_code=status_code, content={"error": str(e), "needs_ai": "AI Engine Required" in str(e), "symbol": body.symbol})
+
+@app.get("/api/trade-analyser/report")
+def trade_analyser_report(symbol: str):
+    from app import trade_analyser as ta
+    try:
+        cached = ta.load_cached_reports()
+        sym = symbol.strip().upper()
+        if sym in cached:
+            return ta.sanitize_for_json(cached[sym])
+        candidates = ta.get_top10_candidates()
+        cand = next((c for c in candidates if c["symbol"] == sym), None)
+        ex = cand.get("exchange", "NSE") if cand else "NSE"
+        nm = cand.get("name") if cand else sym
+        rep = ta.run_trading_agents_analysis(sym, ex, nm)
+        return ta.sanitize_for_json(rep)
+    except Exception as e:
+        from fastapi.responses import JSONResponse
+        status_code = 400 if "AI Engine Required" in str(e) else 500
+        return JSONResponse(status_code=status_code, content={"error": str(e), "needs_ai": "AI Engine Required" in str(e), "symbol": symbol})
+
+@app.post("/api/trade-analyser/batch")
+def trade_analyser_batch():
+    from app import trade_analyser as ta
+    started = ta.batch_analyze_top10()
+    return {"status": "started" if started else "already_running"}
+
+@app.get("/api/trade-analyser/status")
+def trade_analyser_status():
+    from app import trade_analyser as ta
+    return ta.get_analysis_status()
+
+@app.get("/api/trade-analyser/offline")
+def trade_analyser_offline():
+    from app import trade_analyser as ta
+    return ta.load_offline_screen()
+
+@app.post("/api/trade-analyser/offline")
+def trade_analyser_offline_start():
+    from app import trade_analyser as ta
+    started = ta.start_offline_screen()
+    return {"status": "started" if started else "already_running"}
+
+@app.get("/api/trade-analyser/offline/status")
+def trade_analyser_offline_status():
+    from app import trade_analyser as ta
+    return ta.get_offline_status()
+
+# ---------- AI Provider & LLM Engine Settings ----------
+class AIConfigIn(BaseModel):
+    enabled: bool
+    provider: str
+    api_key: Optional[str] = None
+    base_url: Optional[str] = None
+    model: Optional[str] = None
+
+class AITestIn(BaseModel):
+    provider: str
+    api_key: str
+    base_url: Optional[str] = None
+    model: Optional[str] = None
+
+@app.get("/api/trade-analyser/ai-config")
+def get_ai_config():
+    from app import llm_client
+    return llm_client.get_sanitized_config()
+
+@app.post("/api/trade-analyser/ai-config")
+def update_ai_config(body: AIConfigIn):
+    from app import llm_client
+    try:
+        curr = llm_client.load_ai_config()
+        raw_key = body.api_key.strip() if body.api_key else ""
+        if "••••" in raw_key:
+            raw_key = curr.get("api_key", "")
+        new_cfg = {
+            "enabled": body.enabled,
+            "provider": body.provider,
+            "api_key": raw_key,
+            "base_url": body.base_url or curr.get("base_url", ""),
+            "model": body.model or curr.get("model", "")
+        }
+        llm_client.save_ai_config(new_cfg)
+        return llm_client.get_sanitized_config()
+    except Exception as e:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+@app.post("/api/trade-analyser/test-ai")
+def test_ai(body: AITestIn):
+    from app import llm_client
+    try:
+        key = body.api_key.strip() if body.api_key else ""
+        if "••••" in key:
+            curr = llm_client.load_ai_config()
+            key = curr.get("api_key", "")
+        return llm_client.test_ai_connection(body.provider, key, body.base_url, body.model)
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+

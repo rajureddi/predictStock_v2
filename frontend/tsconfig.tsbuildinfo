@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/portfolio.tsx","./src/stockdesk.tsx","./src/lib.tsx","./src/main.tsx","./src/scene/backdrop.tsx","./src/scene/surfacebackdrop.ts"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/backtestview.tsx","./src/budgetsettingsmodal.tsx","./src/portfolio.tsx","./src/sectorheatmap.tsx","./src/shortterm.tsx","./src/stockdesk.tsx","./src/tradeanalyser.tsx","./src/lib.tsx","./src/main.tsx","./src/scene/backdrop.tsx","./src/scene/surfacebackdrop.ts"],"version":"5.9.3"}
