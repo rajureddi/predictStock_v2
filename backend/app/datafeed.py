@@ -295,20 +295,83 @@ def nifty_close(period="2y"):
     df = download_one("^NSEI", period=period)
     return df["Close"] if df is not None else None
 
+def expected_session_date():
+    """Last NSE session whose official close should already be out. Weekends roll back to Friday.
+    Before 16:00 IST the current day's close is not expected yet."""
+    import datetime
+    ist = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=5, minutes=30)
+    d = ist.date()
+    if ist.time() < datetime.time(16, 0):
+        d -= datetime.timedelta(days=1)
+    while d.weekday() >= 5:
+        d -= datetime.timedelta(days=1)
+    return d
+
+
+def _last_session_date(df):
+    if df is None or len(df) == 0:
+        return None
+    idx = df.index[-1]
+    return idx.date() if hasattr(idx, "date") else None
+
+
+def _yahoo_fill(tickers):
+    """Newer daily bars for tickers whose local panel is behind the last session.
+    Chunked so one slow download cannot drop the whole set."""
+    out = {}
+    for i in range(0, len(tickers), 8):
+        try:
+            out.update(_yahoo_batch(tickers[i:i + 8], period="1mo"))
+        except Exception:
+            pass
+    return out
+
+
+def with_latest_session(ticker, df=None):
+    """One ticker's bars, with Yahoo appended when the bhavcopy panel is behind."""
+    if df is None:
+        df = local_history(ticker)
+    if df is None or len(df) < 5:
+        got = _yahoo_fill([ticker]).get(ticker)
+        return got if got is not None else df
+    last_d = _last_session_date(df)
+    if last_d is not None and last_d < expected_session_date():
+        extra = _yahoo_fill([ticker]).get(ticker)
+        if extra is not None:
+            df = _merge(df, extra)
+    return df
+
+
+def with_latest_sessions(tickers):
+    """Same latest close the chart uses, for many tickers at once.
+    A fresh local panel is returned as-is. A stale one is merged with newer Yahoo bars
+    (local exchange rows win on dates both sources have)."""
+    expected = expected_session_date()
+    frames = {}
+    need = []
+    for t in tickers:
+        df = local_history(t)
+        frames[t] = df
+        last_d = _last_session_date(df)
+        if df is None or len(df) < 5 or last_d is None or last_d < expected:
+            need.append(t)
+    if need:
+        for t, extra in _yahoo_fill(need).items():
+            frames[t] = _merge(frames.get(t), extra)
+    return frames
+
+
 def history_series(ticker, days=90):
     """Recent OHLC rows for charts: [{date, open, high, low, close, volume}].
-    The bhavcopy panel can lag the latest session; Yahoo fills only those newer bars."""
+    The bhavcopy panel can lag the latest session; Yahoo fills only those newer bars.
+    The last close here is the same number live quotes return."""
     df = local_history(ticker)
     if df is None or len(df) < 5:
         df = download_one(ticker, period="1y")
-    elif len(df):
-        from datetime import date, timedelta
-        last = df.index[-1]
-        last_d = last.date() if hasattr(last, "date") else None
-        if last_d and last_d < date.today() - timedelta(days=1):
-            extra = _yahoo_batch([ticker], period="1mo").get(ticker)
-            if extra is not None:
-                df = _merge(df, extra)
+        if df is not None and _last_session_date(df) is not None and _last_session_date(df) < expected_session_date():
+            df = with_latest_session(ticker, df)
+    else:
+        df = with_latest_session(ticker, df)
     if df is None: return []
     df = df.tail(days)
     return [dict(date=str(idx.date()), open=round(float(r["Open"]), 2), high=round(float(r["High"]), 2),

@@ -384,28 +384,6 @@ def _resolve_yahoo_map(symbols: list[str], exchange_hints: dict[str, str] | None
     return out
 
 
-def _expected_session_date():
-    """Last NSE session whose official close should already exist (capped at latest local panel date)."""
-    import datetime
-    from app import datafeed
-    ist = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=5, minutes=30)
-    d = ist.date()
-    if ist.time() < datetime.time(16, 0):
-        d -= datetime.timedelta(days=1)
-    while d.weekday() >= 5:
-        d -= datetime.timedelta(days=1)
-    try:
-        meta_f = datafeed.HIST / "panel_meta.json"
-        if meta_f.exists():
-            meta = json.loads(meta_f.read_text(encoding="utf-8"))
-            lasts = [datetime.date.fromisoformat(v["last"]) for v in meta.values() if v.get("last")]
-            if lasts and d > max(lasts):
-                return max(lasts)
-    except Exception:
-        pass
-    return d
-
-
 def _frame_last_close(df):
     if df is None or len(df) == 0 or "Close" not in getattr(df, "columns", []):
         return None, None
@@ -433,60 +411,28 @@ def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = 
         return res
 
     sym_to_yh = _resolve_yahoo_map(missing, exchange_hints)
-    expected = _expected_session_date()
+    # Same bars as the chart. download_batch stops at the local panel once it
+    # has 20 rows, so a stale bhavcopy close was being returned as "live"
+    # while /api/prices appended the newer Yahoo session.
+    tickers = list(dict.fromkeys(yh for yh in (sym_to_yh.get(s) for s in missing) if yh))
+    try:
+        frames = datafeed.with_latest_sessions(tickers)
+    except Exception:
+        frames = {}
 
-    # 1. Official Bhavcopy local panel. Its last row can be a session or two
-    # behind, so the date is kept and a newer Yahoo close replaces it.
-    local_latest = {}
-    for s in missing:
-        yh = sym_to_yh.get(s)
-        if not yh:
-            continue
-        df = datafeed.local_history(yh)
-        if df is None or len(df) == 0:
-            f = datafeed.CACHE / f"{yh}.csv"
-            if f.exists():
-                try:
-                    import pandas as pd
-                    df = pd.read_csv(f, index_col=0, parse_dates=True)
-                except Exception:
-                    df = None
-        price, asof = _frame_last_close(df)
-        if price:
-            local_latest[s] = (price, asof)
-
-    # 2. Report prices only when the symbol has no history at all
+    report_px = {}
     r = _latest()
     if r:
         for p in r.get("picks", []) + r.get("stage1_top50", []):
             sym, cp = p.get("symbol"), p.get("current_price")
-            if sym and cp and sym not in local_latest:
-                local_latest[sym] = (round(float(cp), 2), None)
-
-    # 3. Yahoo for anything missing or older than the last session
-    stale = [s for s in missing if local_latest.get(s, (None, None))[1] is None or local_latest[s][1] < expected]
-    yh_to_sym = {sym_to_yh[s]: s for s in stale if sym_to_yh.get(s)}
-    yahoo_latest = {}
-    tickers = list(yh_to_sym.keys())
-    if tickers:
-        try:
-            yh_frames = datafeed.download_batch(tickers, period="1mo")
-            for yh, df in yh_frames.items():
-                sym = yh_to_sym.get(yh)
-                price, asof = _frame_last_close(df)
-                if sym and price:
-                    yahoo_latest[sym] = (price, asof)
-        except Exception:
-            pass
+            if sym and cp and sym not in report_px:
+                report_px[sym] = round(float(cp), 2)
 
     for s in missing:
-        local = local_latest.get(s)
-        yahoo = yahoo_latest.get(s)
-        chosen = None
-        if yahoo and (not local or local[1] is None or (yahoo[1] and yahoo[1] >= local[1])):
-            chosen = yahoo[0]
-        elif local:
-            chosen = local[0]
+        yh = sym_to_yh.get(s)
+        chosen, _asof = _frame_last_close(frames.get(yh) if yh else None)
+        if not chosen:
+            chosen = report_px.get(s)
         if chosen:
             _LIVE_CACHE[s] = {"price": chosen, "ts": now}
             res[s] = chosen

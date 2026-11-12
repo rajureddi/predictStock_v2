@@ -159,7 +159,8 @@ export default function StockDesk({ list, idx, targetDate, holding, onSelect, on
   const orb = useOrb()
   const rows = useSeries(p.symbol, p.exchange)
   const liveQuote = useLiveStockQuote(p.symbol, p.live_price)
-  const currentLivePrice = liveQuote?.price ?? p.live_price ?? p.current_price
+  const seriesLast = rows && rows.length ? rows[rows.length - 1].close : null
+  const currentLivePrice = seriesLast ?? liveQuote?.price ?? p.live_price ?? p.current_price
   const isRealtime = !!liveQuote?.isLive || !!p.live_price
   const liveReturnPct = p.current_price && currentLivePrice
     ? ((currentLivePrice - p.current_price) / p.current_price) * 100
