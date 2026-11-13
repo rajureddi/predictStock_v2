@@ -178,6 +178,15 @@ def stage2(candidates, log=print):
                     **trade_rules.relative_strength(df["Close"], nifty_close), **fc)
         evaluated.append(pick)
         log(f"[stage2] {t}: score {ts['score']} ({m.get('setup_type')}) pred {fc['predicted_return_pct']}% winP={fc.get('ml_win_prob_pct')}% pass={fc['quality_pass']} acc={fc['backtest']['best_dir_acc']}")
+
+    # Sector labels are filled after this step. The momentum penalty runs once
+    # those labels exist, so a bottom-3 sector is not scored before it is known.
+    try:
+        sec_str = sector_strength_mod.get_sector_strength()
+        sector_strength_mod.attach_sector_strength(evaluated, sec_str)
+    except Exception as e:
+        log(f"[stage2] sector strength attachment failed: {e}")
+
     return evaluated
 
 def dedupe_by_isin(ranked):
@@ -273,6 +282,9 @@ def select_picks_for_budget(pool, budget_inr=None, want=5, rules=None):
     clean_pool = [dict(p) for p in pool if not (p.get("news") or {}).get("veto")]
     if not clean_pool:
         clean_pool = [dict(p) for p in pool]
+    outside = [p for p in clean_pool if not p.get("sector_bottom")]
+    if len(outside) >= want:
+        clean_pool = outside
 
     if not budget_inr or float(budget_inr) <= 0:
         # Filter by the active Stock Weight Class Rule (e.g. No Heavy <= ₹2,500 or Moderate <= ₹4,500)
@@ -473,7 +485,7 @@ def run_pipeline(log=print, fresh: bool = False):
     if good:
         fundamentals_mod.attach_fundamentals(good, log=log)
         sectors_mod.attach_sectors(good, log=log)
-        sector_strength_mod.attach_sector_strength(good, sector_strength)
+        sector_strength_mod.apply_momentum_penalty(good, sector_strength)
     sim_rejected = []
     try:
         from app import simulation

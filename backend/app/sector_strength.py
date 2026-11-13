@@ -136,12 +136,38 @@ def get_sector_strength(force: bool = False) -> Dict[str, Any]:
     return out
 
 
+def apply_momentum_penalty(picks: List[Dict[str, Any]], strength: Dict[str, Any]) -> None:
+    """Bottom 3 sectors versus NIFTY lose 15 points. Other lagging sectors lose 8.
+    Applied once, after the stock's sector label is known."""
+    attach_sector_strength(picks, strength)
+    rows = strength.get("sectors") or []
+    n = len(rows)
+    bottom = {r.get("sector") for r in rows if n >= 4 and (r.get("rank") or 0) > n - 3}
+    for p in picks:
+        if p.get("_sector_penalized"):
+            continue
+        in_bottom = bool(p.get("sector_index") and p.get("sector_index") in bottom)
+        p["sector_bottom"] = in_bottom
+        reasons = p.get("reasons")
+        if not isinstance(reasons, list):
+            reasons = []
+            p["reasons"] = reasons
+        if in_bottom:
+            p["trader_score"] = max(0.0, float(p.get("trader_score") or 0) - 15.0)
+            reasons.append("Parent sector is one of the 3 weakest versus NIFTY — left out of new swings (−15)")
+        elif p.get("sector_trend") == "Lagging":
+            p["trader_score"] = max(0.0, float(p.get("trader_score") or 0) - 8.0)
+            reasons.append("Lagging sector momentum — penalized (-8 pts)")
+        p["_sector_penalized"] = True
+
+
 def attach_sector_strength(picks: List[Dict[str, Any]], strength: Dict[str, Any]) -> None:
     by_name = {r["sector"]: r for r in strength.get("sectors", [])}
     for p in picks:
         idx = map_sector(p.get("sector"), p.get("industry"))
         row = by_name.get(idx) if idx else None
         p["sector_index"] = idx
+        p["sector_rank"] = row["rank"] if row else None
         p["sector_rs_1m_pct"] = row["rs_1m_pct"] if row else None
         p["sector_rotation_accel_pct"] = row.get("rotation_accel_pct") if row else None
         p["sector_trend"] = row["trend"] if row else None

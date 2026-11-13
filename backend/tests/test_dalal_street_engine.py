@@ -85,6 +85,43 @@ def test_operator_churn_penalised_and_delivery_surge_rewarded():
     assert any("delivery volume surge" in r.lower() for r in ts_surge["reasons"])
 
 
+def test_climax_upper_wick_is_downgraded():
+    calm = _stage2_frame(160, seed=19)
+    climax = calm.copy()
+    last = climax.index[-1]
+    prev = float(climax["Close"].iloc[-2])
+    climax["Volume"] = 400_000.0
+    climax.loc[last, "Volume"] = 1_400_000.0
+    climax.loc[last, "Open"] = prev
+    climax.loc[last, "Low"] = prev * 0.99
+    climax.loc[last, "Close"] = prev * 1.004
+    climax.loc[last, "High"] = prev * 1.07
+    ts = trader_score(climax)
+    assert any("fomo" in r.lower() for r in ts["reasons"])
+    assert ts["score"] <= trader_score(calm)["score"] - 10
+
+
+def test_bottom_three_sectors_are_penalized_once():
+    from app.sector_strength import apply_momentum_penalty
+    names = ["Bank", "IT", "Auto", "Pharma", "Metal", "FMCG"]
+    sectors = [
+        {"sector": name, "rank": i + 1, "rs_1m_pct": 6 - i, "rotation_accel_pct": 0,
+         "trend": "Leading" if i < 3 else "Lagging"}
+        for i, name in enumerate(names)
+    ]
+    picks = [
+        {"symbol": "INFY", "sector": "Technology", "industry": "software", "trader_score": 70, "reasons": []},
+        {"symbol": "TATASTEEL", "sector": "Basic Materials", "industry": "steel", "trader_score": 70, "reasons": []},
+    ]
+    apply_momentum_penalty(picks, {"sectors": sectors})
+    apply_momentum_penalty(picks, {"sectors": sectors})
+    by_sym = {p["symbol"]: p for p in picks}
+    assert by_sym["INFY"]["trader_score"] == 70
+    assert by_sym["INFY"]["sector_bottom"] is False
+    assert by_sym["TATASTEEL"]["trader_score"] == 55
+    assert by_sym["TATASTEEL"]["sector_bottom"] is True
+
+
 def test_realistic_5d_atr_target_and_chase_penalty():
     df = _stage2_frame(200)
     ts = trader_score(df)

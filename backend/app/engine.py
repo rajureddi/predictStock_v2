@@ -388,7 +388,15 @@ def trader_score(df, nifty_close=None):
     # 3. Volume & Supply Exhaustion (VDU) vs Distribution
     vr = float(last['VOL_RATIO']) if not np.isnan(last['VOL_RATIO']) else 1.0
     vcp_r = float(last['VCP_RATIO'])
-    if vr >= 1.5 and last['RET1'] > 0 and last['CLV'] >= 0.55:
+    body_atr = float(last.get('BODY_ATR', 0.5))
+    uwick = float(last['UWICK_ATR'])
+    clv = float(last['CLV'])
+
+    # A volume spike that cannot close near the high is supply, not accumulation.
+    climax = vr >= 2.0 and uwick >= 1.5 * max(abs(body_atr), 0.15) and clv < 0.70
+    if climax:
+        add(-14, f"Climax volume ({vr:.1f}× avg) closed off the high (CLV {clv:.2f}) — retail FOMO trap")
+    elif vr >= 1.5 and last['RET1'] > 0 and clv >= 0.70:
         add(5, f"Volume {vr:.1f}× 20-day average with strong close")
     elif vr >= 1.5 and last['RET1'] <= 0:
         add(-4, f"Volume {vr:.1f}× average on a down day — distribution")
@@ -425,6 +433,12 @@ def trader_score(df, nifty_close=None):
         elif not np.isnan(deliv_avg5) and deliv_avg5 >= 52 and abs(ret5_v) <= 0.035 and vcp_r <= 0.92 and c > last['EMA50']:
             add(3, f"Silent delivery accumulation ({deliv_avg5:.0f}% 5d avg in tight coil)")
 
+    tight7 = int((d['VCP_RATIO'].tail(7) < 0.80).sum()) if len(d) else 0
+    nr7_recent = int(d['NR7'].tail(7).sum()) if len(d) and 'NR7' in d.columns else 0
+    delivery_supports = bool(np.isnan(deliv) or (not np.isnan(deliv_avg5) and deliv + 1e-9 >= deliv_avg5) or (np.isnan(deliv_avg5) and deliv >= 45))
+    if (not climax) and vcp_r < 0.80 and (tight7 >= 5 or nr7_recent >= 1) and delivery_supports and c > last['EMA50']:
+        add(5, f"Volatility compressed for {tight7} of the last 7 sessions (VCP {vcp_r:.2f}) with delivery holding up")
+
     # 5. Dalal Street High-Edge 5D Setup Archetypes & Candle Micro-Geometry
     hi52 = float(df['High'].tail(250).max())
     lo52 = float(df['Low'].tail(250).min())
@@ -455,16 +469,17 @@ def trader_score(df, nifty_close=None):
     elif (
         c > last['EMA50']
         and c >= 0.78 * hi52
-        and (prev_vcp <= 0.86 or vcp_r <= 0.84 or prev_nr7 == 1.0 or float(last['INSIDE_BAR']) == 1.0)
+        and (vcp_r < 0.80 or prev_vcp < 0.80)
+        and (tight7 >= 5 or prev_nr7 == 1.0 or nr7_recent >= 1 or float(last['INSIDE_BAR']) == 1.0)
         and ret5_v <= 0.048
         and dist21_atr <= 1.75
-        and clv >= 0.58
+        and clv >= 0.70
         and uwick <= 0.42
     ):
         setup_type = "VCP Coil Expansion"
         add(7, f"Tight VCP coil (ATR ratio {min(prev_vcp, vcp_r):.2f}) with strong close location")
 
-    if uwick >= 0.80 and clv <= 0.35:
+    if (not climax) and uwick >= 0.80 and clv <= 0.35:
         add(-6, "Upper-wick rejection — overhead supply defending highs")
 
     # Candlestick Patterns
