@@ -15,6 +15,14 @@ const PALETTES = {
 }
 export const applyPalette = (t: Theme) => Object.assign(C, PALETTES[t])
 
+export function readFalling(): boolean {
+  const s = localStorage.getItem('marketmind.falling')
+  return s == null ? true : s === '1'
+}
+export function writeFalling(on: boolean) {
+  localStorage.setItem('marketmind.falling', on ? '1' : '0')
+}
+
 /* ---------- formatting ---------- */
 export const inr = (n?: number | null) => n == null ? '—' : '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })
 export const pct = (n?: number | null, d = 2) => n == null ? '—' : (n >= 0 ? '+' : '') + Number(n).toFixed(d) + '%'

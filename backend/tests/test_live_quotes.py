@@ -33,8 +33,46 @@ def test_live_quote_matches_chart_when_panel_is_behind(monkeypatch):
     main._LIVE_CACHE.clear()
     monkeypatch.setattr(main, "_resolve_yahoo_map", lambda symbols, hints=None: {s: f"{s}.NS" for s in symbols})
     monkeypatch.setattr(main, "_latest", lambda: None)
+    monkeypatch.setattr(datafeed, "yahoo_last_prices", lambda tickers: {})
     quotes = main.get_live_quotes(["RELIANCE"])
     assert quotes["RELIANCE"] == series[-1]["close"]
+
+
+def test_live_quote_prefers_yahoo_last_trade(monkeypatch):
+    main._LIVE_CACHE.clear()
+    called = []
+    monkeypatch.setattr(main, "_resolve_yahoo_map", lambda symbols, hints=None: {s: f"{s}.NS" for s in symbols})
+    monkeypatch.setattr(main, "_latest", lambda: {"picks": [{"symbol": "LAURUSLABS", "current_price": 2400}]})
+    monkeypatch.setattr(datafeed, "yahoo_last_prices", lambda tickers: {t: 2424.0 for t in tickers})
+
+    def _sessions(tickers):
+        called.append(list(tickers))
+        return {}
+
+    monkeypatch.setattr(datafeed, "with_latest_sessions", _sessions)
+    quotes = main.get_live_quotes(["LAURUSLABS"])
+    assert quotes["LAURUSLABS"] == 2424.0
+    assert called == []
+
+
+def test_yahoo_last_prices_reads_regular_market_price(monkeypatch):
+    import json
+    import urllib.request
+
+    payload = {"chart": {"result": [{"meta": {"regularMarketPrice": 2424.4, "chartPreviousClose": 2400}}]}}
+
+    class Resp:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def read(self):
+            return json.dumps(payload).encode()
+
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: Resp())
+    assert datafeed.yahoo_last_prices(["LAURUSLABS.NS"]) == {"LAURUSLABS.NS": 2424.4}
 
 
 def test_fresh_panel_is_not_replaced(monkeypatch):

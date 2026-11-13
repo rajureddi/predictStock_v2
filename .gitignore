@@ -27,4 +27,9 @@ data/reports/reports.db-shm
 
 # Local AI and private configs
 data/ai_config.json
+data/mail_config.json
+data/alerts_state.json
+data/morning_state.json
+data/portfolio.json
+data/auth.json
 data/*_cache.json

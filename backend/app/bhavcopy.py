@@ -11,6 +11,9 @@ quantity / delivery % — a genuine-buying signal the trader score uses.
 Downloads are resumable: a date whose raw file exists is never re-fetched,
 and dates that produced no file (holidays) are remembered in missing.txt
 (today is never marked missing — its file appears in the evening).
+
+Raw files older than the scan window (14 months) are deleted on each top-up.
+The history panels are rebuilt from whatever remains.
 """
 import io, json, time, urllib.request
 from concurrent.futures import ThreadPoolExecutor
@@ -26,6 +29,7 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 NSE_URL = "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{:%d%m%Y}.csv"
 BSE_URL = "https://www.bseindia.com/download/BhavCopy/Equity/BhavCopy_BSE_CM_0_0_0_{:%Y%m%d}_F_0000.CSV"
 PANEL_COLS = ["Key", "Date", "Open", "High", "Low", "Close", "Volume", "DelivPer", "DelivQty"]
+KEEP_MONTHS = 14
 
 
 def raw_path(exchange, d):
@@ -77,6 +81,44 @@ def mark_missing(exchange, d):
     f.parent.mkdir(parents=True, exist_ok=True)
     with open(f, "a", encoding="utf-8") as fh:
         fh.write(f"{d:%Y%m%d}\n")
+
+
+def window_start(months_back=KEEP_MONTHS):
+    """First date the scan still needs. Older raw files are disposable."""
+    return date.today() - timedelta(days=int(months_back * 30.5))
+
+
+def prune_raw(start, log=print):
+    """Delete daily files and missing-list entries older than start. Returns how many files were removed."""
+    removed = 0
+    for ex in ("nse", "bse"):
+        for d in existing_dates(ex):
+            if d >= start:
+                continue
+            try:
+                raw_path(ex, d).unlink()
+                removed += 1
+            except OSError as e:
+                log(f"[bhavcopy] could not remove {ex} {d:%Y%m%d}: {e}")
+        f = _missing_file(ex)
+        if not f.exists():
+            continue
+        kept, changed = [], False
+        for token in sorted(load_missing(ex)):
+            try:
+                d = date(int(token[:4]), int(token[4:6]), int(token[6:8]))
+            except Exception:
+                changed = True
+                continue
+            if d < start:
+                changed = True
+                continue
+            kept.append(f"{d:%Y%m%d}")
+        if changed:
+            f.write_text("".join(t + "\n" for t in kept), encoding="utf-8")
+    if removed:
+        log(f"[bhavcopy] removed {removed} daily files older than {start}")
+    return removed
 
 
 def existing_dates(exchange):
@@ -223,13 +265,19 @@ def build_panels(universe, log=print):
     return meta
 
 
-def top_up(months_back=14, log=print):
-    """Fetch any missing recent daily files for both exchanges and rebuild
-    the panels if anything new arrived. Never raises."""
+def top_up(months_back=KEEP_MONTHS, log=print):
+    """Fetch any missing recent daily files for both exchanges, drop raw files
+    older than the window, and rebuild the panels if anything changed. Never raises."""
     meta_f = HIST / "panel_meta.json"
     stamp_f = HIST / "last_top_up.txt"
     today_iso = date.today().isoformat()
-    if meta_f.exists() and stamp_f.exists():
+    start = window_start(months_back)
+    try:
+        removed = prune_raw(start, log=log)
+    except Exception as e:
+        log(f"[bhavcopy] prune failed: {e}")
+        removed = 0
+    if meta_f.exists() and stamp_f.exists() and not removed:
         try:
             if stamp_f.read_text(encoding="utf-8").strip() == today_iso:
                 log(f"[bhavcopy] already checked today ({today_iso})")
@@ -242,7 +290,6 @@ def top_up(months_back=14, log=print):
     except Exception as e:
         log(f"[bhavcopy] top-up skipped (universe): {e}")
         return None
-    start = date.today() - timedelta(days=int(months_back * 30.5))
     new_total = 0
     for ex in ("nse", "bse"):
         try:
@@ -255,7 +302,7 @@ def top_up(months_back=14, log=print):
         stamp_f.write_text(today_iso, encoding="utf-8")
     except Exception:
         pass
-    if new_total or not meta_f.exists():
+    if new_total or removed or not meta_f.exists():
         try:
             return build_panels(uni, log=log)
         except Exception as e:

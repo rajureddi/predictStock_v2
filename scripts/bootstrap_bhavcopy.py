@@ -18,6 +18,7 @@ def main():
     months = float(sys.argv[1]) if len(sys.argv) > 1 else 13
     start = date.today() - timedelta(days=int(months * 30.5))
     print(f"Bootstrap window: {start} .. {date.today()}", flush=True)
+    print(f"Removed {bhavcopy.prune_raw(start)} daily files older than {start}", flush=True)
     for ex in ("nse", "bse"):
         got, att = bhavcopy.download_range(ex, start, date.today())
         print(f"{ex}: +{got} files ({att} attempted), total on disk: "

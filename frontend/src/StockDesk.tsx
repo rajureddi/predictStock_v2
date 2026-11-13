@@ -160,7 +160,7 @@ export default function StockDesk({ list, idx, targetDate, holding, onSelect, on
   const rows = useSeries(p.symbol, p.exchange)
   const liveQuote = useLiveStockQuote(p.symbol, p.live_price)
   const seriesLast = rows && rows.length ? rows[rows.length - 1].close : null
-  const currentLivePrice = seriesLast ?? liveQuote?.price ?? p.live_price ?? p.current_price
+  const currentLivePrice = liveQuote?.price ?? seriesLast ?? p.live_price ?? p.current_price
   const isRealtime = !!liveQuote?.isLive || !!p.live_price
   const liveReturnPct = p.current_price && currentLivePrice
     ? ((currentLivePrice - p.current_price) / p.current_price) * 100
@@ -171,8 +171,8 @@ export default function StockDesk({ list, idx, targetDate, holding, onSelect, on
   const [buy, setBuy] = useState('')
   useEffect(() => {
     setShares(String(holding?.shares ?? p.shares ?? 1))
-    setBuy(String(holding?.buy ?? currentLivePrice ?? p.current_price ?? ''))
-  }, [p.symbol, holding?.shares, holding?.buy, currentLivePrice])
+    setBuy(String(holding?.buy ?? p.current_price ?? ''))
+  }, [p.symbol, holding?.shares, holding?.buy, p.shares, p.current_price])
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }, [idx])
 
   const day = useMemo(() => {

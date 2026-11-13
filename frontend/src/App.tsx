@@ -2,10 +2,10 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { ThinkingOrb } from 'thinking-orbs'
 import {
   ArrowRight, Brain, CaretLeft, CaretRight, CheckCircle, ClockCounterClockwise, CurrencyInr, DiceFive,
-  Lightning, MagnifyingGlass, Moon, Rocket, ShieldWarning, Sun, Warning, X, Briefcase, TrendUp, TrendDown, Gauge, ChartLineUp,
-  SlidersHorizontal, Gear,
+  Lightning, List, MagnifyingGlass, Moon, Rocket, ShieldWarning, SignOut, Sun, Warning, X, Briefcase, TrendUp, TrendDown, Gauge, ChartLineUp,
+  SlidersHorizontal, Gear, Bell, Leaf, Snowflake,
 } from '@phosphor-icons/react'
-import { C, Holding, Theme, ThemeCtx, applyPalette, fetchSeries, holdingFromPick, inr, loadHoldings, num, pct, saveHoldings } from './lib'
+import { C, Holding, Theme, ThemeCtx, applyPalette, fetchSeries, holdingFromPick, inr, loadHoldings, num, pct, readFalling, saveHoldings, writeFalling } from './lib'
 import StockDesk from './StockDesk'
 import Portfolio from './Portfolio'
 import ShortTerm, { ShortTermReport } from './ShortTerm'
@@ -13,8 +13,10 @@ import TradeAnalyser from './TradeAnalyser'
 import { BacktestView } from './BacktestView'
 import SectorHeatmap from './SectorHeatmap'
 import BudgetSettingsModal from './BudgetSettingsModal'
+import AlertsMail from './AlertsMail'
 
 import { FallingLeaves } from "falling-leaves/react"
+import Snowfall from "react-snowfall"
 
 const Backdrop = lazy(() => import('./scene/Backdrop'))
 
@@ -68,7 +70,7 @@ function AccMeter({ v }: { v?: number | null }) {
 
 /* ---------- main app ---------- */
 type SortKey = 'symbol' | 'current_price' | 'trader_score' | 'delivery_pct' | 'rsi' | 'ret21_pct'
-export default function App() {
+export default function App({ onSignOut }: { onSignOut?: () => void }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const s = localStorage.getItem('marketmind.theme')
     return s === 'dark' || s === 'light' ? s : (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
@@ -80,11 +82,36 @@ export default function App() {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0A1931' : '#F5F8FC')
     localStorage.setItem('marketmind.theme', theme)
   }, [theme])
-  const [tab, setTab] = useState<'picks' | 'analyser' | 'shortterm' | 'scanned' | 'sectors' | 'backtest' | 'history' | 'portfolio'>('picks')
+  const [tab, setTab] = useState<'picks' | 'analyser' | 'shortterm' | 'scanned' | 'sectors' | 'backtest' | 'history' | 'portfolio' | 'alerts'>('picks')
+  const [navOpen, setNavOpen] = useState(false)
+  const [falling, setFalling] = useState(readFalling)
+  const toggleFalling = () => setFalling(v => { writeFalling(!v); return !v })
   const [shortTermReport, setShortTermReport] = useState<ShortTermReport | null>(null)
   const [shortTermScan, setShortTermScan] = useState<any>(null)
   const [holdings, setHoldingsRaw] = useState<Holding[]>(loadHoldings)
+  const [portfolioReady, setPortfolioReady] = useState(false)
   const setHoldings = (f: (h: Holding[]) => Holding[]) => setHoldingsRaw(h => { const n = f(h); saveHoldings(n); return n })
+  useEffect(() => {
+    let stop = false
+    fetch('/api/portfolio').then(r => r.ok ? r.json() : { holdings: [] }).then(data => {
+      if (stop) return
+      const remote = Array.isArray(data.holdings) ? data.holdings : []
+      setHoldingsRaw(local => {
+        if (local.length || !remote.length) return local
+        saveHoldings(remote)
+        return remote
+      })
+    }).catch(() => {}).finally(() => { if (!stop) setPortfolioReady(true) })
+    return () => { stop = true }
+  }, [])
+  useEffect(() => {
+    if (!portfolioReady) return
+    fetch('/api/portfolio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ holdings }),
+    }).catch(() => {})
+  }, [holdings, portfolioReady])
   const [report, setReport] = useState<any>(null)
   const [scanned, setScanned] = useState<any>(null)
   const [history, setHistory] = useState<any>(null)
@@ -421,10 +448,23 @@ export default function App() {
   return (<ThemeCtx.Provider value={theme}>
     <div className="app-shell">
 
-      <FallingLeaves
-        fullScreen
-        shapes={["maple"]}
-      />
+      {falling && (
+        <>
+          <FallingLeaves
+            fullScreen
+            shapes={["maple"]}
+            count={18}
+            colors={["#FF5E1A", "#E04809", "#F59E0B", "#C2410C", "#FBBF24"]}
+            zIndex={30}
+            opacity={0.9}
+          />
+          <Snowfall
+            snowflakeCount={70}
+            color={theme === 'dark' ? '#F4F7FB' : '#FFFFFF'}
+            style={{ position: 'fixed', width: '100vw', height: '100vh', zIndex: 30, pointerEvents: 'none' }}
+          />
+        </>
+      )}
       {predictLoading && (
         <div className="predict-loading-modal" role="status">
           <div className="predict-loading-card">
@@ -438,7 +478,8 @@ export default function App() {
       )}
 
       {/* LEFT SIDEBAR NAVIGATION */}
-      <aside className="app-sidebar" aria-label="Main Navigation">
+      {navOpen && <button className="nav-scrim" aria-label="Close menu" onClick={() => setNavOpen(false)} />}
+      <aside className={`app-sidebar${navOpen ? ' open' : ''}`} aria-label="Main Navigation">
         <div className="sidebar-header">
           <div className="sidebar-brand">
             <span className="brand-mark" aria-hidden="true" />
@@ -446,11 +487,15 @@ export default function App() {
               <span className="brand-title">MarketMind</span>
               <span className="brand-badge">PRO</span>
             </div>
+            <button type="button" className="sidebar-close" aria-label="Close menu" onClick={() => setNavOpen(false)}>
+              <X size={16} weight="bold" />
+              <span>Close</span>
+            </button>
           </div>
           <div className="sidebar-sub">QUANT DESK · NSE/BSE</div>
         </div>
 
-        <nav className="sidebar-tabs" role="tablist" aria-label="Sections">
+        <nav className="sidebar-tabs" role="tablist" aria-label="Sections" onClick={() => setNavOpen(false)}>
           <div className="sidebar-sec-label">DESK &amp; PORTFOLIO</div>
           <button
             role="tab"
@@ -536,13 +581,22 @@ export default function App() {
             <span>Portfolio</span>
             {holdings.length > 0 && <span className="tabcount num">{holdings.length}</span>}
           </button>
+          <button
+            role="tab"
+            aria-selected={tab === 'alerts'}
+            className={`sidebar-tab-btn ${tab === 'alerts' ? 'on' : ''}`}
+            onClick={() => { setCustomDesk(null); setTab('alerts') }}
+          >
+            <Bell size={18} weight={tab === 'alerts' ? 'bold' : 'regular'} />
+            <span>Alerts &amp; mail</span>
+          </button>
         </nav>
 
         <div className="sidebar-footer">
           <button
             type="button"
             className="sidebar-rules-btn"
-            onClick={() => setShowBudgetModal(true)}
+            onClick={() => { setNavOpen(false); setShowBudgetModal(true) }}
             title="Open Budget Settings: Configure budget rules, stock price ceilings (No Heavy), and min profit"
           >
             <span className="srb-left">
@@ -566,6 +620,16 @@ export default function App() {
             <span className="market-text">{indices?.market_open ? 'NSE: OPEN' : 'NSE: CLOSED'}</span>
             <span className="cutoff-text num">{indices?.cutoff || '15:30 IST'}</span>
           </div>
+          <button
+            type="button"
+            className="sidebar-rules-btn"
+            onClick={() => { fetch('/api/auth/logout', { method: 'POST' }).finally(() => onSignOut?.()) }}
+          >
+            <span className="srb-left">
+              <SignOut size={15} weight="bold" />
+              <span>Sign out</span>
+            </span>
+          </button>
           <div className="sidebar-theme-toggle">
             <span className="theme-text">{theme === 'dark' ? 'Dark Theme' : 'Light Theme'}</span>
             <button
@@ -584,6 +648,14 @@ export default function App() {
       <div className="app-main">
         {/* PERSISTENT TOPBAR */}
         <header className="app-topbar">
+          <button
+            className="nav-toggle iconbtn"
+            aria-label={navOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen(o => !o)}
+          >
+            {navOpen ? <X size={18} weight="bold" /> : <List size={18} weight="bold" />}
+          </button>
           <div className="topbar-left">
             <div className="indices-strip">
               <div className="index-pill">
@@ -680,7 +752,7 @@ export default function App() {
               )}
             </button>
             <button
-              className="topbar-scan-btn"
+              className="topbar-scan-btn topbar-fresh"
               style={{ background: 'transparent', border: '1px solid var(--line)', color: 'var(--fg)' }}
               onClick={() => startScan(true)}
               title="Wipe today's predictions & checkpoints and run a 100% fresh scratch scan from Batch 0"
@@ -688,6 +760,16 @@ export default function App() {
               <Lightning size={15} weight="bold" /> Fresh Scan
             </button>
 
+            <button
+              type="button"
+              className={`login-fall topbar-fall${falling ? ' on' : ''}`}
+              aria-pressed={falling}
+              onClick={toggleFalling}
+            >
+              <Leaf size={14} weight="fill" />
+              <Snowflake size={14} weight="fill" />
+              <span className="fall-label">{falling ? 'Falling on' : 'Falling off'}</span>
+            </button>
             <button
               className="iconbtn themebtn"
               onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
@@ -705,6 +787,10 @@ export default function App() {
             {tab === 'portfolio' && <div className="hero-title">
               <h2>Portfolio</h2>
               <p>Your holdings from MarketMind picks, valued at the latest official close.</p>
+            </div>}
+            {tab === 'alerts' && <div className="hero-title">
+              <h2>Alerts &amp; mail</h2>
+              <p>Stop-loss hits, target hits, and heavy selling email you when they hit. The weekday scan starts at 7:00 AM so the prediction mail is in before the 9:15 open.</p>
             </div>}
             {tab === 'analyser' && !customDesk && <div className="hero-title">
               <h2>TradeAnalyser · Institutional Committee</h2>
@@ -775,6 +861,8 @@ export default function App() {
 
           {!loading && !customDesk && tab === 'portfolio' && <Portfolio holdings={holdings} picks={picks}
             onOpen={openFromPortfolio} onRemove={removeHolding} onAddAll={addAllPicks} onEditShares={editShares} />}
+
+          {!loading && !customDesk && tab === 'alerts' && <AlertsMail holdings={holdings} />}
 
           {!loading && !customDesk && tab === 'shortterm' && (
             <ShortTerm
@@ -994,6 +1082,7 @@ export default function App() {
 
                 {(vetoed.length > 0 || demoted.length > 0 || simRejected.length > 0 || survVetoed.length > 0 || earningsSkipped.length > 0 || sectorCapped.length > 0) && <section className="panel side-sec veto-sec">
                   <h3><ShieldWarning size={17} weight="bold" /> Excluded by safety &amp; simulation checks</h3>
+                  <div className="veto-scroll">
                   {survVetoed.slice(0, 8).map((s: any, i: number) => <div className="vetocard" key={'sv' + i}>
                     <div className="vt">{s.name || s.symbol} <span className="chip exch">{s.symbol} · {s.exchange}</span> <span className="chip neg">SURVEILLANCE</span></div>
                     <div className="vr">Under exchange surveillance: <b>{s.reason}</b>. Never swing-traded — 100% margin, T2T settlement or tight circuits.</div>
@@ -1019,6 +1108,7 @@ export default function App() {
                     <div className="vt">{v.name} <span className="chip exch">{v.symbol} · {v.exchange}</span> <span className="chip neg">RED-FLAG DEMOTED</span></div>
                     <div className="vr">Excluded on fundamentals: {(v.flags || []).join(' · ') || 'Severe debt + shrinking earnings.'}</div>
                   </div>)}
+                  </div>
                 </section>}
               </aside>
             </div>

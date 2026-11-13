@@ -1,18 +1,63 @@
 import json, sys
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
+from app import auth as auth_mod
 from app import pipeline as pl
 from app import scan as scan_mod
 from app.allocate import allocate
 from app import backtest as backtest_mod
 
+class SessionGate(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        if not auth_mod.auth_enabled() or not path.startswith("/api/"):
+            return await call_next(request)
+        if path in ("/api/auth/login", "/api/auth/logout", "/api/auth/me", "/api/health"):
+            return await call_next(request)
+        if auth_mod.read_token(request.cookies.get(auth_mod.COOKIE, "")):
+            return await call_next(request)
+        return JSONResponse({"detail": "Sign in required"}, status_code=401)
+
 app = FastAPI(title="MarketMind Pro", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(SessionGate)
+
+class LoginIn(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/auth/login")
+def auth_login(body: LoginIn):
+    if auth_mod.too_many_attempts():
+        return JSONResponse({"ok": False, "error": "Too many attempts. Wait a few minutes."}, status_code=429)
+    if not auth_mod.verify(body.username, body.password):
+        auth_mod.note_failure()
+        return JSONResponse({"ok": False, "error": "Those details do not match."}, status_code=401)
+    response = JSONResponse({"ok": True, "username": auth_mod.load_account()["username"]})
+    response.set_cookie(
+        auth_mod.COOKIE, auth_mod.make_token(),
+        max_age=auth_mod.MAX_AGE, httponly=True, samesite="lax", path="/",
+    )
+    return response
+
+@app.post("/api/auth/logout")
+def auth_logout():
+    response = JSONResponse({"ok": True})
+    response.delete_cookie(auth_mod.COOKIE, path="/")
+    return response
+
+@app.get("/api/auth/me")
+def auth_me(request: Request):
+    if auth_mod.read_token(request.cookies.get(auth_mod.COOKIE, "")):
+        return {"ok": True, "username": auth_mod.load_account()["username"]}
+    return JSONResponse({"ok": False}, status_code=401)
 REPORTS = ROOT / "data" / "reports"
 
 @app.on_event("startup")
@@ -20,6 +65,8 @@ def _warm_price_panels():
     import threading
     from app import datafeed
     threading.Thread(target=datafeed.warm_panels, daemon=True).start()
+    from app import morning
+    threading.Thread(target=morning.loop, daemon=True).start()
 
 def _latest():
     from app import report_store
@@ -402,7 +449,7 @@ def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = 
     res = {}
     missing = []
     for s in symbols:
-        if s in _LIVE_CACHE and (now - _LIVE_CACHE[s]["ts"] < 60):
+        if s in _LIVE_CACHE and (now - _LIVE_CACHE[s]["ts"] < 20):
             res[s] = _LIVE_CACHE[s]["price"]
         else:
             missing.append(s)
@@ -411,12 +458,16 @@ def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = 
         return res
 
     sym_to_yh = _resolve_yahoo_map(missing, exchange_hints)
-    # Same bars as the chart. download_batch stops at the local panel once it
-    # has 20 rows, so a stale bhavcopy close was being returned as "live"
-    # while /api/prices appended the newer Yahoo session.
+    # Yahoo's last traded price. The daily bar is still yesterday's close until
+    # the exchange file lands, which is why the desk was showing a stale "LIVE".
     tickers = list(dict.fromkeys(yh for yh in (sym_to_yh.get(s) for s in missing) if yh))
     try:
-        frames = datafeed.with_latest_sessions(tickers)
+        live_px = datafeed.yahoo_last_prices(tickers)
+    except Exception:
+        live_px = {}
+    missed = [sym_to_yh[s] for s in missing if sym_to_yh.get(s) and sym_to_yh[s] not in live_px]
+    try:
+        frames = datafeed.with_latest_sessions(missed) if missed else {}
     except Exception:
         frames = {}
 
@@ -430,7 +481,9 @@ def get_live_quotes(symbols: list[str], exchange_hints: dict[str, str] | None = 
 
     for s in missing:
         yh = sym_to_yh.get(s)
-        chosen, _asof = _frame_last_close(frames.get(yh) if yh else None)
+        chosen = live_px.get(yh) if yh else None
+        if not chosen:
+            chosen, _asof = _frame_last_close(frames.get(yh) if yh else None)
         if not chosen:
             chosen = report_px.get(s)
         if chosen:
@@ -691,6 +744,133 @@ def post_budget(body: BudgetIn):
         pass
     return {"budget_inr": pl.get_budget()}
 
+# ---------- Alerts (NSE/BSE stops, targets, 15:20 IST review) ----------
+class AlertAddIn(BaseModel):
+    symbol: str
+    exchange: Optional[str] = "NSE"
+    type: str
+    price: Optional[float] = None
+    pct: Optional[float] = None
+    at: Optional[str] = None
+    note: Optional[str] = ""
+    entry_price: Optional[float] = None
+    direction: Optional[str] = None
+
+class AlertToggleIn(BaseModel):
+    id: str
+    enabled: bool = True
+
+class AlertResetIn(BaseModel):
+    id: Optional[str] = None
+
+def _alert_quotes(rules):
+    from app import alerts as alerts_mod
+    syms, hints = [], {}
+    for rule in rules:
+        if rule.get("type") in alerts_mod.NO_QUOTE:
+            continue
+        sym = (rule.get("symbol") or "").upper()
+        if sym and sym not in hints:
+            syms.append(sym)
+            hints[sym] = rule.get("exchange") or "NSE"
+    if not syms:
+        return {}
+    try:
+        return get_live_quotes(syms, hints)
+    except Exception:
+        return {}
+
+@app.get("/api/alerts")
+def alerts_get():
+    from app import alerts as alerts_mod
+    doc = alerts_mod.load_rules()
+    return alerts_mod.snapshot(_alert_quotes(doc["rules"]))
+
+@app.post("/api/alerts/sync")
+def alerts_sync():
+    from app import alerts as alerts_mod
+    report = _latest() or {}
+    alerts_mod.sync_from_picks(report.get("picks") or [])
+    doc = alerts_mod.load_rules()
+    return alerts_mod.snapshot(_alert_quotes(doc["rules"]))
+
+@app.post("/api/alerts/check")
+def alerts_check():
+    from app import alerts as alerts_mod
+    doc = alerts_mod.load_rules()
+    return alerts_mod.check(_alert_quotes(doc["rules"]))
+
+@app.post("/api/alerts/reset")
+def alerts_reset(body: AlertResetIn):
+    from app import alerts as alerts_mod
+    return alerts_mod.reset(body.id)
+
+@app.post("/api/alerts/add")
+def alerts_add(body: AlertAddIn):
+    from app import alerts as alerts_mod
+    return alerts_mod.add_rule(body.dict())
+
+@app.post("/api/alerts/toggle")
+def alerts_toggle(body: AlertToggleIn):
+    from app import alerts as alerts_mod
+    return alerts_mod.set_enabled(body.id, body.enabled)
+
+# ---------- Portfolio (saved for the morning email) ----------
+class HoldingIn(BaseModel):
+    symbol: str
+    exchange: Optional[str] = "NSE"
+    name: Optional[str] = ""
+    shares: Optional[float] = 0
+    buy: Optional[float] = 0
+    added: Optional[str] = ""
+    predicted: Optional[float] = None
+    target: Optional[float] = None
+    stop: Optional[float] = None
+
+class PortfolioIn(BaseModel):
+    holdings: List[HoldingIn] = []
+
+@app.get("/api/portfolio")
+def portfolio_get():
+    from app import mailer
+    return {"holdings": mailer.load_portfolio()}
+
+@app.post("/api/portfolio")
+def portfolio_save(body: PortfolioIn):
+    from app import mailer
+    return mailer.save_portfolio([h.dict() for h in body.holdings])
+
+# ---------- Mail (weekly picks report) ----------
+class MailIn(BaseModel):
+    to: Optional[str] = None
+    from_addr: Optional[str] = None
+    smtp_host: Optional[str] = None
+    smtp_port: Optional[int] = None
+    smtp_user: Optional[str] = None
+    smtp_password: Optional[str] = None
+    scan_start: Optional[str] = None
+    email_by: Optional[str] = None
+
+@app.get("/api/morning")
+def morning_status():
+    from app import morning
+    return morning.status()
+
+@app.get("/api/mail")
+def mail_get():
+    from app import mailer
+    return mailer.public_config()
+
+@app.post("/api/mail")
+def mail_save(body: MailIn):
+    from app import mailer
+    return mailer.save_config(body.dict(exclude_unset=True))
+
+@app.post("/api/mail/send")
+def mail_send(test: bool = False):
+    from app import mailer
+    return mailer.send_report(_latest() or {}, test=test)
+
 # ---------- Short-Term Quality Compounders Screener (On-Demand) ----------
 @app.get("/api/short-term/picks")
 def short_term_picks():
@@ -838,4 +1018,27 @@ def test_ai(body: AITestIn):
         return llm_client.test_ai_connection(body.provider, key, body.base_url, body.model)
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+# The Vite dev server proxies /api on port 5174. A Docker build has no dev
+# server, so when frontend/dist exists the same API process serves the site.
+_DIST = ROOT / "frontend" / "dist"
+_INDEX = _DIST / "index.html"
+if _INDEX.is_file():
+    from fastapi import HTTPException
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    _assets = _DIST / "assets"
+    if _assets.is_dir():
+        app.mount("/assets", StaticFiles(directory=_assets), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def frontend(full_path: str):
+        if full_path == "api" or full_path.startswith("api/"):
+            raise HTTPException(status_code=404)
+        candidate = (_DIST / full_path).resolve()
+        dist_root = _DIST.resolve()
+        if full_path and candidate.is_file() and dist_root in candidate.parents:
+            return FileResponse(candidate)
+        return FileResponse(_INDEX)
 

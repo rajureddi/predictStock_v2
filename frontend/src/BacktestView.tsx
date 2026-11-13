@@ -678,7 +678,7 @@ export function BacktestView() {
             </span>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tablewrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, textAlign: 'left' }}>
               <thead>
                 <tr style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)', color: 'var(--mut)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.3px' }}>

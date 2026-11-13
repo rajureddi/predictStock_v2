@@ -110,7 +110,7 @@ function OfflineScreen({ onOpenChart }: { onOpenChart: (symbol: string, exchange
       {!rows.length && !running ? <section className="panel emptystate" style={{ padding: 40, textAlign: 'center' }}>
         <p>No offline results yet. Press Run offline screen.</p>
       </section> : (
-        <section className="panel" style={{ overflow: 'auto' }}>
+        <section className="panel tablewrap">
           <table>
             <thead><tr>
               <th>#</th><th>Stock</th><th>Order</th><th>Conviction</th><th>Fund</th><th>Tech</th><th>Entry</th><th>Target 1</th><th>Stop</th><th>R:R</th>

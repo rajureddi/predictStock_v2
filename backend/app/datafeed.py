@@ -361,10 +361,66 @@ def with_latest_sessions(tickers):
     return frames
 
 
+def yahoo_last_prices(tickers):
+    """Last traded price from Yahoo Finance (regularMarketPrice).
+
+    Daily bhavcopy bars stay on the previous close until the official file is
+    published, so they are the wrong source while the market is open. This is
+    the same free Yahoo feed the history extender uses, read as a quote.
+    Returns {ticker: price}. Missing or blocked symbols are omitted.
+    """
+    import json
+    import urllib.parse
+    import urllib.request
+    from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError as FutTimeout
+
+    tickers = [t for t in dict.fromkeys(tickers or []) if t]
+    if not tickers:
+        return {}
+    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+
+    def one(ticker):
+        url = (
+            "https://query1.finance.yahoo.com/v8/finance/chart/"
+            + urllib.parse.quote(ticker, safe="")
+            + "?interval=1m&range=1d"
+        )
+        req = urllib.request.Request(url, headers={"User-Agent": ua, "Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            payload = json.loads(resp.read().decode("utf-8", "replace"))
+        result = (payload.get("chart") or {}).get("result") or []
+        if not result:
+            return ticker, None
+        px = (result[0].get("meta") or {}).get("regularMarketPrice")
+        if px is None:
+            return ticker, None
+        px = round(float(px), 2)
+        return ticker, px if px > 0 else None
+
+    out = {}
+    workers = min(6, len(tickers))
+    ex = ThreadPoolExecutor(max_workers=workers)
+    try:
+        futs = [ex.submit(one, t) for t in tickers]
+        try:
+            for fut in as_completed(futs, timeout=8):
+                try:
+                    ticker, px = fut.result()
+                except Exception:
+                    continue
+                if px:
+                    out[ticker] = px
+        except FutTimeout:
+            pass
+    finally:
+        ex.shutdown(wait=False, cancel_futures=True)
+    return out
+
+
 def history_series(ticker, days=90):
     """Recent OHLC rows for charts: [{date, open, high, low, close, volume}].
     The bhavcopy panel can lag the latest session; Yahoo fills only those newer bars.
-    The last close here is the same number live quotes return."""
+    The last close is the last completed daily bar, not the live print."""
     df = local_history(ticker)
     if df is None or len(df) < 5:
         df = download_one(ticker, period="1y")

@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ThinkingOrb } from 'thinking-orbs'
 import { ArrowsClockwise, Briefcase, CheckCircle, Plus, Trash, TrendDown, TrendUp } from '@phosphor-icons/react'
 import { C, Holding, inr, pct, useOrb } from './lib'
-import { FallingLeaves } from "falling-leaves/react"
-import SnowFall from "react-snowfall"
 const shades = () => ['#FF5E1A', '#2563EB', '#10B981', '#8B5CF6', '#06B6D4', '#F59E0B', '#EC4899', '#3B82F6', '#14B8A6', '#6366F1']
 
 function usePortfolioLiveQuotes(holdings: Holding[], picks: any[]) {
@@ -102,18 +100,6 @@ export default function Portfolio({ holdings, picks, onOpen, onRemove, onAddAll,
 
   return (<>
     <dl className="kpis panel">
-      <FallingLeaves
-        fullScreen
-        shapes={["maple"]}
-      />
-      <SnowFall
-        color="#87CEEB"
-        style={{
-          position: "fixed",
-          width: '200vh',
-          height: '200vh'
-        }}
-      ></SnowFall>
       <div>
         <dt>Invested</dt>
         <dd className="num">{inr(Math.round(invested))}</dd>

@@ -101,7 +101,7 @@ export default function SectorHeatmap() {
         : error && !data ? <section className="panel emptystate" style={{ padding: 40, textAlign: 'center' }}>
           <p>{error}</p><button className="btn dark" onClick={() => load(true)}>Retry</button>
         </section>
-        : <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10 }}>
+        : <section className="heat-grid">
           {sorted.map(r => {
             const v = r[metric]
             const picks = picksBySector[r.sector] || []
@@ -127,7 +127,7 @@ export default function SectorHeatmap() {
         {data.picks.map(p => {
           const row = rows.find(r => r.sector === p.sector_index)
           const against = row && (row.trend === 'Lagging')
-          return <div key={p.symbol} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--line)', fontSize: 13 }}>
+          return <div key={p.symbol} className="heat-pick">
             <span><b>{p.symbol}</b> <span className="mut">{p.name}</span></span>
             <span>
               {row ? <>{row.sector}: <b className={(row.rs_1m_pct ?? 0) >= 0 ? 'pos' : 'neg'}>{signed(row.rs_1m_pct)}</b> vs NIFTY · {against ? <b className="neg">Fighting a weak sector</b> : <b className="pos">Sector supports the trade</b>}</>
